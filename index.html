@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>🔐 Quản trị câu hỏi</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <!--excel-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- Thư viện tạo mã QR -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e8f0fe 0%, #d4e4f7 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a3a6b, #2a5298);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 14px;
+        }
+
+        .header .user-info .logout-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 13px;
+        }
+
+        .header .user-info .logout-btn:hover {
+            background: rgba(255,255,255,0.35);
+        }
+
+        .card {
+            background: white;
+            border-radius: 0 0 20px 20px;
+            padding: 30px 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Auth */
+        .auth-container {
+            padding: 20px 0;
+        }
+
+        .auth-form h2 {
+            text-align: center;
+            color: #1a3a6b;
+            margin-bottom: 20px;
+        }
+
+        .auth-form .form-group {
+            margin-bottom: 15px;
+        }
+
+        .auth-form .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .auth-form .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e7ef;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s;
+            background: #fafcfe;
+        }
+
+        .auth-form .form-group input:focus {
+            border-color: #2a5298;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(42, 82, 152, 0.12);
+        }
+
+        .btn-auth {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #1a3a6b, #2a5298);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-auth:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(26, 58, 107, 0.35);
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+        }
+
+        .auth-switch a {
+            color: #2a5298;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: underline;
+        }
+
+        .auth-switch a:hover {
+            color: #1a3a6b;
+        }
+
+        /* Admin Content */
+        .admin-content {
+            display: none;
+        }
+
+        .admin-content.active {
+            display: block;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #e8edf5;
+            color: #2a5298;
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #1a3a6b, #2a5298);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* QR */
+        .qr-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 0;
+        }
+
+        #qrcode {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            display: inline-block;
+        }
+
+        .qr-info {
+            margin-top: 15px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .qr-info .url-box {
+            background: #f0f4fa;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            word-break: break-all;
+            margin: 10px 0;
+            border: 1px dashed #b0c4de;
+        }
+
+        .qr-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .qr-actions button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-copy {
+            background: #e8edf5;
+            color: #1a3a6b;
+        }
+
+        .btn-copy:hover {
+            background: #d0dcee;
+        }
+
+        .btn-download {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-download:hover {
+            background: #219a52;
+        }
+
+        .print-hint {
+            font-size: 13px;
+            color: #888;
+            margin-top: 15px;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 12px;
+            border-left: 4px solid #2a5298;
+            text-align: left;
+        }
+
+        /* Admin Stats */
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .admin-stat-card {
+            background: #f0f6fe;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .admin-stat-card .number {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1a3a6b;
+        }
+
+        .admin-stat-card .label {
+            font-size: 13px;
+            color: #666;
+            margin-top: 3px;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .admin-actions button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-export {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-export:hover {
+            background: #219a52;
+        }
+
+        .btn-refresh {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-refresh:hover {
+            background: #2980b9;
+        }
+
+        .btn-clear {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background: #c0392b;
+        }
+
+        .admin-questions {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .admin-question-item {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            border-left: 4px solid #2a5298;
+            font-size: 14px;
+        }
+
+        .admin-question-item .meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px 15px;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .admin-question-item .meta .tag {
+            background: #e0e9f5;
+            padding: 0 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            color: #1a3a6b;
+        }
+
+        .admin-question-item .content {
+            color: #222;
+        }
+
+        .admin-question-item .delete-btn {
+            float: right;
+            background: none;
+            border: none;
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0 5px;
+        }
+
+        .admin-question-item .delete-btn:hover {
+            color: #c0392b;
+        }
+
+        .empty-admin {
+            text-align: center;
+            color: #999;
+            padding: 40px 0;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading-spinner .spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #e0e7ef;
+            border-top: 3px solid #2a5298;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1a3a6b;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 16px;
+            font-weight: 600;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: all 0.4s ease;
+            z-index: 999;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background: #27ae60;
+        }
+
+        .toast.error {
+            background: #e74c3c;
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 18px;
+            }
+            .header .user-info {
+                font-size: 12px;
+            }
+            .card {
+                padding: 20px 18px;
+            }
+            .tabs {
+                flex-direction: column;
+            }
+            .tab-btn {
+                width: 100%;
+                text-align: center;
+            }
+            .admin-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Quản trị</h1>
+            <div class="user-info" id="userInfo" style="display:none;">
+                <span id="userEmail">admin@email.com</span>
+                <button class="logout-btn" onclick="logout()">🚪 Đăng xuất</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <!-- Đăng nhập / Đăng ký -->
+            <div class="auth-container" id="authContainer">
+                <div class="auth-form" id="loginForm">
+                    <h2>🔐 Đăng nhập</h2>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="loginEmail" placeholder="admin@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Mật khẩu</label>
+                        <input type="password" id="loginPassword" placeholder="••••••••">
+                    </div>
+                    <button class="btn-auth" onclick="login()">Đăng nhập</button>
+                    <div class="auth-switch">
+                        Chưa có tài khoản? <a onclick="showRegister()">Đăng ký ngay</a>
+                    </div>
+                </div>
+
+                <div class="auth-form" id="registerForm" style="display:none;">
+                    <h2>📝 Đăng ký</h2>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="registerEmail" placeholder="admin@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Mật khẩu (tối thiểu 6 ký tự)</label>
+                        <input type="password" id="registerPassword" placeholder="••••••••">
+                    </div>
+                    <button class="btn-auth" onclick="register()">Đăng ký</button>
+                    <div class="auth-switch">
+                        Đã có tài khoản? <a onclick="showLogin()">Đăng nhập</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nội dung Admin -->
+            <div class="admin-content" id="adminContent">
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('tab-questions')">📊 Câu hỏi</button>
+                    <button class="tab-btn" onclick="switchTab('tab-qr')">📱 Tạo mã QR</button>
+                </div>
+
+                <!-- Tab 1: Câu hỏi -->
+                <div id="tab-questions" class="tab-content active">
+                    <div class="admin-stats">
+                        <div class="admin-stat-card">
+                            <div class="number" id="totalCount">0</div>
+                            <div class="label">📬 Tổng câu hỏi</div>
+                        </div>
+                        <div class="admin-stat-card">
+                            <div class="number" id="topField">—</div>
+                            <div class="label">📂 Lĩnh vực nhiều nhất</div>
+                        </div>
+                        <div class="admin-stat-card">
+                            <div class="number" id="topPerson">—</div>
+                            <div class="label">👤 Người gửi nhiều nhất</div>
+                        </div>
+                    </div>
+
+                    <div class="admin-actions">
+                        <button class="btn-export" onclick="exportSummary()">📨 Xuất tổng hợp</button>
+                        <button class="btn-refresh" onclick="loadQuestions()">🔄 Làm mới</button>
+                        <button class="btn-clear" onclick="clearAll()">🗑️ Xóa tất cả</button>
+                    </div>
+
+                    <div class="admin-questions" id="adminQuestions">
+                        <div class="empty-admin">📭 Chưa có câu hỏi nào</div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Tạo QR -->
+                <div id="tab-qr" class="tab-content">
+                    <h3 style="color:#1a3a6b; margin-bottom:15px;">📱 Tạo mã QR</h3>
+                    <p style="color:#666; margin-bottom:20px;">
+                        Tạo mã QR để người dân quét và gửi câu hỏi.
+                    </p>
+
+                    <div class="qr-container">
+                        <div id="qrcode"></div>
+                        <div class="qr-info">
+                            <p><strong>🔗 Link:</strong></p>
+                            <div class="url-box" id="pageUrl">Đang tải...</div>
+                            <div class="qr-actions">
+                                <button class="btn-copy" onclick="copyUrl()">📋 Sao chép</button>
+                                <button class="btn-download" onclick="downloadQR()">⬇️ Tải mã QR</button>
+                            </div>
+                            <div class="print-hint">
+                                💡 In mã QR này và dán tại các điểm tiếp dân.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // ========== FIREBASE CONFIG ==========
+        const firebaseConfig = {
+  apiKey: "AIzaSyCAn-dCRdVkbYZYuh_wWWKPe2-5_meQuBA",
+  authDomain: "hoidap-ff5ed.firebaseapp.com",
+  databaseURL: "https://hoidap-ff5ed-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "hoidap-ff5ed",
+  storageBucket: "hoidap-ff5ed.firebasestorage.app",
+  messagingSenderId: "747872918560",
+  appId: "1:747872918560:web:f9f0d5073d083a46e03045"
+};
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        // ========== DOM REFS ==========
+        const authContainer = document.getElementById('authContainer');
+        const adminContent = document.getElementById('adminContent');
+        const userInfo = document.getElementById('userInfo');
+        const userEmail = document.getElementById('userEmail');
+
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const loginEmail = document.getElementById('loginEmail');
+        const loginPassword = document.getElementById('loginPassword');
+        const registerEmail = document.getElementById('registerEmail');
+        const registerPassword = document.getElementById('registerPassword');
+
+        const totalCount = document.getElementById('totalCount');
+        const topField = document.getElementById('topField');
+        const topPerson = document.getElementById('topPerson');
+        const adminQuestions = document.getElementById('adminQuestions');
+        const toast = document.getElementById('toast');
+
+        let currentUser = null;
+        let toastTimeout = null;
+        let qrCodeInstance = null;
+
+        // ========== AUTH ==========
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                currentUser = user;
+                userEmail.textContent = user.email;
+                userInfo.style.display = 'flex';
+                authContainer.style.display = 'none';
+                adminContent.classList.add('active');
+                
+                loadQuestions();
+                generateQR();
+                updateUrlDisplay();
+                showToast('✅ Đã đăng nhập!', 'success');
+            } else {
+                currentUser = null;
+                userInfo.style.display = 'none';
+                authContainer.style.display = 'block';
+                adminContent.classList.remove('active');
+            }
+        });
+
+        function login() {
+            const email = loginEmail.value.trim();
+            const password = loginPassword.value.trim();
+            
+            if (!email || !password) {
+                showToast('⚠️ Vui lòng nhập email và mật khẩu!', 'error');
+                return;
+            }
+
+            auth.signInWithEmailAndPassword(email, password)
+                .then(() => {
+                    showToast('✅ Đăng nhập thành công!', 'success');
+                    loginEmail.value = '';
+                    loginPassword.value = '';
+                })
+                .catch(error => {
+                    showToast('❌ ' + error.message, 'error');
+                });
+        }
+
+        function register() {
+            const email = registerEmail.value.trim();
+            const password = registerPassword.value.trim();
+
+            if (!email || !password) {
+                showToast('⚠️ Vui lòng nhập email và mật khẩu!', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                showToast('⚠️ Mật khẩu tối thiểu 6 ký tự!', 'error');
+                return;
+            }
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(() => {
+                    showToast('✅ Đăng ký thành công!', 'success');
+                    registerEmail.value = '';
+                    registerPassword.value = '';
+                })
+                .catch(error => {
+                    showToast('❌ ' + error.message, 'error');
+                });
+        }
+
+        function logout() {
+            auth.signOut().then(() => {
+                showToast('👋 Đã đăng xuất!', 'success');
+            });
+        }
+
+        function showRegister() {
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+        }
+
+        function showLogin() {
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+        }
+
+        // ========== TABS ==========
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(tabId)) {
+                    btn.classList.add('active');
+                }
+            });
+
+            if (tabId === 'tab-qr') {
+                setTimeout(() => {
+                    if (!document.getElementById('qrcode').innerHTML) {
+                        generateQR();
+                    }
+                }, 100);
+            }
+        }
+
+        // ========== QR CODE ==========
+        function generateQR() {
+            const url = window.location.href.split('?')[0];
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = '';
+            try {
+                qrCodeInstance = new QRCode(qrContainer, {
+                    text: url.replace('/admin.html', '/index.html'),
+                    width: 220,
+                    height: 220,
+                    colorDark: '#1a3a6b',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            } catch (e) {
+                qrContainer.innerHTML = '<p style="color:red;">⚠️ Lỗi tạo mã QR.</p>';
+            }
+        }
+
+        function updateUrlDisplay() {
+            const url = window.location.href.split('?')[0];
+            document.getElementById('pageUrl').textContent = url.replace('/admin.html', '/index.html');
+        }
+
+        function copyUrl() {
+            const url = window.location.href.split('?')[0].replace('/admin.html', '/index.html');
+            navigator.clipboard.writeText(url).then(() => {
+                showToast('✅ Đã sao chép link!', 'success');
+            }).catch(() => {
+                const input = document.createElement('input');
+                input.value = url;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+                showToast('✅ Đã sao chép link!', 'success');
+            });
+        }
+
+        function downloadQR() {
+            const qrContainer = document.getElementById('qrcode');
+            const canvas = qrContainer.querySelector('canvas');
+            const img = qrContainer.querySelector('img');
+
+            if (canvas) {
+                const link = document.createElement('a');
+                link.download = 'ma_qr.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                showToast('⬇️ Đã tải mã QR!', 'success');
+            } else if (img) {
+                const link = document.createElement('a');
+                link.download = 'ma_qr.png';
+                link.href = img.src;
+                link.click();
+                showToast('⬇️ Đã tải mã QR!', 'success');
+            } else {
+                showToast('⚠️ Không thể tải mã QR.', 'error');
+            }
+        }
+
+        // ========== LOAD QUESTIONS ==========
+        function loadQuestions() {
+            if (!currentUser) return;
+
+            adminQuestions.innerHTML = `
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p style="margin-top:10px; color:#666;">Đang tải...</p>
+                </div>
+            `;
+
+            const ref = database.ref('questions/public');
+            ref.on('value', snapshot => {
+                const data = snapshot.val();
+                renderQuestions(data);
+            });
+        }
+
+        function renderQuestions(data) {
+            if (!data) {
+                adminQuestions.innerHTML = '<div class="empty-admin">📭 Chưa có câu hỏi nào</div>';
+                totalCount.textContent = '0';
+                topField.textContent = '—';
+                topPerson.textContent = '—';
+                return;
+            }
+
+            const questionsArray = Object.keys(data).map(key => ({
+                id: key,
+                ...data[key]
+            }));
+
+            questionsArray.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+            totalCount.textContent = questionsArray.length;
+
+            const fieldCount = {};
+            const nameCount = {};
+            questionsArray.forEach(q => {
+                fieldCount[q.field] = (fieldCount[q.field] || 0) + 1;
+                nameCount[q.fullName] = (nameCount[q.fullName] || 0) + 1;
+            });
+
+            let topF = '—', topFVal = 0;
+            for (const [f, count] of Object.entries(fieldCount)) {
+                if (count > topFVal) {
+                    topFVal = count;
+                    topF = f + ` (${count})`;
+                }
+            }
+
+            let topP = '—', topPVal = 0;
+            for (const [name, count] of Object.entries(nameCount)) {
+                if (count > topPVal) {
+                    topPVal = count;
+                    topP = name + ` (${count})`;
+                }
+            }
+
+            topField.textContent = topF;
+            topPerson.textContent = topP;
+
+            let html = '';
+            questionsArray.forEach(q => {
+                html += `
+                    <div class="admin-question-item">
+                        <button class="delete-btn" onclick="deleteQuestion('${q.id}')" title="Xóa">✕</button>
+                        <div class="meta">
+                            <span>👤 ${escapeHtml(q.fullName)}</span>
+                            <span>📞 ${escapeHtml(q.phone)}</span>
+                            <span class="tag">${escapeHtml(q.field)}</span>
+                            <span style="color:#999;">🕐 ${escapeHtml(q.created)}</span>
+                        </div>
+                        <div class="content">${escapeHtml(q.question)}</div>
+                    </div>
+                `;
+            });
+            adminQuestions.innerHTML = html;
+        }
+
+        // ========== DELETE ==========
+        function deleteQuestion(id) {
+            if (!confirm('Xóa câu hỏi này?')) return;
+            
+            const ref = database.ref(`questions/public/${id}`);
+            ref.remove()
+                .then(() => {
+                    showToast('🗑️ Đã xóa câu hỏi!', 'success');
+                })
+                .catch(error => {
+                    showToast('❌ ' + error.message, 'error');
+                });
+        }
+
+        // ========== EXPORT ==========
+        function exportSummary() {
+    if (!currentUser) {
+        showToast('⚠️ Vui lòng đăng nhập!', 'error');
+        return;
+    }
+
+    const ref = database.ref('questions/public');
+    ref.once('value', snapshot => {
+        const data = snapshot.val();
+        if (!data) {
+            showToast('⚠️ Chưa có câu hỏi để xuất!', 'error');
+            return;
+        }
+
+        const questionsArray = Object.keys(data).map(key => ({
+            id: key,
+            ...data[key]
+        }));
+
+        // Sắp xếp theo thời gian
+        questionsArray.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+        // ========== SHEET 1: DANH SÁCH CÂU HỎI ==========
+        const mainData = [
+            ['STT', 'Họ và tên', 'Số điện thoại', 'Địa chỉ', 'Khu vực', 'Lĩnh vực', 'Nội dung câu hỏi', 'Thời gian gửi']
+        ];
+
+        questionsArray.forEach((q, index) => {
+            mainData.push([
+                index + 1,
+                q.fullName || '',
+                q.phone || '',
+                q.address || '',
+                q.area || '',  // ← Thêm cột Khu vực
+                q.field || '',
+                q.question || '',
+                q.created || ''
+            ]);
+        });
+
+        // ========== SHEET 2: THỐNG KÊ ==========
+        const fieldStats = {};
+        const areaStats = {};
+        questionsArray.forEach(q => {
+            fieldStats[q.field] = (fieldStats[q.field] || 0) + 1;
+            if (q.area && q.area.trim() !== '') {
+                areaStats[q.area] = (areaStats[q.area] || 0) + 1;
+            }
+        });
+
+        const total = questionsArray.length;
+
+        const statData = [
+            ['📊 THỐNG KÊ CÂU HỎI'],
+            [],
+            ['1. THỐNG KÊ THEO LĨNH VỰC'],
+            ['Lĩnh vực', 'Số lượng', 'Tỷ lệ (%)']
+        ];
+
+        for (const [f, count] of Object.entries(fieldStats)) {
+            const percent = ((count / total) * 100).toFixed(1);
+            statData.push([f, count, percent]);
+        }
+
+        // Thêm thống kê khu vực
+        if (Object.keys(areaStats).length > 0) {
+            statData.push([]);
+            statData.push(['2. THỐNG KÊ THEO KHU VỰC']);
+            statData.push(['Khu vực', 'Số lượng', 'Tỷ lệ (%)']);
+            for (const [area, count] of Object.entries(areaStats)) {
+                const percent = ((count / total) * 100).toFixed(1);
+                statData.push([area, count, percent]);
+            }
+        }
+
+        statData.push([]);
+        statData.push(['📅 Thời gian xuất:', new Date().toLocaleString('vi-VN')]);
+        statData.push(['📬 Tổng số câu hỏi:', total]);
+
+        // ========== TẠO WORKBOOK ==========
+        const wb = XLSX.utils.book_new();
+
+        // Sheet 1: Câu hỏi
+        const ws1 = XLSX.utils.aoa_to_sheet(mainData);
+        ws1['!cols'] = [
+            { wch: 6 },   // STT
+            { wch: 22 },  // Họ tên
+            { wch: 18 },  // SĐT
+            { wch: 30 },  // Địa chỉ
+            { wch: 15 },  // Khu vực ← Thêm cột
+            { wch: 20 },  // Lĩnh vực
+            { wch: 50 },  // Nội dung
+            { wch: 22 }   // Thời gian
+        ];
+        XLSX.utils.book_append_sheet(wb, ws1, 'Câu hỏi');
+
+        // Sheet 2: Thống kê
+        const ws2 = XLSX.utils.aoa_to_sheet(statData);
+        ws2['!cols'] = [
+            { wch: 30 }, 
+            { wch: 15 }, 
+            { wch: 15 }
+        ];
+        XLSX.utils.book_append_sheet(wb, ws2, 'Thống kê');
+
+        // ========== XUẤT FILE ==========
+        const filename = `tong_hop_cau_hoi_${new Date().toISOString().slice(0,10)}.xlsx`;
+        XLSX.writeFile(wb, filename);
+
+        showToast('📨 Đã xuất file Excel!', 'success');
+    });
+}
+
+
+        // ========== CLEAR ALL ==========
+        function clearAll() {
+            if (!confirm('⚠️ Xóa TẤT CẢ câu hỏi?')) return;
+
+            const ref = database.ref('questions/public');
+            ref.remove()
+                .then(() => {
+                    showToast('🗑️ Đã xóa tất cả.', 'success');
+                })
+                .catch(error => {
+                    showToast('❌ ' + error.message, 'error');
+                });
+        }
+
+        // ========== HELPERS ==========
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+        function showToast(message, type = 'success') {
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // ========== ENTER KEY ==========
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                if (loginForm.style.display !== 'none' && document.activeElement === loginPassword) {
+                    login();
+                }
+                if (registerForm.style.display !== 'none' && document.activeElement === registerPassword) {
+                    register();
+                }
+            }
+        });
+
+        console.log('🔐 Trang quản trị sẵn sàng!');
+    </script>
+</body>
+</html>
