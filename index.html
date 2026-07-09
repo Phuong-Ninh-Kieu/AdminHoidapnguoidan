@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>📋 Gửi câu hỏi đến cơ quan</title>
+    <title>🔐 Quản trị câu hỏi</title>
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    
+    <!--excel-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
     <!-- Thư viện tạo mã QR -->
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     
@@ -31,20 +33,21 @@
         }
 
         .container {
-            max-width: 700px;
+            max-width: 900px;
             width: 100%;
             margin: 0 auto;
         }
 
-        /* Header */
         .header {
             background: linear-gradient(135deg, #1a3a6b, #2a5298);
             color: white;
             padding: 20px 25px;
             border-radius: 20px 20px 0 0;
-            box-shadow: 0 4px 20px rgba(26, 58, 107, 0.3);
-            text-align: center;
-            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .header h1 {
@@ -52,63 +55,31 @@
             font-weight: 700;
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 10px;
-        }
-
-        .header p {
-            font-size: 14px;
-            opacity: 0.85;
-            margin-top: 5px;
-        }
-
-        .header .admin-link {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 12px;
-        }
-
-        .header .admin-link a {
-            color: rgba(255,255,255,0.7);
-            text-decoration: none;
-            padding: 4px 12px;
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 20px;
-            transition: 0.3s;
-        }
-
-        .header .admin-link a:hover {
-            background: rgba(255,255,255,0.15);
-            color: white;
         }
 
         .header .user-info {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 13px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
+            font-size: 14px;
         }
 
         .header .user-info .logout-btn {
             background: rgba(255,255,255,0.2);
             border: none;
             color: white;
-            padding: 5px 14px;
+            padding: 6px 16px;
             border-radius: 20px;
             cursor: pointer;
-            font-size: 12px;
             transition: 0.3s;
+            font-size: 13px;
         }
 
         .header .user-info .logout-btn:hover {
             background: rgba(255,255,255,0.35);
         }
 
-        /* Card */
         .card {
             background: white;
             border-radius: 0 0 20px 20px;
@@ -116,12 +87,22 @@
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
         }
 
-        /* Form */
-        .form-group {
-            margin-bottom: 18px;
+        /* Auth */
+        .auth-container {
+            padding: 20px 0;
         }
 
-        .form-group label {
+        .auth-form h2 {
+            text-align: center;
+            color: #1a3a6b;
+            margin-bottom: 20px;
+        }
+
+        .auth-form .form-group {
+            margin-bottom: 15px;
+        }
+
+        .auth-form .form-group label {
             display: block;
             font-weight: 600;
             font-size: 14px;
@@ -129,14 +110,7 @@
             margin-bottom: 5px;
         }
 
-        .form-group label .required {
-            color: #e74c3c;
-            margin-left: 3px;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
+        .auth-form .form-group input {
             width: 100%;
             padding: 12px 16px;
             border: 2px solid #e0e7ef;
@@ -146,183 +120,13 @@
             background: #fafcfe;
         }
 
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
+        .auth-form .form-group input:focus {
             border-color: #2a5298;
             outline: none;
             box-shadow: 0 0 0 4px rgba(42, 82, 152, 0.12);
-            background: white;
         }
 
-        .form-group textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #1a3a6b, #2a5298);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            font-size: 18px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 6px 25px rgba(26, 58, 107, 0.35);
-            margin-top: 10px;
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(26, 58, 107, 0.45);
-        }
-
-        .btn-submit:active {
-            transform: translateY(0);
-        }
-
-        .btn-submit:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Toast */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #1a3a6b;
-            color: white;
-            padding: 14px 28px;
-            border-radius: 16px;
-            font-weight: 600;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            opacity: 0;
-            transition: all 0.4s ease;
-            z-index: 999;
-            max-width: 90%;
-            text-align: center;
-        }
-
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-
-        .toast.success {
-            background: #27ae60;
-        }
-
-        .toast.error {
-            background: #e74c3c;
-        }
-
-        /* Success screen */
-        .success-screen {
-            display: none;
-            text-align: center;
-            padding: 30px 20px;
-        }
-
-        .success-screen .icon {
-            font-size: 70px;
-            display: block;
-            margin-bottom: 15px;
-        }
-
-        .success-screen h2 {
-            color: #1a3a6b;
-            margin-bottom: 10px;
-        }
-
-        .success-screen p {
-            color: #555;
-            line-height: 1.6;
-        }
-
-        .btn-new {
-            background: #e8edf5;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 50px;
-            font-weight: 600;
-            color: #1a3a6b;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 15px;
-            font-size: 15px;
-        }
-
-        .btn-new:hover {
-            background: #d0dcee;
-        }
-
-        /* Auth Forms (cho admin) */
-        .auth-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .auth-overlay.active {
-            display: flex;
-        }
-
-        .auth-modal {
-            background: white;
-            padding: 35px 30px;
-            border-radius: 24px;
-            max-width: 420px;
-            width: 90%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            position: relative;
-        }
-
-        .auth-modal .close-btn {
-            position: absolute;
-            top: 12px;
-            right: 18px;
-            font-size: 24px;
-            cursor: pointer;
-            color: #999;
-            background: none;
-            border: none;
-        }
-
-        .auth-modal .close-btn:hover {
-            color: #333;
-        }
-
-        .auth-form h2 {
-            text-align: center;
-            color: #1a3a6b;
-            margin-bottom: 20px;
-            font-size: 22px;
-        }
-
-        .auth-form .form-group {
-            margin-bottom: 15px;
-        }
-
-        .auth-form .btn-auth {
+        .btn-auth {
             width: 100%;
             padding: 14px;
             background: linear-gradient(135deg, #1a3a6b, #2a5298);
@@ -335,7 +139,7 @@
             transition: 0.3s;
         }
 
-        .auth-form .btn-auth:hover {
+        .btn-auth:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 25px rgba(26, 58, 107, 0.35);
         }
@@ -357,36 +161,137 @@
             color: #1a3a6b;
         }
 
-        /* Admin Panel (hiện sau khi đăng nhập) */
-        .admin-panel {
+        /* Admin Content */
+        .admin-content {
             display: none;
-            margin-top: 25px;
-            border-top: 2px solid #e8edf5;
-            padding-top: 25px;
         }
 
-        .admin-panel.active {
+        .admin-content.active {
             display: block;
         }
 
-        .admin-header {
+        /* Tabs */
+        .tabs {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
-            margin-bottom: 15px;
         }
 
-        .admin-header h3 {
-            color: #1a3a6b;
-            font-size: 20px;
+        .tab-btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #e8edf5;
+            color: #2a5298;
         }
 
-        .admin-header .user-email {
+        .tab-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #1a3a6b, #2a5298);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* QR */
+        .qr-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 0;
+        }
+
+        #qrcode {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            display: inline-block;
+        }
+
+        .qr-info {
+            margin-top: 15px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .qr-info .url-box {
+            background: #f0f4fa;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            word-break: break-all;
+            margin: 10px 0;
+            border: 1px dashed #b0c4de;
+        }
+
+        .qr-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .qr-actions button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
             font-size: 14px;
-            color: #666;
         }
 
+        .btn-copy {
+            background: #e8edf5;
+            color: #1a3a6b;
+        }
+
+        .btn-copy:hover {
+            background: #d0dcee;
+        }
+
+        .btn-download {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-download:hover {
+            background: #219a52;
+        }
+
+        .print-hint {
+            font-size: 13px;
+            color: #888;
+            margin-top: 15px;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 12px;
+            border-left: 4px solid #2a5298;
+            text-align: left;
+        }
+
+        /* Admin Stats */
         .admin-stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -532,341 +437,191 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* QR Code Section */
-        .qr-section {
-            display: none;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 2px solid #e8edf5;
-        }
-
-        .qr-section.active {
-            display: block;
-        }
-
-        .qr-section h3 {
-            color: #1a3a6b;
-            margin-bottom: 10px;
-        }
-
-        .qr-section .qr-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 10px 0;
-        }
-
-        #qrcode {
-            background: white;
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            display: inline-block;
-        }
-
-        #qrcode img {
-            display: block;
-        }
-
-        .qr-info {
-            margin-top: 15px;
-            text-align: center;
-            color: #555;
-            width: 100%;
-        }
-
-        .qr-info .url-box {
-            background: #f0f4fa;
-            padding: 10px 18px;
-            border-radius: 10px;
-            font-size: 13px;
-            word-break: break-all;
-            margin: 10px 0;
-            border: 1px dashed #b0c4de;
-        }
-
-        .qr-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-top: 10px;
-        }
-
-        .qr-actions button {
-            padding: 8px 20px;
-            border: none;
-            border-radius: 30px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
-            font-size: 14px;
-        }
-
-        .btn-copy {
-            background: #e8edf5;
-            color: #1a3a6b;
-        }
-
-        .btn-copy:hover {
-            background: #d0dcee;
-        }
-
-        .btn-download {
-            background: #27ae60;
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1a3a6b;
             color: white;
+            padding: 14px 28px;
+            border-radius: 16px;
+            font-weight: 600;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: all 0.4s ease;
+            z-index: 999;
+            max-width: 90%;
+            text-align: center;
         }
 
-        .btn-download:hover {
-            background: #219a52;
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
         }
 
-        .print-hint {
-            font-size: 13px;
-            color: #888;
-            margin-top: 15px;
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 12px;
-            border-left: 4px solid #2a5298;
-            text-align: left;
+        .toast.success {
+            background: #27ae60;
         }
 
-        /* Responsive */
+        .toast.error {
+            background: #e74c3c;
+        }
+
         @media (max-width: 480px) {
-            .form-row {
-                grid-template-columns: 1fr;
-                gap: 0;
-            }
-
             .header h1 {
                 font-size: 18px;
             }
-            .header .admin-link {
-                position: static;
-                margin-top: 10px;
-            }
             .header .user-info {
-                position: static;
-                margin-top: 10px;
-                justify-content: center;
+                font-size: 12px;
             }
             .card {
                 padding: 20px 18px;
             }
-            .toast {
-                font-size: 14px;
-                padding: 12px 20px;
-                bottom: 20px;
+            .tabs {
+                flex-direction: column;
+            }
+            .tab-btn {
+                width: 100%;
+                text-align: center;
             }
             .admin-stats {
                 grid-template-columns: 1fr 1fr;
-            }
-            .auth-modal {
-                padding: 25px 20px;
-            }
-            #qrcode {
-                padding: 10px;
-            }
-            #qrcode canvas,
-            #qrcode img {
-                width: 180px !important;
-                height: 180px !important;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
-        <div class="header" id="appHeader">
-            <h1>📋 Gửi câu hỏi</h1>
-            <p>Điền thông tin để gửi câu hỏi đến cơ quan chức năng</p>
-            <div class="admin-link">
-                <a href="#" onclick="openAdminLogin()">🔐 Quản trị</a>
-            </div>
+        <div class="header">
+            <h1>🔐 Quản trị</h1>
             <div class="user-info" id="userInfo" style="display:none;">
                 <span id="userEmail">admin@email.com</span>
                 <button class="logout-btn" onclick="logout()">🚪 Đăng xuất</button>
             </div>
         </div>
 
-        <!-- Card -->
-        <div class="card" id="mainCard">
-            <!-- Form người dân (luôn hiện) -->
-            <form id="questionForm">
-                <div class="form-row">
+        <div class="card">
+            <!-- Đăng nhập / Đăng ký -->
+            <div class="auth-container" id="authContainer">
+                <div class="auth-form" id="loginForm">
+                    <h2>🔐 Đăng nhập</h2>
                     <div class="form-group">
-                        <label>Họ và tên <span class="required">*</span></label>
-                        <input type="text" id="fullName" placeholder="Nguyễn Văn A" required>
+                        <label>Email</label>
+                        <input type="email" id="loginEmail" placeholder="admin@example.com">
                     </div>
                     <div class="form-group">
-                        <label>Số điện thoại <span class="required">*</span></label>
-                        <input type="tel" id="phone" placeholder="090 123 4567" required>
+                        <label>Mật khẩu</label>
+                        <input type="password" id="loginPassword" placeholder="••••••••">
+                    </div>
+                    <button class="btn-auth" onclick="login()">Đăng nhập</button>
+                    <div class="auth-switch">
+                        Chưa có tài khoản? <a onclick="showRegister()">Đăng ký ngay</a>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Địa chỉ <span class="required">*</span></label>
-                    <input type="text" id="address" placeholder="Số nhà, đường, phường/xã, tỉnh/thành" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Lĩnh vực cần hỏi <span class="required">*</span></label>
-                    <select id="field" required>
-                        <option value="">-- Chọn lĩnh vực --</option>
-                        <option value="Đất đai, nhà ở">Đất đai, nhà ở</option>
-                        <option value="Giao thông, xây dựng">Giao thông, xây dựng</option>
-                        <option value="Môi trường, vệ sinh">Môi trường, vệ sinh</option>
-                        <option value="Y tế, sức khỏe">Y tế, sức khỏe</option>
-                        <option value="Giáo dục, đào tạo">Giáo dục, đào tạo</option>
-                        <option value="Pháp lý, tư pháp">Pháp lý, tư pháp</option>
-                        <option value="An ninh, trật tự">An ninh, trật tự</option>
-                        <option value="Thủ tục hành chính">Thủ tục hành chính</option>
-                        <option value="Khác">Khác</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Nội dung câu hỏi <span class="required">*</span></label>
-                    <textarea id="question" placeholder="Nhập chi tiết câu hỏi của bạn..." required></textarea>
-                </div>
-
-                <button type="submit" class="btn-submit" id="submitBtn">📤 Gửi câu hỏi</button>
-            </form>
-
-            <div class="success-screen" id="successScreen">
-                <span class="icon">✅</span>
-                <h2>Gửi câu hỏi thành công!</h2>
-                <p>Câu hỏi của bạn đã được gửi đến cơ quan chức năng.<br>Chúng tôi sẽ phản hồi trong thời gian sớm nhất.</p>
-                <button class="btn-new" onclick="resetForm()">📝 Gửi câu hỏi mới</button>
-            </div>
-
-            <!-- QR Code Section (hiện cho admin) -->
-            <div class="qr-section" id="qrSection">
-                <h3>📱 Tạo mã QR</h3>
-                <p style="color:#666; margin-bottom:15px; font-size:14px;">
-                    Tạo mã QR để người dân quét và gửi câu hỏi. Giống như quét mã điểm danh vậy!
-                </p>
-                <div class="qr-container">
-                    <div id="qrcode"></div>
-                    <div class="qr-info">
-                        <p><strong>🔗 Link truy cập:</strong></p>
-                        <div class="url-box" id="pageUrl">Đang tải...</div>
-                        <div class="qr-actions">
-                            <button class="btn-copy" onclick="copyUrl()">📋 Sao chép link</button>
-                            <button class="btn-download" onclick="downloadQR()">⬇️ Tải mã QR</button>
-                        </div>
-                        <div class="print-hint">
-                            💡 <strong>Hướng dẫn:</strong> In mã QR này và dán tại các điểm tiếp dân, 
-                            khu dân cư. Người dân quét mã sẽ đến form gửi câu hỏi.
-                        </div>
+                <div class="auth-form" id="registerForm" style="display:none;">
+                    <h2>📝 Đăng ký</h2>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="registerEmail" placeholder="admin@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Mật khẩu (tối thiểu 6 ký tự)</label>
+                        <input type="password" id="registerPassword" placeholder="••••••••">
+                    </div>
+                    <button class="btn-auth" onclick="register()">Đăng ký</button>
+                    <div class="auth-switch">
+                        Đã có tài khoản? <a onclick="showLogin()">Đăng nhập</a>
                     </div>
                 </div>
             </div>
 
-            <!-- Admin Panel (hiện sau khi đăng nhập) -->
-            <div class="admin-panel" id="adminPanel">
-                <div class="admin-header">
-                    <h3>📊 Quản trị câu hỏi</h3>
-                    <span class="user-email" id="adminEmailDisplay">admin@email.com</span>
+            <!-- Nội dung Admin -->
+            <div class="admin-content" id="adminContent">
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('tab-questions')">📊 Câu hỏi</button>
+                    <button class="tab-btn" onclick="switchTab('tab-qr')">📱 Tạo mã QR</button>
                 </div>
-                
-                <div class="admin-stats">
-                    <div class="admin-stat-card">
-                        <div class="number" id="totalCount">0</div>
-                        <div class="label">📬 Tổng câu hỏi</div>
+
+                <!-- Tab 1: Câu hỏi -->
+                <div id="tab-questions" class="tab-content active">
+                    <div class="admin-stats">
+                        <div class="admin-stat-card">
+                            <div class="number" id="totalCount">0</div>
+                            <div class="label">📬 Tổng câu hỏi</div>
+                        </div>
+                        <div class="admin-stat-card">
+                            <div class="number" id="topField">—</div>
+                            <div class="label">📂 Lĩnh vực nhiều nhất</div>
+                        </div>
+                        <div class="admin-stat-card">
+                            <div class="number" id="topPerson">—</div>
+                            <div class="label">👤 Người gửi nhiều nhất</div>
+                        </div>
                     </div>
-                    <div class="admin-stat-card">
-                        <div class="number" id="topField">—</div>
-                        <div class="label">📂 Lĩnh vực nhiều nhất</div>
+
+                    <div class="admin-actions">
+                        <button class="btn-export" onclick="exportSummary()">📨 Xuất tổng hợp</button>
+                        <button class="btn-refresh" onclick="loadQuestions()">🔄 Làm mới</button>
+                        <button class="btn-clear" onclick="clearAll()">🗑️ Xóa tất cả</button>
                     </div>
-                    <div class="admin-stat-card">
-                        <div class="number" id="topPerson">—</div>
-                        <div class="label">👤 Người gửi nhiều nhất</div>
+
+                    <div class="admin-questions" id="adminQuestions">
+                        <div class="empty-admin">📭 Chưa có câu hỏi nào</div>
                     </div>
                 </div>
 
-                <div class="admin-actions">
-                    <button class="btn-export" onclick="exportSummary()">📨 Xuất tổng hợp</button>
-                    <button class="btn-refresh" onclick="loadQuestions()">🔄 Làm mới</button>
-                    <button class="btn-clear" onclick="clearAll()">🗑️ Xóa tất cả</button>
-                </div>
+                <!-- Tab 2: Tạo QR -->
+                <div id="tab-qr" class="tab-content">
+                    <h3 style="color:#1a3a6b; margin-bottom:15px;">📱 Tạo mã QR</h3>
+                    <p style="color:#666; margin-bottom:20px;">
+                        Tạo mã QR để người dân quét và gửi câu hỏi.
+                    </p>
 
-                <div class="admin-questions" id="adminQuestions">
-                    <div class="empty-admin">📭 Chưa có câu hỏi nào</div>
+                    <div class="qr-container">
+                        <div id="qrcode"></div>
+                        <div class="qr-info">
+                            <p><strong>🔗 Link:</strong></p>
+                            <div class="url-box" id="pageUrl">Đang tải...</div>
+                            <div class="qr-actions">
+                                <button class="btn-copy" onclick="copyUrl()">📋 Sao chép</button>
+                                <button class="btn-download" onclick="downloadQR()">⬇️ Tải mã QR</button>
+                            </div>
+                            <div class="print-hint">
+                                💡 In mã QR này và dán tại các điểm tiếp dân.
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Auth Modal (đăng nhập admin) -->
-    <div class="auth-overlay" id="authOverlay">
-        <div class="auth-modal">
-            <button class="close-btn" onclick="closeAdminLogin()">✕</button>
-            <div class="auth-form" id="loginForm">
-                <h2>🔐 Đăng nhập quản trị</h2>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="loginEmail" placeholder="admin@example.com">
-                </div>
-                <div class="form-group">
-                    <label>Mật khẩu</label>
-                    <input type="password" id="loginPassword" placeholder="••••••••">
-                </div>
-                <button class="btn-auth" onclick="login()">Đăng nhập</button>
-                <div class="auth-switch">
-                    Chưa có tài khoản? <a onclick="showRegister()">Đăng ký ngay</a>
-                </div>
-            </div>
-
-            <div class="auth-form" id="registerForm" style="display:none;">
-                <h2>📝 Đăng ký tài khoản</h2>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="registerEmail" placeholder="admin@example.com">
-                </div>
-                <div class="form-group">
-                    <label>Mật khẩu (tối thiểu 6 ký tự)</label>
-                    <input type="password" id="registerPassword" placeholder="••••••••">
-                </div>
-                <button class="btn-auth" onclick="register()">Đăng ký</button>
-                <div class="auth-switch">
-                    Đã có tài khoản? <a onclick="showLogin()">Đăng nhập</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast -->
     <div id="toast" class="toast"></div>
 
     <script>
         // ========== FIREBASE CONFIG ==========
-        // 🔥 THAY THẾ BẰNG CONFIG CỦA BẠN 🔥
         const firebaseConfig = {
-        apiKey: "AIzaSyCAn-dCRdVkbYZYuh_wWWKPe2-5_meQuBA",
-        authDomain: "hoidap-ff5ed.firebaseapp.com",
-        databaseURL: "https://hoidap-ff5ed-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "hoidap-ff5ed",
-        storageBucket: "hoidap-ff5ed.firebasestorage.app",
-        messagingSenderId: "747872918560",
-        appId: "1:747872918560:web:f9f0d5073d083a46e03045"
-        };
+  apiKey: "AIzaSyCAn-dCRdVkbYZYuh_wWWKPe2-5_meQuBA",
+  authDomain: "hoidap-ff5ed.firebaseapp.com",
+  databaseURL: "https://hoidap-ff5ed-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "hoidap-ff5ed",
+  storageBucket: "hoidap-ff5ed.firebasestorage.app",
+  messagingSenderId: "747872918560",
+  appId: "1:747872918560:web:f9f0d5073d083a46e03045"
+};
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const database = firebase.database();
 
         // ========== DOM REFS ==========
-        const authOverlay = document.getElementById('authOverlay');
+        const authContainer = document.getElementById('authContainer');
+        const adminContent = document.getElementById('adminContent');
         const userInfo = document.getElementById('userInfo');
         const userEmail = document.getElementById('userEmail');
-        const adminEmailDisplay = document.getElementById('adminEmailDisplay');
-        const submitBtn = document.getElementById('submitBtn');
-        const qrSection = document.getElementById('qrSection');
-        const adminPanel = document.getElementById('adminPanel');
 
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
@@ -875,22 +630,14 @@
         const registerEmail = document.getElementById('registerEmail');
         const registerPassword = document.getElementById('registerPassword');
 
-        const fullName = document.getElementById('fullName');
-        const phone = document.getElementById('phone');
-        const address = document.getElementById('address');
-        const field = document.getElementById('field');
-        const questionText = document.getElementById('question');
-        const successScreen = document.getElementById('successScreen');
-        const toast = document.getElementById('toast');
-
         const totalCount = document.getElementById('totalCount');
         const topField = document.getElementById('topField');
         const topPerson = document.getElementById('topPerson');
         const adminQuestions = document.getElementById('adminQuestions');
+        const toast = document.getElementById('toast');
 
-        let toastTimeout = null;
         let currentUser = null;
-        let questionsRef = null;
+        let toastTimeout = null;
         let qrCodeInstance = null;
 
         // ========== AUTH ==========
@@ -898,28 +645,19 @@
             if (user) {
                 currentUser = user;
                 userEmail.textContent = user.email;
-                adminEmailDisplay.textContent = user.email;
                 userInfo.style.display = 'flex';
-                authOverlay.classList.remove('active');
-                authOverlay.style.display = 'none';
-                
-                // Hiện QR và Admin
-                qrSection.classList.add('active');
-                adminPanel.classList.add('active');
-                
-                const userId = user.uid;
-                questionsRef = database.ref(`questions/${userId}`);
+                authContainer.style.display = 'none';
+                adminContent.classList.add('active');
                 
                 loadQuestions();
                 generateQR();
                 updateUrlDisplay();
-                showToast('✅ Đã đăng nhập quản trị!', 'success');
+                showToast('✅ Đã đăng nhập!', 'success');
             } else {
                 currentUser = null;
                 userInfo.style.display = 'none';
-                qrSection.classList.remove('active');
-                adminPanel.classList.remove('active');
-                questionsRef = null;
+                authContainer.style.display = 'block';
+                adminContent.classList.remove('active');
             }
         });
 
@@ -932,7 +670,6 @@
                 return;
             }
 
-            submitBtn.disabled = true;
             auth.signInWithEmailAndPassword(email, password)
                 .then(() => {
                     showToast('✅ Đăng nhập thành công!', 'success');
@@ -941,9 +678,6 @@
                 })
                 .catch(error => {
                     showToast('❌ ' + error.message, 'error');
-                })
-                .finally(() => {
-                    submitBtn.disabled = false;
                 });
         }
 
@@ -961,7 +695,6 @@
                 return;
             }
 
-            submitBtn.disabled = true;
             auth.createUserWithEmailAndPassword(email, password)
                 .then(() => {
                     showToast('✅ Đăng ký thành công!', 'success');
@@ -970,9 +703,6 @@
                 })
                 .catch(error => {
                     showToast('❌ ' + error.message, 'error');
-                })
-                .finally(() => {
-                    submitBtn.disabled = false;
                 });
         }
 
@@ -980,18 +710,6 @@
             auth.signOut().then(() => {
                 showToast('👋 Đã đăng xuất!', 'success');
             });
-        }
-
-        function openAdminLogin() {
-            authOverlay.style.display = 'flex';
-            authOverlay.classList.add('active');
-            loginForm.style.display = 'block';
-            registerForm.style.display = 'none';
-        }
-
-        function closeAdminLogin() {
-            authOverlay.classList.remove('active');
-            authOverlay.style.display = 'none';
         }
 
         function showRegister() {
@@ -1004,6 +722,27 @@
             registerForm.style.display = 'none';
         }
 
+        // ========== TABS ==========
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(tabId)) {
+                    btn.classList.add('active');
+                }
+            });
+
+            if (tabId === 'tab-qr') {
+                setTimeout(() => {
+                    if (!document.getElementById('qrcode').innerHTML) {
+                        generateQR();
+                    }
+                }, 100);
+            }
+        }
+
         // ========== QR CODE ==========
         function generateQR() {
             const url = window.location.href.split('?')[0];
@@ -1011,7 +750,7 @@
             qrContainer.innerHTML = '';
             try {
                 qrCodeInstance = new QRCode(qrContainer, {
-                    text: url,
+                    text: url.replace('/admin.html', '/index.html'),
                     width: 220,
                     height: 220,
                     colorDark: '#1a3a6b',
@@ -1020,17 +759,16 @@
                 });
             } catch (e) {
                 qrContainer.innerHTML = '<p style="color:red;">⚠️ Lỗi tạo mã QR.</p>';
-                console.error('QR Error:', e);
             }
         }
 
         function updateUrlDisplay() {
             const url = window.location.href.split('?')[0];
-            document.getElementById('pageUrl').textContent = url;
+            document.getElementById('pageUrl').textContent = url.replace('/admin.html', '/index.html');
         }
 
         function copyUrl() {
-            const url = window.location.href.split('?')[0];
+            const url = window.location.href.split('?')[0].replace('/admin.html', '/index.html');
             navigator.clipboard.writeText(url).then(() => {
                 showToast('✅ Đã sao chép link!', 'success');
             }).catch(() => {
@@ -1051,13 +789,13 @@
 
             if (canvas) {
                 const link = document.createElement('a');
-                link.download = 'ma_qr_tiep_nhan_cau_hoi.png';
+                link.download = 'ma_qr.png';
                 link.href = canvas.toDataURL('image/png');
                 link.click();
                 showToast('⬇️ Đã tải mã QR!', 'success');
             } else if (img) {
                 const link = document.createElement('a');
-                link.download = 'ma_qr_tiep_nhan_cau_hoi.png';
+                link.download = 'ma_qr.png';
                 link.href = img.src;
                 link.click();
                 showToast('⬇️ Đã tải mã QR!', 'success');
@@ -1068,7 +806,7 @@
 
         // ========== LOAD QUESTIONS ==========
         function loadQuestions() {
-            if (!questionsRef) return;
+            if (!currentUser) return;
 
             adminQuestions.innerHTML = `
                 <div class="loading-spinner">
@@ -1077,7 +815,8 @@
                 </div>
             `;
 
-            questionsRef.on('value', snapshot => {
+            const ref = database.ref('questions/public');
+            ref.on('value', snapshot => {
                 const data = snapshot.val();
                 renderQuestions(data);
             });
@@ -1145,56 +884,12 @@
             adminQuestions.innerHTML = html;
         }
 
-        // ========== SUBMIT QUESTION ==========
-        document.getElementById('questionForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const name = fullName.value.trim();
-            const phoneVal = phone.value.trim();
-            const addressVal = address.value.trim();
-            const fieldVal = field.value;
-            const questionVal = questionText.value.trim();
-
-            if (!name || !phoneVal || !addressVal || !fieldVal || !questionVal) {
-                showToast('⚠️ Vui lòng điền đầy đủ thông tin!', 'error');
-                return;
-            }
-
-            // Lưu vào node public (không cần đăng nhập)
-            const ref = database.ref('questions/public');
-
-            const newQ = {
-                fullName: name,
-                phone: phoneVal,
-                address: addressVal,
-                field: fieldVal,
-                question: questionVal,
-                created: new Date().toLocaleString('vi-VN'),
-                timestamp: Date.now()
-            };
-
-            submitBtn.disabled = true;
-            ref.push(newQ)
-                .then(() => {
-                    document.getElementById('questionForm').style.display = 'none';
-                    successScreen.style.display = 'block';
-                    showToast('✅ Gửi câu hỏi thành công!', 'success');
-                    if (currentUser) loadQuestions();
-                })
-                .catch(error => {
-                    showToast('❌ ' + error.message, 'error');
-                })
-                .finally(() => {
-                    submitBtn.disabled = false;
-                });
-        });
-
-        // ========== DELETE QUESTION ==========
+        // ========== DELETE ==========
         function deleteQuestion(id) {
-            if (!questionsRef) return;
             if (!confirm('Xóa câu hỏi này?')) return;
-
-            questionsRef.child(id).remove()
+            
+            const ref = database.ref(`questions/public/${id}`);
+            ref.remove()
                 .then(() => {
                     showToast('🗑️ Đã xóa câu hỏi!', 'success');
                 })
@@ -1203,83 +898,133 @@
                 });
         }
 
-        // ========== EXPORT SUMMARY ==========
+        // ========== EXPORT ==========
         function exportSummary() {
-            if (!questionsRef) return;
+    if (!currentUser) {
+        showToast('⚠️ Vui lòng đăng nhập!', 'error');
+        return;
+    }
 
-            questionsRef.once('value', snapshot => {
-                const data = snapshot.val();
-                if (!data) {
-                    showToast('⚠️ Chưa có câu hỏi để xuất!', 'error');
-                    return;
-                }
-
-                const questionsArray = Object.keys(data).map(key => ({
-                    id: key,
-                    ...data[key]
-                }));
-
-                const fieldStats = {};
-                questionsArray.forEach(q => {
-                    fieldStats[q.field] = (fieldStats[q.field] || 0) + 1;
-                });
-
-                let content = '========================================\n';
-                content += '  BẢN TỔNG HỢP CÂU HỎI TỪ NGƯỜI DÂN\n';
-                content += '========================================\n\n';
-                content += `📅 Thời gian: ${new Date().toLocaleString('vi-VN')}\n`;
-                content += `📬 Tổng số: ${questionsArray.length} câu hỏi\n\n`;
-                content += '📊 THỐNG KÊ LĨNH VỰC:\n';
-                content += '----------------------------------------\n';
-                for (const [f, count] of Object.entries(fieldStats)) {
-                    content += `  • ${f}: ${count} câu hỏi\n`;
-                }
-                content += '\n' + '='.repeat(40) + '\n\n';
-                content += '📋 CHI TIẾT CÂU HỎI:\n';
-                content += '----------------------------------------\n\n';
-
-                questionsArray.forEach((q, i) => {
-                    content += `${i+1}. 👤 ${q.fullName} | 📞 ${q.phone}\n`;
-                    content += `   📍 ${q.address}\n`;
-                    content += `   📂 ${q.field}\n`;
-                    content += `   📝 ${q.question}\n`;
-                    content += `   🕐 ${q.created}\n\n`;
-                });
-
-                content += '========================================\n';
-
-                const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = `tong_hop_cau_hoi_${new Date().toISOString().slice(0,10)}.txt`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-
-                showToast('📨 Đã xuất bản tổng hợp!', 'success');
-            });
+    const ref = database.ref('questions/public');
+    ref.once('value', snapshot => {
+        const data = snapshot.val();
+        if (!data) {
+            showToast('⚠️ Chưa có câu hỏi để xuất!', 'error');
+            return;
         }
+
+        const questionsArray = Object.keys(data).map(key => ({
+            id: key,
+            ...data[key]
+        }));
+
+        // Sắp xếp theo thời gian
+        questionsArray.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+        // ========== SHEET 1: DANH SÁCH CÂU HỎI ==========
+        const mainData = [
+            ['STT', 'Họ và tên', 'Số điện thoại', 'Địa chỉ', 'Khu vực', 'Lĩnh vực', 'Nội dung câu hỏi', 'Thời gian gửi']
+        ];
+
+        questionsArray.forEach((q, index) => {
+            mainData.push([
+                index + 1,
+                q.fullName || '',
+                q.phone || '',
+                q.address || '',
+                q.area || '',  // ← Thêm cột Khu vực
+                q.field || '',
+                q.question || '',
+                q.created || ''
+            ]);
+        });
+
+        // ========== SHEET 2: THỐNG KÊ ==========
+        const fieldStats = {};
+        const areaStats = {};
+        questionsArray.forEach(q => {
+            fieldStats[q.field] = (fieldStats[q.field] || 0) + 1;
+            if (q.area && q.area.trim() !== '') {
+                areaStats[q.area] = (areaStats[q.area] || 0) + 1;
+            }
+        });
+
+        const total = questionsArray.length;
+
+        const statData = [
+            ['📊 THỐNG KÊ CÂU HỎI'],
+            [],
+            ['1. THỐNG KÊ THEO LĨNH VỰC'],
+            ['Lĩnh vực', 'Số lượng', 'Tỷ lệ (%)']
+        ];
+
+        for (const [f, count] of Object.entries(fieldStats)) {
+            const percent = ((count / total) * 100).toFixed(1);
+            statData.push([f, count, percent]);
+        }
+
+        // Thêm thống kê khu vực
+        if (Object.keys(areaStats).length > 0) {
+            statData.push([]);
+            statData.push(['2. THỐNG KÊ THEO KHU VỰC']);
+            statData.push(['Khu vực', 'Số lượng', 'Tỷ lệ (%)']);
+            for (const [area, count] of Object.entries(areaStats)) {
+                const percent = ((count / total) * 100).toFixed(1);
+                statData.push([area, count, percent]);
+            }
+        }
+
+        statData.push([]);
+        statData.push(['📅 Thời gian xuất:', new Date().toLocaleString('vi-VN')]);
+        statData.push(['📬 Tổng số câu hỏi:', total]);
+
+        // ========== TẠO WORKBOOK ==========
+        const wb = XLSX.utils.book_new();
+
+        // Sheet 1: Câu hỏi
+        const ws1 = XLSX.utils.aoa_to_sheet(mainData);
+        ws1['!cols'] = [
+            { wch: 6 },   // STT
+            { wch: 22 },  // Họ tên
+            { wch: 18 },  // SĐT
+            { wch: 30 },  // Địa chỉ
+            { wch: 15 },  // Khu vực ← Thêm cột
+            { wch: 20 },  // Lĩnh vực
+            { wch: 50 },  // Nội dung
+            { wch: 22 }   // Thời gian
+        ];
+        XLSX.utils.book_append_sheet(wb, ws1, 'Câu hỏi');
+
+        // Sheet 2: Thống kê
+        const ws2 = XLSX.utils.aoa_to_sheet(statData);
+        ws2['!cols'] = [
+            { wch: 30 }, 
+            { wch: 15 }, 
+            { wch: 15 }
+        ];
+        XLSX.utils.book_append_sheet(wb, ws2, 'Thống kê');
+
+        // ========== XUẤT FILE ==========
+        const filename = `tong_hop_cau_hoi_${new Date().toISOString().slice(0,10)}.xlsx`;
+        XLSX.writeFile(wb, filename);
+
+        showToast('📨 Đã xuất file Excel!', 'success');
+    });
+}
+
 
         // ========== CLEAR ALL ==========
         function clearAll() {
-            if (!questionsRef) return;
             if (!confirm('⚠️ Xóa TẤT CẢ câu hỏi?')) return;
 
-            questionsRef.remove()
+            const ref = database.ref('questions/public');
+            ref.remove()
                 .then(() => {
                     showToast('🗑️ Đã xóa tất cả.', 'success');
                 })
                 .catch(error => {
                     showToast('❌ ' + error.message, 'error');
                 });
-        }
-
-        // ========== RESET FORM ==========
-        function resetForm() {
-            document.getElementById('questionForm').reset();
-            document.getElementById('questionForm').style.display = 'block';
-            successScreen.style.display = 'none';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // ========== HELPERS ==========
@@ -1304,27 +1049,19 @@
             }, 3000);
         }
 
-        // ========== ENTER KEY SUPPORT ==========
+        // ========== ENTER KEY ==========
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
-                if (authOverlay.classList.contains('active')) {
-                    if (loginForm.style.display !== 'none' && document.activeElement === loginPassword) {
-                        login();
-                    }
-                    if (registerForm.style.display !== 'none' && document.activeElement === registerPassword) {
-                        register();
-                    }
+                if (loginForm.style.display !== 'none' && document.activeElement === loginPassword) {
+                    login();
                 }
-            }
-            if (e.key === 'Escape') {
-                closeAdminLogin();
+                if (registerForm.style.display !== 'none' && document.activeElement === registerPassword) {
+                    register();
+                }
             }
         });
 
-        // ========== INIT ==========
-        console.log('📋 Hệ thống tiếp nhận câu hỏi sẵn sàng!');
-        console.log('🔐 Nhấn "Quản trị" để đăng nhập');
-        console.log('📱 Người dân quét QR sẽ thấy form nhập');
+        console.log('🔐 Trang quản trị sẵn sàng!');
     </script>
 </body>
 </html>
