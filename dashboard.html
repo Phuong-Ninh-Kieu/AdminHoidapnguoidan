@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Dashboard - Quản trị câu hỏi</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <!-- Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f1f5f9;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard {
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            color: white;
+            padding: 16px 28px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 16px rgba(30, 41, 59, 0.25);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-left .logo-icon {
+            font-size: 28px;
+        }
+
+        .header-left h1 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .header-left h1 .highlight {
+            color: #fbbf24;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 14px;
+        }
+
+        .header-right .user-email {
+            background: rgba(255, 255, 255, 0.12);
+            padding: 5px 14px;
+            border-radius: 18px;
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        .header-right .logout-btn {
+            background: rgba(255, 255, 255, 0.12);
+            border: none;
+            color: white;
+            padding: 6px 18px;
+            border-radius: 18px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .header-right .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* ===== STATS - NHỎ GỌN ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 12px 18px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: transform 0.2s;
+            border-left: 3px solid #1e293b;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-1px);
+        }
+
+        .stat-card .stat-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .stat-card .stat-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .stat-card .number {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1e293b;
+            line-height: 1.2;
+        }
+
+        .stat-card .label {
+            font-size: 12px;
+            color: #94a3b8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .stat-card.accent-red {
+            border-left-color: #dc2626;
+        }
+
+        .stat-card.accent-yellow {
+            border-left-color: #fbbf24;
+        }
+
+        .stat-card.accent-blue {
+            border-left-color: #3b82f6;
+        }
+
+        /* ===== MAIN LAYOUT ===== */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== LEFT COLUMN ===== */
+        .left-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .panel-header h2 {
+            font-size: 17px;
+            color: #1e293b;
+        }
+
+        .panel-header .actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .panel-header .actions button {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 12px;
+        }
+
+        .btn-export {
+            background: #16a34a;
+            color: white;
+        }
+        .btn-export:hover { background: #15803d; }
+
+        .btn-refresh {
+            background: #3b82f6;
+            color: white;
+        }
+        .btn-refresh:hover { background: #2563eb; }
+
+        .btn-clear {
+            background: #dc2626;
+            color: white;
+        }
+        .btn-clear:hover { background: #b91c1c; }
+
+        /* ===== SEARCH & FILTER ===== */
+        .search-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .search-bar input {
+            flex: 1;
+            min-width: 150px;
+            padding: 8px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 13px;
+            transition: 0.3s;
+            background: #f8fafc;
+        }
+
+        .search-bar input:focus {
+            border-color: #1e293b;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.08);
+        }
+
+        .search-bar select {
+            padding: 8px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 13px;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .search-bar select:focus {
+            border-color: #1e293b;
+            outline: none;
+        }
+
+        /* ===== TABLE ===== */
+        .table-wrapper {
+            max-height: 480px;
+            overflow-y: auto;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .table-wrapper::-webkit-scrollbar {
+            width: 5px;
+        }
+        .table-wrapper::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 6px;
+        }
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 6px;
+        }
+
+        .question-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .question-table thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .question-table th {
+            background: #1e293b;
+            color: white;
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .question-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #1e293b;
+            vertical-align: middle;
+            font-size: 13px;
+        }
+
+        .question-table tbody tr {
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .question-table tbody tr:hover {
+            background: #f1f5f9;
+        }
+
+        .question-table tbody tr.active {
+            background: #e0e7ff;
+        }
+
+        .question-table .field-tag {
+            display: inline-block;
+            padding: 1px 10px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #1e293b;
+            white-space: nowrap;
+        }
+
+        .question-table .area-tag {
+            display: inline-block;
+            padding: 1px 10px;
+            background: #dbeafe;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #1e40af;
+            white-space: nowrap;
+        }
+
+        .question-table .delete-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 15px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+
+        .question-table .delete-btn:hover {
+            color: #dc2626;
+            background: #fef2f2;
+        }
+
+        .question-table .truncate {
+            max-width: 160px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #94a3b8;
+        }
+
+        .empty-state .icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .loading-state .spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid #1e293b;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ===== RIGHT PANEL - DETAIL ===== */
+        .right-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+            max-height: calc(100vh - 160px);
+            overflow-y: auto;
+        }
+
+        .right-panel::-webkit-scrollbar {
+            width: 4px;
+        }
+        .right-panel::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 6px;
+        }
+
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .detail-header h3 {
+            font-size: 15px;
+            color: #1e293b;
+            font-weight: 700;
+        }
+
+        .detail-header .close-detail {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 0 4px;
+        }
+
+        .detail-header .close-detail:hover {
+            color: #1e293b;
+        }
+
+        .detail-empty {
+            text-align: center;
+            padding: 30px 16px;
+            color: #94a3b8;
+        }
+
+        .detail-empty .icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+
+        .detail-empty p {
+            font-size: 13px;
+        }
+
+        /* Detail grid - 2 cột */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 16px;
+            margin-bottom: 14px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-item.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .detail-item .label {
+            font-size: 10px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 1px;
+        }
+
+        .detail-item .value {
+            font-size: 14px;
+            color: #1e293b;
+            word-break: break-word;
+            line-height: 1.4;
+            font-weight: 500;
+        }
+
+        .detail-item .value .tag {
+            display: inline-block;
+            padding: 1px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .detail-item .value .tag.field {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .detail-item .value .tag.area {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .detail-item .question-full {
+            background: #f8fafc;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border-left: 3px solid #1e293b;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #1e293b;
+            margin-top: 2px;
+        }
+
+        .detail-actions {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 8px;
+        }
+
+        .detail-actions button {
+            padding: 6px 16px;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 12px;
+        }
+
+        .detail-actions .btn-delete-detail {
+            background: #dc2626;
+            color: white;
+        }
+
+        .detail-actions .btn-delete-detail:hover {
+            background: #b91c1c;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 14px;
+            font-weight: 600;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: all 0.4s ease;
+            z-index: 999;
+            max-width: 90%;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background: #16a34a;
+        }
+
+        .toast.error {
+            background: #dc2626;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .header { padding: 14px 16px; }
+            .header-left h1 { font-size: 17px; }
+            .header-left .logo-icon { font-size: 22px; }
+            .header-right .user-email { font-size: 12px; padding: 4px 10px; }
+            .left-panel { padding: 14px; }
+            .right-panel { padding: 14px; position: static; max-height: none; }
+            .search-bar { flex-direction: column; }
+            .search-bar input { min-width: auto; }
+            .question-table th,
+            .question-table td { padding: 6px 8px; font-size: 12px; }
+            .question-table .truncate { max-width: 100px; }
+            .detail-grid { grid-template-columns: 1fr; gap: 6px; }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .stat-card { padding: 10px 14px; }
+            .stat-card .number { font-size: 18px; }
+            .stat-card .stat-icon { font-size: 20px; }
+            .panel-header { flex-direction: column; align-items: stretch; }
+            .panel-header .actions { justify-content: stretch; }
+            .panel-header .actions button { flex: 1; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- ===== HEADER ===== -->
+        <header class="header">
+            <div class="header-left">
+                <img src="logo-mat-tran-to-quoc-viet-nam-01.png" alt="Logo" style="width:32px; height:32px; border-radius:6px;">
+            <!--    <span class="logo-icon">🇻🇳</span> -->
+                <h1><span class="highlight">Mặt trận Tổ quốc Việt Nam Phường Ninh Kiều</span></h1>
+            </div>
+            <div class="header-right">
+                <span class="user-email" id="userEmail">admin@email.com</span>
+                <button class="logout-btn" onclick="logout()">🚪 Đăng xuất</button>
+            </div>
+        </header>
+
+        <!-- ===== STATS - NHỎ GỌN ===== -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-icon">📬</span>
+                <div class="stat-info">
+                    <div class="number" id="totalCount">0</div>
+                    <div class="label">Tổng câu hỏi</div>
+                </div>
+            </div>
+            <div class="stat-card accent-red">
+                <span class="stat-icon">📂</span>
+                <div class="stat-info">
+                    <div class="number" id="topField">—</div>
+                    <div class="label">Lĩnh vực nhiều nhất</div>
+                </div>
+            </div>
+            <div class="stat-card accent-yellow">
+                <span class="stat-icon">👤</span>
+                <div class="stat-info">
+                    <div class="number" id="topPerson">—</div>
+                    <div class="label">Người gửi nhiều nhất</div>
+                </div>
+            </div>
+            <div class="stat-card accent-blue">
+                <span class="stat-icon">📍</span>
+                <div class="stat-info">
+                    <div class="number" id="topArea">—</div>
+                    <div class="label">Khu vực nhiều nhất</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== MAIN GRID ===== -->
+        <div class="main-grid">
+            <!-- LEFT: Table -->
+            <div class="left-panel">
+                <div class="panel-header">
+                    <h2>📋 Danh sách câu hỏi</h2>
+                    <div class="actions">
+                        <button class="btn-export" onclick="exportSummary()">📨 Xuất</button>
+                        <button class="btn-refresh" onclick="loadQuestions()">🔄</button>
+                        <button class="btn-clear" onclick="clearAll()">🗑️</button>
+                    </div>
+                </div>
+
+                <!-- Search & Filter -->
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="🔍 Tìm kiếm..." oninput="filterQuestions()">
+                    <select id="fieldFilter" onchange="filterQuestions()">
+                        <option value="">📂 Tất cả</option>
+                    </select>
+                    <select id="areaFilter" onchange="filterQuestions()">
+                        <option value="">📍 Tất cả</option>
+                    </select>
+                </div>
+
+                <!-- Table -->
+                <div class="table-wrapper">
+                    <table class="question-table">
+                        <thead>
+                            <tr>
+                                <th style="width:28px;">#</th>
+                                <th>Họ tên</th>
+                                <th>SĐT</th>
+                                <th>Lĩnh vực</th>
+                                <th>Khu vực</th>
+                                <th style="width:34px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <tr>
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        <div class="icon">📭</div>
+                                        <p>Chưa có câu hỏi nào</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- RIGHT: Detail Panel - 2 cột -->
+            <div class="right-panel" id="detailPanel">
+                <div class="detail-header">
+                    <h3>📄 Chi tiết</h3>
+                    <button class="close-detail" onclick="clearDetail()">✕</button>
+                </div>
+                <div id="detailContent">
+                    <div class="detail-empty">
+                        <div class="icon">👆</div>
+                        <p>Chọn một câu hỏi để xem chi tiết</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // ========== FIREBASE CONFIG ==========
+        const firebaseConfig = {
+            apiKey: "AIzaSyCAn-dCRdVkbYZYuh_wWWKPe2-5_meQuBA",
+            authDomain: "hoidap-ff5ed.firebaseapp.com",
+            databaseURL: "https://hoidap-ff5ed-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "hoidap-ff5ed",
+            storageBucket: "hoidap-ff5ed.firebasestorage.app",
+            messagingSenderId: "747872918560",
+            appId: "1:747872918560:web:f9f0d5073d083a46e03045"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        // ========== DOM REFS ==========
+        const userEmail = document.getElementById('userEmail');
+        const totalCount = document.getElementById('totalCount');
+        const topField = document.getElementById('topField');
+        const topPerson = document.getElementById('topPerson');
+        const topArea = document.getElementById('topArea');
+        const tableBody = document.getElementById('tableBody');
+        const detailContent = document.getElementById('detailContent');
+        const searchInput = document.getElementById('searchInput');
+        const fieldFilter = document.getElementById('fieldFilter');
+        const areaFilter = document.getElementById('areaFilter');
+        const toast = document.getElementById('toast');
+
+        let allQuestions = [];
+        let filteredQuestions = [];
+        let selectedId = null;
+        let toastTimeout = null;
+
+        // ========== AUTH ==========
+        auth.onAuthStateChanged(user => {
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+            userEmail.textContent = user.email;
+            loadQuestions();
+        });
+
+        function logout() {
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            });
+        }
+
+        // ========== LOAD QUESTIONS ==========
+        function loadQuestions() {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6">
+                        <div class="loading-state">
+                            <div class="spinner"></div>
+                            <p style="margin-top:10px; color:#94a3b8; font-size:13px;">Đang tải...</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+
+            const ref = database.ref('questions/public');
+            ref.on('value', snapshot => {
+                const data = snapshot.val();
+                if (!data) {
+                    allQuestions = [];
+                    renderTable();
+                    updateStats();
+                    return;
+                }
+
+                allQuestions = Object.keys(data).map(key => ({
+                    id: key,
+                    ...data[key]
+                }));
+
+                allQuestions.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+                updateFilters();
+                renderTable();
+                updateStats();
+            });
+        }
+
+        // ========== UPDATE FILTERS ==========
+        function updateFilters() {
+            const fieldSet = new Set();
+            const areaSet = new Set();
+            allQuestions.forEach(q => {
+                if (q.field) fieldSet.add(q.field);
+                if (q.area && q.area.trim()) areaSet.add(q.area);
+            });
+
+            const currentField = fieldFilter.value;
+            fieldFilter.innerHTML = '<option value="">📂 Tất cả</option>';
+            [...fieldSet].sort().forEach(f => {
+                const opt = document.createElement('option');
+                opt.value = f;
+                opt.textContent = f;
+                fieldFilter.appendChild(opt);
+            });
+            fieldFilter.value = currentField;
+
+            const currentArea = areaFilter.value;
+            areaFilter.innerHTML = '<option value="">📍 Tất cả</option>';
+            [...areaSet].sort().forEach(a => {
+                const opt = document.createElement('option');
+                opt.value = a;
+                opt.textContent = a;
+                areaFilter.appendChild(opt);
+            });
+            areaFilter.value = currentArea;
+        }
+
+        // ========== FILTER ==========
+        function filterQuestions() {
+            const keyword = searchInput.value.toLowerCase().trim();
+            const fieldVal = fieldFilter.value;
+            const areaVal = areaFilter.value;
+
+            filteredQuestions = allQuestions.filter(q => {
+                const matchKeyword = !keyword || 
+                    (q.fullName && q.fullName.toLowerCase().includes(keyword)) ||
+                    (q.phone && q.phone.includes(keyword)) ||
+                    (q.question && q.question.toLowerCase().includes(keyword));
+                const matchField = !fieldVal || q.field === fieldVal;
+                const matchArea = !areaVal || q.area === areaVal;
+                return matchKeyword && matchField && matchArea;
+            });
+
+            renderTable();
+        }
+
+        // ========== RENDER TABLE ==========
+        function renderTable() {
+            const data = searchInput.value || fieldFilter.value || areaFilter.value ? filteredQuestions : allQuestions;
+
+            if (data.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <div class="icon">📭</div>
+                                <p>Không tìm thấy câu hỏi nào</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            let html = '';
+            data.forEach((q, index) => {
+                const isActive = q.id === selectedId;
+                html += `
+                    <tr class="${isActive ? 'active' : ''}" onclick="selectQuestion('${q.id}')">
+                        <td>${index + 1}</td>
+                        <td><span class="truncate" title="${escapeHtml(q.fullName)}">${escapeHtml(q.fullName)}</span></td>
+                        <td>${escapeHtml(q.phone)}</td>
+                        <td><span class="field-tag">${escapeHtml(q.field)}</span></td>
+                        <td>${q.area ? `<span class="area-tag">${escapeHtml(q.area)}</span>` : '—'}</td>
+                        <td>
+                            <button class="delete-btn" onclick="event.stopPropagation(); deleteQuestion('${q.id}')" title="Xóa">✕</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            tableBody.innerHTML = html;
+
+            if (selectedId && data.some(q => q.id === selectedId)) {
+                // keep detail
+            } else if (selectedId) {
+                clearDetail();
+            }
+        }
+
+        // ========== SELECT QUESTION - DETAIL 2 CỘT ==========
+        function selectQuestion(id) {
+            const q = allQuestions.find(item => item.id === id);
+            if (!q) return;
+
+            selectedId = id;
+            renderTable();
+
+            let areaDisplay = q.area ? `<span class="tag area">${escapeHtml(q.area)}</span>` : '—';
+
+            detailContent.innerHTML = `
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <span class="label">Họ và tên</span>
+                        <span class="value"><strong>${escapeHtml(q.fullName)}</strong></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Số điện thoại</span>
+                        <span class="value">${escapeHtml(q.phone)}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Địa chỉ</span>
+                        <span class="value">${escapeHtml(q.address) || '—'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Khu vực</span>
+                        <span class="value">${areaDisplay}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Lĩnh vực</span>
+                        <span class="value"><span class="tag field">${escapeHtml(q.field)}</span></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Thời gian gửi</span>
+                        <span class="value" style="color:#64748b; font-weight:400;">${escapeHtml(q.created) || '—'}</span>
+                    </div>
+                    <div class="detail-item full-width">
+                        <span class="label">Nội dung câu hỏi</span>
+                        <div class="question-full">${escapeHtml(q.question)}</div>
+                    </div>
+                </div>
+                <div class="detail-actions">
+                    <button class="btn-delete-detail" onclick="deleteQuestion('${q.id}')">🗑️ Xóa</button>
+                </div>
+            `;
+        }
+
+        function clearDetail() {
+            selectedId = null;
+            renderTable();
+            detailContent.innerHTML = `
+                <div class="detail-empty">
+                    <div class="icon">👆</div>
+                    <p>Chọn một câu hỏi để xem chi tiết</p>
+                </div>
+            `;
+        }
+
+        // ========== DELETE ==========
+        function deleteQuestion(id) {
+            if (!confirm('Xóa câu hỏi này?')) return;
+
+            const ref = database.ref(`questions/public/${id}`);
+            ref.remove()
+                .then(() => {
+                    showToast('🗑️ Đã xóa câu hỏi!', 'success');
+                    if (selectedId === id) clearDetail();
+                })
+                .catch(error => {
+                    showToast('❌ ' + error.message, 'error');
+                });
+        }
+
+        // ========== CLEAR ALL ==========
+        function clearAll() {
+            if (!confirm('⚠️ Xóa TẤT CẢ câu hỏi?')) return;
+
+            const ref = database.ref('questions/public');
+            ref.remove()
+                .then(() => {
+                    showToast('🗑️ Đã xóa tất cả.', 'success');
+                    clearDetail();
+                })
+                .catch(error => {
+                    showToast('❌ ' + error.message, 'error');
+                });
+        }
+
+        // ========== UPDATE STATS ==========
+        function updateStats() {
+            const data = allQuestions;
+            totalCount.textContent = data.length;
+
+            const fieldCount = {};
+            const nameCount = {};
+            const areaCount = {};
+            data.forEach(q => {
+                fieldCount[q.field] = (fieldCount[q.field] || 0) + 1;
+                nameCount[q.fullName] = (nameCount[q.fullName] || 0) + 1;
+                if (q.area && q.area.trim()) {
+                    areaCount[q.area] = (areaCount[q.area] || 0) + 1;
+                }
+            });
+
+            let topF = '—', topFVal = 0;
+            for (const [f, count] of Object.entries(fieldCount)) {
+                if (count > topFVal) { topFVal = count; topF = f; }
+            }
+
+            let topP = '—', topPVal = 0;
+            for (const [name, count] of Object.entries(nameCount)) {
+                if (count > topPVal) { topPVal = count; topP = name; }
+            }
+
+            let topA = '—', topAVal = 0;
+            for (const [area, count] of Object.entries(areaCount)) {
+                if (count > topAVal) { topAVal = count; topA = area; }
+            }
+
+            topField.textContent = topF;
+            topPerson.textContent = topP;
+            topArea.textContent = topA;
+        }
+
+        // ========== EXPORT ==========
+        function exportSummary() {
+            if (allQuestions.length === 0) {
+                showToast('⚠️ Chưa có câu hỏi để xuất!', 'error');
+                return;
+            }
+
+            const data = [...allQuestions].sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+            const mainData = [
+                ['STT', 'Họ và tên', 'Số điện thoại', 'Địa chỉ', 'Khu vực', 'Lĩnh vực', 'Nội dung câu hỏi', 'Thời gian gửi']
+            ];
+
+            data.forEach((q, index) => {
+                mainData.push([
+                    index + 1,
+                    q.fullName || '',
+                    q.phone || '',
+                    q.address || '',
+                    q.area || '',
+                    q.field || '',
+                    q.question || '',
+                    q.created || ''
+                ]);
+            });
+
+            const fieldStats = {};
+            const areaStats = {};
+            data.forEach(q => {
+                fieldStats[q.field] = (fieldStats[q.field] || 0) + 1;
+                if (q.area && q.area.trim()) {
+                    areaStats[q.area] = (areaStats[q.area] || 0) + 1;
+                }
+            });
+
+            const total = data.length;
+            const statData = [
+                ['📊 THỐNG KÊ CÂU HỎI'],
+                [],
+                ['1. THỐNG KÊ THEO LĨNH VỰC'],
+                ['Lĩnh vực', 'Số lượng', 'Tỷ lệ (%)']
+            ];
+
+            for (const [f, count] of Object.entries(fieldStats)) {
+                const percent = ((count / total) * 100).toFixed(1);
+                statData.push([f, count, percent]);
+            }
+
+            if (Object.keys(areaStats).length > 0) {
+                statData.push([]);
+                statData.push(['2. THỐNG KÊ THEO KHU VỰC']);
+                statData.push(['Khu vực', 'Số lượng', 'Tỷ lệ (%)']);
+                for (const [area, count] of Object.entries(areaStats)) {
+                    const percent = ((count / total) * 100).toFixed(1);
+                    statData.push([area, count, percent]);
+                }
+            }
+
+            statData.push([]);
+            statData.push(['📅 Thời gian xuất:', new Date().toLocaleString('vi-VN')]);
+            statData.push(['📬 Tổng số câu hỏi:', total]);
+
+            const wb = XLSX.utils.book_new();
+
+            const ws1 = XLSX.utils.aoa_to_sheet(mainData);
+            ws1['!cols'] = [
+                { wch: 6 }, { wch: 22 }, { wch: 18 },
+                { wch: 30 }, { wch: 15 }, { wch: 20 },
+                { wch: 50 }, { wch: 22 }
+            ];
+            XLSX.utils.book_append_sheet(wb, ws1, 'Câu hỏi');
+
+            const ws2 = XLSX.utils.aoa_to_sheet(statData);
+            ws2['!cols'] = [{ wch: 30 }, { wch: 15 }, { wch: 15 }];
+            XLSX.utils.book_append_sheet(wb, ws2, 'Thống kê');
+
+            const filename = `tong_hop_cau_hoi_${new Date().toISOString().slice(0,10)}.xlsx`;
+            XLSX.writeFile(wb, filename);
+            showToast('📨 Đã xuất file Excel!', 'success');
+        }
+
+        // ========== HELPERS ==========
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+        function showToast(message, type = 'success') {
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        console.log('📊 Dashboard sẵn sàng!');
+    </script>
+</body>
+</html>
