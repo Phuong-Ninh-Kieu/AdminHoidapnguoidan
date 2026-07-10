@@ -22,42 +22,47 @@
 
         body {
             background: #f1f5f9;
-            min-height: 100vh;
-            padding: 20px;
+            height: 100vh;
+            overflow: hidden;
+            padding: 12px;
         }
 
         .dashboard {
             max-width: 1440px;
+            height: 100%;
             margin: 0 auto;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* ===== HEADER ===== */
+        /* ===== HEADER - CỐ ĐỊNH - NHỎ GỌN ===== */
         .header {
             background: linear-gradient(135deg, #1e293b, #334155);
             color: white;
-            padding: 16px 28px;
-            border-radius: 16px;
+            padding: 10px 20px;
+            border-radius: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 16px rgba(30, 41, 59, 0.25);
+            gap: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 10px rgba(30, 41, 59, 0.2);
+            flex-shrink: 0;
         }
 
         .header-left {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .header-left .logo-icon {
-            font-size: 28px;
+            font-size: 24px;
         }
 
         .header-left h1 {
-            font-size: 20px;
+            font-size: 16px;
             font-weight: 700;
         }
 
@@ -68,27 +73,27 @@
         .header-right {
             display: flex;
             align-items: center;
-            gap: 14px;
-            font-size: 14px;
+            gap: 10px;
+            font-size: 13px;
         }
 
         .header-right .user-email {
             background: rgba(255, 255, 255, 0.12);
-            padding: 5px 14px;
-            border-radius: 18px;
+            padding: 4px 12px;
+            border-radius: 16px;
             font-weight: 500;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .header-right .logout-btn {
             background: rgba(255, 255, 255, 0.12);
             border: none;
             color: white;
-            padding: 6px 18px;
-            border-radius: 18px;
+            padding: 4px 14px;
+            border-radius: 16px;
             cursor: pointer;
             transition: 0.3s;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
         }
 
@@ -96,22 +101,23 @@
             background: rgba(255, 255, 255, 0.25);
         }
 
-        /* ===== STATS - NHỎ GỌN ===== */
+        /* ===== STATS - CỐ ĐỊNH - NHỎ GỌN ===== */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-shrink: 0;
         }
 
         .stat-card {
             background: white;
-            border-radius: 12px;
-            padding: 12px 18px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+            padding: 8px 14px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             transition: transform 0.2s;
             border-left: 3px solid #1e293b;
         }
@@ -121,7 +127,7 @@
         }
 
         .stat-card .stat-icon {
-            font-size: 24px;
+            font-size: 20px;
             flex-shrink: 0;
         }
 
@@ -131,14 +137,14 @@
         }
 
         .stat-card .number {
-            font-size: 22px;
+            font-size: 18px;
             font-weight: 800;
             color: #1e293b;
             line-height: 1.2;
         }
 
         .stat-card .label {
-            font-size: 12px;
+            font-size: 11px;
             color: #94a3b8;
             white-space: nowrap;
             overflow: hidden;
@@ -157,11 +163,13 @@
             border-left-color: #3b82f6;
         }
 
-        /* ===== MAIN LAYOUT ===== */
+        /* ===== MAIN LAYOUT - PHẦN CUỘN ===== */
         .main-grid {
             display: grid;
             grid-template-columns: 1fr 340px;
-            gap: 20px;
+            gap: 12px;
+            flex: 1;
+            min-height: 0;
         }
 
         @media (max-width: 1024px) {
@@ -171,20 +179,28 @@
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
+            .right-panel {
+                max-height: 350px !important;
+            }
         }
 
         @media (max-width: 600px) {
             .stats-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr 1fr;
             }
+            body { padding: 8px; }
         }
 
-        /* ===== LEFT COLUMN ===== */
+        /* ===== LEFT COLUMN - CÓ CUỘN ===== */
         .left-panel {
             background: white;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            padding: 14px 16px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            overflow: hidden;
         }
 
         .panel-header {
@@ -192,29 +208,30 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 16px;
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-shrink: 0;
         }
 
         .panel-header h2 {
-            font-size: 17px;
+            font-size: 15px;
             color: #1e293b;
         }
 
         .panel-header .actions {
             display: flex;
-            gap: 6px;
+            gap: 5px;
             flex-wrap: wrap;
         }
 
         .panel-header .actions button {
-            padding: 6px 14px;
+            padding: 4px 12px;
             border: none;
-            border-radius: 20px;
+            border-radius: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: 0.3s;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .btn-export {
@@ -235,21 +252,22 @@
         }
         .btn-clear:hover { background: #b91c1c; }
 
-        /* ===== SEARCH & FILTER ===== */
+        /* ===== SEARCH & FILTER - CỐ ĐỊNH ===== */
         .search-bar {
             display: flex;
-            gap: 8px;
-            margin-bottom: 14px;
+            gap: 6px;
+            margin-bottom: 10px;
             flex-wrap: wrap;
+            flex-shrink: 0;
         }
 
         .search-bar input {
             flex: 1;
-            min-width: 150px;
-            padding: 8px 14px;
+            min-width: 120px;
+            padding: 6px 12px;
             border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 13px;
+            border-radius: 8px;
+            font-size: 12px;
             transition: 0.3s;
             background: #f8fafc;
         }
@@ -261,10 +279,10 @@
         }
 
         .search-bar select {
-            padding: 8px 12px;
+            padding: 6px 10px;
             border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 13px;
+            border-radius: 8px;
+            font-size: 12px;
             background: #f8fafc;
             cursor: pointer;
             transition: 0.3s;
@@ -275,16 +293,17 @@
             outline: none;
         }
 
-        /* ===== TABLE ===== */
+        /* ===== TABLE - CUỘN ===== */
         .table-wrapper {
-            max-height: 480px;
+            flex: 1;
             overflow-y: auto;
-            border-radius: 10px;
+            border-radius: 8px;
             border: 1px solid #e2e8f0;
+            min-height: 0;
         }
 
         .table-wrapper::-webkit-scrollbar {
-            width: 5px;
+            width: 4px;
         }
         .table-wrapper::-webkit-scrollbar-track {
             background: #f1f5f9;
@@ -298,7 +317,7 @@
         .question-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .question-table thead {
@@ -310,19 +329,19 @@
         .question-table th {
             background: #1e293b;
             color: white;
-            padding: 10px 12px;
+            padding: 7px 10px;
             text-align: left;
             font-weight: 600;
-            font-size: 12px;
+            font-size: 11px;
             white-space: nowrap;
         }
 
         .question-table td {
-            padding: 8px 12px;
+            padding: 6px 10px;
             border-bottom: 1px solid #e2e8f0;
             color: #1e293b;
             vertical-align: middle;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .question-table tbody tr {
@@ -340,10 +359,10 @@
 
         .question-table .field-tag {
             display: inline-block;
-            padding: 1px 10px;
+            padding: 1px 8px;
             background: #e2e8f0;
-            border-radius: 10px;
-            font-size: 11px;
+            border-radius: 8px;
+            font-size: 10px;
             font-weight: 600;
             color: #1e293b;
             white-space: nowrap;
@@ -351,10 +370,10 @@
 
         .question-table .area-tag {
             display: inline-block;
-            padding: 1px 10px;
+            padding: 1px 8px;
             background: #dbeafe;
-            border-radius: 10px;
-            font-size: 11px;
+            border-radius: 8px;
+            font-size: 10px;
             font-weight: 600;
             color: #1e40af;
             white-space: nowrap;
@@ -365,7 +384,7 @@
             border: none;
             color: #94a3b8;
             cursor: pointer;
-            font-size: 15px;
+            font-size: 13px;
             padding: 2px 6px;
             border-radius: 4px;
             transition: 0.2s;
@@ -377,7 +396,7 @@
         }
 
         .question-table .truncate {
-            max-width: 160px;
+            max-width: 140px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -386,24 +405,24 @@
 
         .empty-state {
             text-align: center;
-            padding: 40px 20px;
+            padding: 30px 20px;
             color: #94a3b8;
         }
 
         .empty-state .icon {
-            font-size: 40px;
-            margin-bottom: 8px;
+            font-size: 32px;
+            margin-bottom: 6px;
         }
 
         .loading-state {
             text-align: center;
-            padding: 40px 20px;
+            padding: 30px 20px;
         }
 
         .loading-state .spinner {
             display: inline-block;
-            width: 30px;
-            height: 30px;
+            width: 24px;
+            height: 24px;
             border: 3px solid #e2e8f0;
             border-top: 3px solid #1e293b;
             border-radius: 50%;
@@ -415,17 +434,17 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* ===== RIGHT PANEL - DETAIL ===== */
+        /* ===== RIGHT PANEL - CUỘN ===== */
         .right-panel {
             background: white;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-            position: sticky;
-            top: 20px;
-            height: fit-content;
-            max-height: calc(100vh - 160px);
-            overflow-y: auto;
+            border-radius: 12px;
+            padding: 14px 16px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            overflow: hidden;
+            max-height: 100%;
         }
 
         .right-panel::-webkit-scrollbar {
@@ -440,13 +459,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
-            padding-bottom: 10px;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
             border-bottom: 2px solid #e2e8f0;
+            flex-shrink: 0;
         }
 
         .detail-header h3 {
-            font-size: 15px;
+            font-size: 14px;
             color: #1e293b;
             font-weight: 700;
         }
@@ -454,7 +474,7 @@
         .detail-header .close-detail {
             background: none;
             border: none;
-            font-size: 20px;
+            font-size: 18px;
             color: #94a3b8;
             cursor: pointer;
             padding: 0 4px;
@@ -464,27 +484,41 @@
             color: #1e293b;
         }
 
+        #detailContent {
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
+        }
+
+        #detailContent::-webkit-scrollbar {
+            width: 4px;
+        }
+        #detailContent::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 6px;
+        }
+
         .detail-empty {
             text-align: center;
-            padding: 30px 16px;
+            padding: 25px 12px;
             color: #94a3b8;
         }
 
         .detail-empty .icon {
-            font-size: 40px;
-            margin-bottom: 8px;
+            font-size: 32px;
+            margin-bottom: 6px;
         }
 
         .detail-empty p {
-            font-size: 13px;
+            font-size: 12px;
         }
 
         /* Detail grid - 2 cột */
         .detail-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px 16px;
-            margin-bottom: 14px;
+            gap: 6px 12px;
+            margin-bottom: 10px;
         }
 
         .detail-item {
@@ -497,16 +531,16 @@
         }
 
         .detail-item .label {
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 600;
             color: #94a3b8;
             text-transform: uppercase;
-            letter-spacing: 0.4px;
+            letter-spacing: 0.3px;
             margin-bottom: 1px;
         }
 
         .detail-item .value {
-            font-size: 14px;
+            font-size: 13px;
             color: #1e293b;
             word-break: break-word;
             line-height: 1.4;
@@ -515,9 +549,9 @@
 
         .detail-item .value .tag {
             display: inline-block;
-            padding: 1px 12px;
-            border-radius: 10px;
-            font-size: 12px;
+            padding: 1px 10px;
+            border-radius: 8px;
+            font-size: 11px;
             font-weight: 600;
         }
 
@@ -533,31 +567,32 @@
 
         .detail-item .question-full {
             background: #f8fafc;
-            padding: 12px 14px;
-            border-radius: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
             border-left: 3px solid #1e293b;
-            font-size: 13px;
+            font-size: 12px;
             line-height: 1.6;
             color: #1e293b;
             margin-top: 2px;
         }
 
         .detail-actions {
-            margin-top: 12px;
-            padding-top: 12px;
+            margin-top: 10px;
+            padding-top: 10px;
             border-top: 1px solid #e2e8f0;
             display: flex;
-            gap: 8px;
+            gap: 6px;
+            flex-shrink: 0;
         }
 
         .detail-actions button {
-            padding: 6px 16px;
+            padding: 5px 14px;
             border: none;
-            border-radius: 20px;
+            border-radius: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: 0.3s;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .detail-actions .btn-delete-detail {
@@ -577,8 +612,8 @@
             transform: translateX(-50%) translateY(100px);
             background: #1e293b;
             color: white;
-            padding: 12px 24px;
-            border-radius: 14px;
+            padding: 10px 22px;
+            border-radius: 12px;
             font-weight: 600;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
             opacity: 0;
@@ -604,39 +639,44 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            body { padding: 12px; }
-            .header { padding: 14px 16px; }
-            .header-left h1 { font-size: 17px; }
-            .header-left .logo-icon { font-size: 22px; }
-            .header-right .user-email { font-size: 12px; padding: 4px 10px; }
-            .left-panel { padding: 14px; }
-            .right-panel { padding: 14px; position: static; max-height: none; }
-            .search-bar { flex-direction: column; }
+            body { padding: 8px; }
+            .header { padding: 8px 14px; }
+            .header-left h1 { font-size: 14px; }
+            .header-left .logo-icon { font-size: 20px; }
+            .header-right .user-email { font-size: 11px; padding: 3px 8px; }
+            .header-right .logout-btn { font-size: 11px; padding: 3px 10px; }
+            .left-panel { padding: 10px 12px; }
+            .right-panel { padding: 10px 12px; max-height: 300px !important; }
+            .search-bar { flex-direction: column; gap: 4px; }
             .search-bar input { min-width: auto; }
             .question-table th,
-            .question-table td { padding: 6px 8px; font-size: 12px; }
-            .question-table .truncate { max-width: 100px; }
-            .detail-grid { grid-template-columns: 1fr; gap: 6px; }
+            .question-table td { padding: 4px 6px; font-size: 11px; }
+            .question-table .truncate { max-width: 80px; }
+            .detail-grid { grid-template-columns: 1fr; gap: 4px; }
+            .stats-grid { gap: 6px; }
+            .stat-card { padding: 6px 10px; }
+            .stat-card .number { font-size: 16px; }
+            .stat-card .stat-icon { font-size: 18px; }
+            .stat-card .label { font-size: 10px; }
         }
 
         @media (max-width: 480px) {
-            .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-            .stat-card { padding: 10px 14px; }
-            .stat-card .number { font-size: 18px; }
-            .stat-card .stat-icon { font-size: 20px; }
-            .panel-header { flex-direction: column; align-items: stretch; }
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 5px; }
+            .stat-card { padding: 5px 8px; }
+            .stat-card .number { font-size: 14px; }
+            .stat-card .stat-icon { font-size: 16px; }
+            .panel-header { flex-direction: column; align-items: stretch; gap: 4px; }
             .panel-header .actions { justify-content: stretch; }
-            .panel-header .actions button { flex: 1; text-align: center; }
+            .panel-header .actions button { flex: 1; text-align: center; font-size: 10px; padding: 3px 8px; }
         }
     </style>
 </head>
 <body>
     <div class="dashboard">
-        <!-- ===== HEADER ===== -->
+        <!-- ===== HEADER - CỐ ĐỊNH - NHỎ GỌN ===== -->
         <header class="header">
             <div class="header-left">
-                <img src="logo-mat-tran-to-quoc-viet-nam-01.png" alt="Logo" style="width:32px; height:32px; border-radius:6px;">
-            <!--    <span class="logo-icon">🇻🇳</span> -->
+                <img src="logo-mat-tran-to-quoc-viet-nam-01.png" alt="Logo" style="width:28px; height:28px; border-radius:4px;">
                 <h1><span class="highlight">Mặt trận Tổ quốc Việt Nam Phường Ninh Kiều</span></h1>
             </div>
             <div class="header-right">
@@ -645,7 +685,7 @@
             </div>
         </header>
 
-        <!-- ===== STATS - NHỎ GỌN ===== -->
+        <!-- ===== STATS - CỐ ĐỊNH - NHỎ GỌN ===== -->
         <div class="stats-grid">
             <div class="stat-card">
                 <span class="stat-icon">📬</span>
@@ -677,7 +717,7 @@
             </div>
         </div>
 
-        <!-- ===== MAIN GRID ===== -->
+        <!-- ===== MAIN GRID - CUỘN ===== -->
         <div class="main-grid">
             <!-- LEFT: Table -->
             <div class="left-panel">
@@ -701,17 +741,17 @@
                     </select>
                 </div>
 
-                <!-- Table -->
+                <!-- Table - CUỘN -->
                 <div class="table-wrapper">
                     <table class="question-table">
                         <thead>
                             <tr>
-                                <th style="width:28px;">#</th>
+                                <th style="width:24px;">#</th>
                                 <th>Họ tên</th>
                                 <th>SĐT</th>
                                 <th>Lĩnh vực</th>
                                 <th>Khu vực</th>
-                                <th style="width:34px;"></th>
+                                <th style="width:28px;"></th>
                             </tr>
                         </thead>
                         <tbody id="tableBody">
@@ -728,7 +768,7 @@
                 </div>
             </div>
 
-            <!-- RIGHT: Detail Panel - 2 cột -->
+            <!-- RIGHT: Detail Panel - CUỘN -->
             <div class="right-panel" id="detailPanel">
                 <div class="detail-header">
                     <h3>📄 Chi tiết</h3>
@@ -803,7 +843,7 @@
                     <td colspan="6">
                         <div class="loading-state">
                             <div class="spinner"></div>
-                            <p style="margin-top:10px; color:#94a3b8; font-size:13px;">Đang tải...</p>
+                            <p style="margin-top:6px; color:#94a3b8; font-size:12px;">Đang tải...</p>
                         </div>
                     </td>
                 </tr>
