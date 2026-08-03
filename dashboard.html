@@ -57,10 +57,6 @@
             gap: 10px;
         }
 
-        .header-left .logo-icon {
-            font-size: 24px;
-        }
-
         .header-left h1 {
             font-size: 16px;
             font-weight: 700;
@@ -151,47 +147,31 @@
             text-overflow: ellipsis;
         }
 
-        .stat-card.accent-red {
-            border-left-color: #dc2626;
-        }
-
-        .stat-card.accent-yellow {
-            border-left-color: #fbbf24;
-        }
-
-        .stat-card.accent-blue {
-            border-left-color: #3b82f6;
-        }
+        .stat-card.accent-red { border-left-color: #dc2626; }
+        .stat-card.accent-yellow { border-left-color: #fbbf24; }
+        .stat-card.accent-blue { border-left-color: #3b82f6; }
 
         /* ===== MAIN LAYOUT - PHẦN CUỘN ===== */
         .main-grid {
             display: grid;
-            grid-template-columns: 1fr 340px;
+            grid-template-columns: 1fr 360px;
             gap: 12px;
             flex: 1;
             min-height: 0;
         }
 
         @media (max-width: 1024px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .right-panel {
-                max-height: 350px !important;
-            }
+            .main-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .right-panel { max-height: 380px !important; }
         }
 
         @media (max-width: 600px) {
-            .stats-grid {
-                grid-template-columns: 1fr 1fr;
-            }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
             body { padding: 8px; }
         }
 
-        /* ===== LEFT COLUMN - CÓ CUỘN ===== */
+        /* ===== LEFT COLUMN ===== */
         .left-panel {
             background: white;
             border-radius: 12px;
@@ -213,17 +193,8 @@
             flex-shrink: 0;
         }
 
-        .panel-header h2 {
-            font-size: 15px;
-            color: #1e293b;
-        }
-
-        .panel-header .actions {
-            display: flex;
-            gap: 5px;
-            flex-wrap: wrap;
-        }
-
+        .panel-header h2 { font-size: 15px; color: #1e293b; }
+        .panel-header .actions { display: flex; gap: 5px; flex-wrap: wrap; }
         .panel-header .actions button {
             padding: 4px 12px;
             border: none;
@@ -234,25 +205,14 @@
             font-size: 11px;
         }
 
-        .btn-export {
-            background: #16a34a;
-            color: white;
-        }
+        .btn-export { background: #16a34a; color: white; }
         .btn-export:hover { background: #15803d; }
-
-        .btn-refresh {
-            background: #3b82f6;
-            color: white;
-        }
+        .btn-refresh { background: #3b82f6; color: white; }
         .btn-refresh:hover { background: #2563eb; }
-
-        .btn-clear {
-            background: #dc2626;
-            color: white;
-        }
+        .btn-clear { background: #dc2626; color: white; }
         .btn-clear:hover { background: #b91c1c; }
 
-        /* ===== SEARCH & FILTER - CỐ ĐỊNH ===== */
+        /* ===== SEARCH & FILTER ===== */
         .search-bar {
             display: flex;
             gap: 6px;
@@ -268,14 +228,7 @@
             border: 2px solid #e2e8f0;
             border-radius: 8px;
             font-size: 12px;
-            transition: 0.3s;
             background: #f8fafc;
-        }
-
-        .search-bar input:focus {
-            border-color: #1e293b;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.08);
         }
 
         .search-bar select {
@@ -285,15 +238,9 @@
             font-size: 12px;
             background: #f8fafc;
             cursor: pointer;
-            transition: 0.3s;
         }
 
-        .search-bar select:focus {
-            border-color: #1e293b;
-            outline: none;
-        }
-
-        /* ===== TABLE - CUỘN ===== */
+        /* ===== TABLE ===== */
         .table-wrapper {
             flex: 1;
             overflow-y: auto;
@@ -302,30 +249,13 @@
             min-height: 0;
         }
 
-        .table-wrapper::-webkit-scrollbar {
-            width: 4px;
-        }
-        .table-wrapper::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 6px;
-        }
-        .table-wrapper::-webkit-scrollbar-thumb {
-            background: #94a3b8;
-            border-radius: 6px;
-        }
-
         .question-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 12px;
         }
 
-        .question-table thead {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
+        .question-table thead { position: sticky; top: 0; z-index: 10; }
         .question-table th {
             background: #1e293b;
             color: white;
@@ -344,42 +274,40 @@
             font-size: 12px;
         }
 
-        .question-table tbody tr {
-            cursor: pointer;
-            transition: background 0.15s;
-        }
+        .question-table tbody tr { cursor: pointer; transition: background 0.15s; }
+        .question-table tbody tr:hover { background: #f1f5f9; }
+        .question-table tbody tr.active { background: #e0e7ff; }
 
-        .question-table tbody tr:hover {
-            background: #f1f5f9;
-        }
-
-        .question-table tbody tr.active {
-            background: #e0e7ff;
-        }
-
-        .question-table .field-tag {
-            display: inline-block;
+        .field-tag {
             padding: 1px 8px;
             background: #e2e8f0;
             border-radius: 8px;
             font-size: 10px;
             font-weight: 600;
-            color: #1e293b;
-            white-space: nowrap;
         }
 
-        .question-table .area-tag {
-            display: inline-block;
+        .area-tag {
             padding: 1px 8px;
             background: #dbeafe;
             border-radius: 8px;
             font-size: 10px;
             font-weight: 600;
             color: #1e40af;
-            white-space: nowrap;
         }
 
-        .question-table .delete-btn {
+        .file-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            background: #fef3c7;
+            color: #b45309;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .delete-btn {
             background: none;
             border: none;
             color: #94a3b8;
@@ -387,39 +315,20 @@
             font-size: 13px;
             padding: 2px 6px;
             border-radius: 4px;
-            transition: 0.2s;
         }
 
-        .question-table .delete-btn:hover {
-            color: #dc2626;
-            background: #fef2f2;
-        }
+        .delete-btn:hover { color: #dc2626; background: #fef2f2; }
 
-        .question-table .truncate {
-            max-width: 140px;
+        .truncate {
+            max-width: 130px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             display: block;
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 30px 20px;
-            color: #94a3b8;
-        }
-
-        .empty-state .icon {
-            font-size: 32px;
-            margin-bottom: 6px;
-        }
-
-        .loading-state {
-            text-align: center;
-            padding: 30px 20px;
-        }
-
-        .loading-state .spinner {
+        .empty-state, .loading-state { text-align: center; padding: 30px 20px; color: #94a3b8; }
+        .spinner {
             display: inline-block;
             width: 24px;
             height: 24px;
@@ -428,13 +337,9 @@
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* ===== RIGHT PANEL - CUỘN ===== */
+        /* ===== RIGHT PANEL ===== */
         .right-panel {
             background: white;
             border-radius: 12px;
@@ -444,15 +349,6 @@
             flex-direction: column;
             min-height: 0;
             overflow: hidden;
-            max-height: 100%;
-        }
-
-        .right-panel::-webkit-scrollbar {
-            width: 4px;
-        }
-        .right-panel::-webkit-scrollbar-thumb {
-            background: #94a3b8;
-            border-radius: 6px;
         }
 
         .detail-header {
@@ -465,116 +361,59 @@
             flex-shrink: 0;
         }
 
-        .detail-header h3 {
-            font-size: 14px;
-            color: #1e293b;
-            font-weight: 700;
-        }
+        .detail-header h3 { font-size: 14px; color: #1e293b; font-weight: 700; }
+        .detail-header .close-detail { background: none; border: none; font-size: 18px; color: #94a3b8; cursor: pointer; }
 
-        .detail-header .close-detail {
-            background: none;
-            border: none;
-            font-size: 18px;
-            color: #94a3b8;
-            cursor: pointer;
-            padding: 0 4px;
-        }
+        #detailContent { flex: 1; overflow-y: auto; min-height: 0; }
+        .detail-empty { text-align: center; padding: 25px 12px; color: #94a3b8; }
 
-        .detail-header .close-detail:hover {
-            color: #1e293b;
-        }
-
-        #detailContent {
-            flex: 1;
-            overflow-y: auto;
-            min-height: 0;
-        }
-
-        #detailContent::-webkit-scrollbar {
-            width: 4px;
-        }
-        #detailContent::-webkit-scrollbar-thumb {
-            background: #94a3b8;
-            border-radius: 6px;
-        }
-
-        .detail-empty {
-            text-align: center;
-            padding: 25px 12px;
-            color: #94a3b8;
-        }
-
-        .detail-empty .icon {
-            font-size: 32px;
-            margin-bottom: 6px;
-        }
-
-        .detail-empty p {
-            font-size: 12px;
-        }
-
-        /* Detail grid - 2 cột */
         .detail-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 6px 12px;
+            gap: 8px 12px;
             margin-bottom: 10px;
         }
 
-        .detail-item {
-            display: flex;
-            flex-direction: column;
-        }
+        .detail-item { display: flex; flex-direction: column; }
+        .detail-item.full-width { grid-column: 1 / -1; }
+        .detail-item .label { font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 2px; }
+        .detail-item .value { font-size: 13px; color: #1e293b; word-break: break-word; font-weight: 500; }
 
-        .detail-item.full-width {
-            grid-column: 1 / -1;
-        }
-
-        .detail-item .label {
-            font-size: 9px;
-            font-weight: 600;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            margin-bottom: 1px;
-        }
-
-        .detail-item .value {
-            font-size: 13px;
-            color: #1e293b;
-            word-break: break-word;
-            line-height: 1.4;
-            font-weight: 500;
-        }
-
-        .detail-item .value .tag {
-            display: inline-block;
-            padding: 1px 10px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .detail-item .value .tag.field {
-            background: #e2e8f0;
-            color: #1e293b;
-        }
-
-        .detail-item .value .tag.area {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-
-        .detail-item .question-full {
+        .question-full {
             background: #f8fafc;
             padding: 10px 12px;
             border-radius: 8px;
             border-left: 3px solid #1e293b;
             font-size: 12px;
             line-height: 1.6;
-            color: #1e293b;
             margin-top: 2px;
         }
+
+        /* KHU VỰC HIỂN THỊ TỆP ĐÍNH KÈM */
+        .attachment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .attachment-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            padding: 8px 12px;
+            border-radius: 8px;
+            color: #0284c7;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .attachment-btn:hover { background: #e0f2fe; }
 
         .detail-actions {
             margin-top: 10px;
@@ -586,23 +425,16 @@
         }
 
         .detail-actions button {
-            padding: 5px 14px;
+            padding: 6px 14px;
             border: none;
             border-radius: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.3s;
             font-size: 11px;
         }
 
-        .detail-actions .btn-delete-detail {
-            background: #dc2626;
-            color: white;
-        }
-
-        .detail-actions .btn-delete-detail:hover {
-            background: #b91c1c;
-        }
+        .btn-delete-detail { background: #dc2626; color: white; }
+        .btn-delete-detail:hover { background: #b91c1c; }
 
         /* ===== TOAST ===== */
         .toast {
@@ -619,64 +451,20 @@
             opacity: 0;
             transition: all 0.4s ease;
             z-index: 999;
-            max-width: 90%;
-            text-align: center;
             font-size: 13px;
         }
 
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-
-        .toast.success {
-            background: #16a34a;
-        }
-
-        .toast.error {
-            background: #dc2626;
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
-            body { padding: 8px; }
-            .header { padding: 8px 14px; }
-            .header-left h1 { font-size: 14px; }
-            .header-left .logo-icon { font-size: 20px; }
-            .header-right .user-email { font-size: 11px; padding: 3px 8px; }
-            .header-right .logout-btn { font-size: 11px; padding: 3px 10px; }
-            .left-panel { padding: 10px 12px; }
-            .right-panel { padding: 10px 12px; max-height: 300px !important; }
-            .search-bar { flex-direction: column; gap: 4px; }
-            .search-bar input { min-width: auto; }
-            .question-table th,
-            .question-table td { padding: 4px 6px; font-size: 11px; }
-            .question-table .truncate { max-width: 80px; }
-            .detail-grid { grid-template-columns: 1fr; gap: 4px; }
-            .stats-grid { gap: 6px; }
-            .stat-card { padding: 6px 10px; }
-            .stat-card .number { font-size: 16px; }
-            .stat-card .stat-icon { font-size: 18px; }
-            .stat-card .label { font-size: 10px; }
-        }
-
-        @media (max-width: 480px) {
-            .stats-grid { grid-template-columns: 1fr 1fr; gap: 5px; }
-            .stat-card { padding: 5px 8px; }
-            .stat-card .number { font-size: 14px; }
-            .stat-card .stat-icon { font-size: 16px; }
-            .panel-header { flex-direction: column; align-items: stretch; gap: 4px; }
-            .panel-header .actions { justify-content: stretch; }
-            .panel-header .actions button { flex: 1; text-align: center; font-size: 10px; padding: 3px 8px; }
-        }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast.success { background: #16a34a; }
+        .toast.error { background: #dc2626; }
     </style>
 </head>
 <body>
     <div class="dashboard">
-        <!-- ===== HEADER - CỐ ĐỊNH - NHỎ GỌN ===== -->
+        <!-- ===== HEADER ===== -->
         <header class="header">
             <div class="header-left">
-                <img src="logo-mat-tran-to-quoc-viet-nam-01.png" alt="Logo" style="width:28px; height:28px; border-radius:4px;">
+                <img src="logo-mat-tran-to-quoc-viet-nam-01.png" alt="Logo" style="width:28px; height:28px; border-radius:4px;" onerror="this.style.display='none'">
                 <h1><span class="highlight">Mặt trận Tổ quốc Việt Nam Phường Ninh Kiều</span></h1>
             </div>
             <div class="header-right">
@@ -685,7 +473,7 @@
             </div>
         </header>
 
-        <!-- ===== STATS - CỐ ĐỊNH - NHỎ GỌN ===== -->
+        <!-- ===== STATS ===== -->
         <div class="stats-grid">
             <div class="stat-card">
                 <span class="stat-icon">📬</span>
@@ -717,14 +505,14 @@
             </div>
         </div>
 
-        <!-- ===== MAIN GRID - CUỘN ===== -->
+        <!-- ===== MAIN GRID ===== -->
         <div class="main-grid">
             <!-- LEFT: Table -->
             <div class="left-panel">
                 <div class="panel-header">
                     <h2>📋 Danh sách câu hỏi</h2>
                     <div class="actions">
-                        <button class="btn-export" onclick="exportSummary()">📨 Xuất</button>
+                        <button class="btn-export" onclick="exportSummary()">📨 Xuất Excel</button>
                         <button class="btn-refresh" onclick="loadQuestions()">🔄</button>
                         <button class="btn-clear" onclick="clearAll()">🗑️</button>
                     </div>
@@ -734,14 +522,14 @@
                 <div class="search-bar">
                     <input type="text" id="searchInput" placeholder="🔍 Tìm kiếm..." oninput="filterQuestions()">
                     <select id="fieldFilter" onchange="filterQuestions()">
-                        <option value="">📂 Tất cả</option>
+                        <option value="">📂 Tất cả lĩnh vực</option>
                     </select>
                     <select id="areaFilter" onchange="filterQuestions()">
-                        <option value="">📍 Tất cả</option>
+                        <option value="">📍 Tất cả khu vực</option>
                     </select>
                 </div>
 
-                <!-- Table - CUỘN -->
+                <!-- Table -->
                 <div class="table-wrapper">
                     <table class="question-table">
                         <thead>
@@ -751,12 +539,13 @@
                                 <th>SĐT</th>
                                 <th>Lĩnh vực</th>
                                 <th>Khu vực</th>
+                                <th>File</th>
                                 <th style="width:28px;"></th>
                             </tr>
                         </thead>
                         <tbody id="tableBody">
                             <tr>
-                                <td colspan="6">
+                                <td colspan="7">
                                     <div class="empty-state">
                                         <div class="icon">📭</div>
                                         <p>Chưa có câu hỏi nào</p>
@@ -768,10 +557,10 @@
                 </div>
             </div>
 
-            <!-- RIGHT: Detail Panel - CUỘN -->
+            <!-- RIGHT: Detail Panel -->
             <div class="right-panel" id="detailPanel">
                 <div class="detail-header">
-                    <h3>📄 Chi tiết</h3>
+                    <h3>📄 Chi tiết câu hỏi</h3>
                     <button class="close-detail" onclick="clearDetail()">✕</button>
                 </div>
                 <div id="detailContent">
@@ -802,7 +591,7 @@
         const auth = firebase.auth();
         const database = firebase.database();
 
-        // ========== DOM REFS ==========
+        // DOM REFS
         const userEmail = document.getElementById('userEmail');
         const totalCount = document.getElementById('totalCount');
         const topField = document.getElementById('topField');
@@ -819,36 +608,45 @@
         let filteredQuestions = [];
         let selectedId = null;
         let toastTimeout = null;
+        let githubConfig = null;
 
-        // ========== AUTH ==========
+        // AUTH
         auth.onAuthStateChanged(user => {
             if (!user) {
                 window.location.href = 'index.html';
                 return;
             }
             userEmail.textContent = user.email;
+            loadGithubConfig();
             loadQuestions();
         });
 
         function logout() {
-            auth.signOut().then(() => {
-                window.location.href = 'index.html';
-            });
+            auth.signOut().then(() => { window.location.href = 'index.html'; });
         }
 
-        // ========== LOAD QUESTIONS ==========
+        // ĐỌC CẤU HÌNH GITHUB ĐỂ TẢI FILE PRIVATE
+        async function loadGithubConfig() {
+            try {
+                const snap = await database.ref('questions/public/sharedConfig/githubConfig').once('value');
+                githubConfig = snap.val();
+            } catch(e) { console.warn('Không lấy được GitHub Config:', e); }
+        }
+
+        // LOAD CÂU HỎI TỪ FIREBASE REALTIME
         function loadQuestions() {
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="6">
+                    <td colspan="7">
                         <div class="loading-state">
                             <div class="spinner"></div>
-                            <p style="margin-top:6px; color:#94a3b8; font-size:12px;">Đang tải...</p>
+                            <p style="margin-top:6px; color:#94a3b8; font-size:12px;">Đang tải dữ liệu...</p>
                         </div>
                     </td>
                 </tr>
             `;
 
+            // Khớp đúng cấu hình rule public của bạn
             const ref = database.ref('questions/public');
             ref.on('value', snapshot => {
                 const data = snapshot.val();
@@ -859,10 +657,10 @@
                     return;
                 }
 
-                allQuestions = Object.keys(data).map(key => ({
-                    id: key,
-                    ...data[key]
-                }));
+                // Lọc bỏ node sharedConfig nếu có
+                allQuestions = Object.keys(data)
+                    .filter(key => key !== 'sharedConfig')
+                    .map(key => ({ id: key, ...data[key] }));
 
                 allQuestions.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
@@ -872,7 +670,6 @@
             });
         }
 
-        // ========== UPDATE FILTERS ==========
         function updateFilters() {
             const fieldSet = new Set();
             const areaSet = new Set();
@@ -882,27 +679,24 @@
             });
 
             const currentField = fieldFilter.value;
-            fieldFilter.innerHTML = '<option value="">📂 Tất cả</option>';
+            fieldFilter.innerHTML = '<option value="">📂 Tất cả lĩnh vực</option>';
             [...fieldSet].sort().forEach(f => {
                 const opt = document.createElement('option');
-                opt.value = f;
-                opt.textContent = f;
+                opt.value = f; opt.textContent = f;
                 fieldFilter.appendChild(opt);
             });
             fieldFilter.value = currentField;
 
             const currentArea = areaFilter.value;
-            areaFilter.innerHTML = '<option value="">📍 Tất cả</option>';
+            areaFilter.innerHTML = '<option value="">📍 Tất cả khu vực</option>';
             [...areaSet].sort().forEach(a => {
                 const opt = document.createElement('option');
-                opt.value = a;
-                opt.textContent = a;
+                opt.value = a; opt.textContent = a;
                 areaFilter.appendChild(opt);
             });
             areaFilter.value = currentArea;
         }
 
-        // ========== FILTER ==========
         function filterQuestions() {
             const keyword = searchInput.value.toLowerCase().trim();
             const fieldVal = fieldFilter.value;
@@ -921,14 +715,13 @@
             renderTable();
         }
 
-        // ========== RENDER TABLE ==========
         function renderTable() {
             const data = searchInput.value || fieldFilter.value || areaFilter.value ? filteredQuestions : allQuestions;
 
             if (data.length === 0) {
                 tableBody.innerHTML = `
                     <tr>
-                        <td colspan="6">
+                        <td colspan="7">
                             <div class="empty-state">
                                 <div class="icon">📭</div>
                                 <p>Không tìm thấy câu hỏi nào</p>
@@ -942,6 +735,13 @@
             let html = '';
             data.forEach((q, index) => {
                 const isActive = q.id === selectedId;
+                
+                // Kiểm tra xem có file đính kèm hay không
+                const fileCount = (q.files && q.files.length) || (q.fileUrl || q.file ? 1 : 0);
+                const fileBadge = fileCount > 0 
+                    ? `<span class="file-badge">📎 ${fileCount}</span>` 
+                    : '<span style="color:#cbd5e1;">—</span>';
+
                 html += `
                     <tr class="${isActive ? 'active' : ''}" onclick="selectQuestion('${q.id}')">
                         <td>${index + 1}</td>
@@ -949,6 +749,7 @@
                         <td>${escapeHtml(q.phone)}</td>
                         <td><span class="field-tag">${escapeHtml(q.field)}</span></td>
                         <td>${q.area ? `<span class="area-tag">${escapeHtml(q.area)}</span>` : '—'}</td>
+                        <td>${fileBadge}</td>
                         <td>
                             <button class="delete-btn" onclick="event.stopPropagation(); deleteQuestion('${q.id}')" title="Xóa">✕</button>
                         </td>
@@ -957,14 +758,12 @@
             });
             tableBody.innerHTML = html;
 
-            if (selectedId && data.some(q => q.id === selectedId)) {
-                // keep detail
-            } else if (selectedId) {
+            if (selectedId && !data.some(q => q.id === selectedId)) {
                 clearDetail();
             }
         }
 
-        // ========== SELECT QUESTION - DETAIL 2 CỘT ==========
+        // HÀM HIỂN THỊ CHI TIẾT & FILE ĐÍNH KÈM
         function selectQuestion(id) {
             const q = allQuestions.find(item => item.id === id);
             if (!q) return;
@@ -972,7 +771,54 @@
             selectedId = id;
             renderTable();
 
-            let areaDisplay = q.area ? `<span class="tag area">${escapeHtml(q.area)}</span>` : '—';
+            let areaDisplay = q.area ? `<span class="area-tag">${escapeHtml(q.area)}</span>` : '—';
+
+            // Xử lý Render danh sách file
+            let filesHtml = '<span style="color:#94a3b8; font-size:12px;">Không có file đính kèm</span>';
+            
+            // Trường hợp 1: Dạng mảng `files`
+            if (q.files && Array.isArray(q.files) && q.files.length > 0) {
+                filesHtml = '<div class="attachment-list">';
+                q.files.forEach((f, idx) => {
+                    const fileName = escapeHtml(f.name || `Tệp_${idx + 1}`);
+                    if (f.ghPath) {
+                        filesHtml += `
+                            <div class="attachment-btn" onclick="downloadPrivateFile('${f.ghPath}', '${fileName}')">
+                                <span>📄 ${fileName}</span>
+                                <span>⬇️ Tải về</span>
+                            </div>`;
+                    } else if (f.url) {
+                        filesHtml += `
+                            <a href="${f.url}" target="_blank" class="attachment-btn">
+                                <span>📄 ${fileName}</span>
+                                <span>👁️ Xem/Tải</span>
+                            </a>`;
+                    }
+                });
+                filesHtml += '</div>';
+            } 
+            // Trường hợp 2: Dạng thuộc tính lẻ `fileUrl` hoặc `file`
+            else if (q.fileUrl || q.file || q.ghPath) {
+                const targetUrl = q.fileUrl || q.file;
+                const fileName = escapeHtml(q.fileName || 'Tệp_đính_kèm');
+                if (q.ghPath) {
+                    filesHtml = `
+                        <div class="attachment-list">
+                            <div class="attachment-btn" onclick="downloadPrivateFile('${q.ghPath}', '${fileName}')">
+                                <span>📄 ${fileName}</span>
+                                <span>⬇️ Tải về</span>
+                            </div>
+                        </div>`;
+                } else if (targetUrl) {
+                    filesHtml = `
+                        <div class="attachment-list">
+                            <a href="${targetUrl}" target="_blank" class="attachment-btn">
+                                <span>📄 ${fileName}</span>
+                                <span>👁️ Xem/Tải</span>
+                            </a>
+                        </div>`;
+                }
+            }
 
             detailContent.innerHTML = `
                 <div class="detail-grid">
@@ -994,21 +840,72 @@
                     </div>
                     <div class="detail-item">
                         <span class="label">Lĩnh vực</span>
-                        <span class="value"><span class="tag field">${escapeHtml(q.field)}</span></span>
+                        <span class="value"><span class="field-tag">${escapeHtml(q.field)}</span></span>
                     </div>
                     <div class="detail-item">
                         <span class="label">Thời gian gửi</span>
-                        <span class="value" style="color:#64748b; font-weight:400;">${escapeHtml(q.created) || '—'}</span>
+                        <span class="value" style="color:#64748b;">${escapeHtml(q.created) || '—'}</span>
                     </div>
                     <div class="detail-item full-width">
                         <span class="label">Nội dung câu hỏi</span>
                         <div class="question-full">${escapeHtml(q.question)}</div>
                     </div>
+                    <div class="detail-item full-width" style="margin-top: 6px;">
+                        <span class="label">📎 Tệp đính kèm</span>
+                        ${filesHtml}
+                    </div>
                 </div>
                 <div class="detail-actions">
-                    <button class="btn-delete-detail" onclick="deleteQuestion('${q.id}')">🗑️ Xóa</button>
+                    <button class="btn-delete-detail" onclick="deleteQuestion('${q.id}')">🗑️ Xóa câu hỏi</button>
                 </div>
             `;
+        }
+
+        // XỬ LÝ TẢI TỆP TỪ REPO PRIVATE QUA GITHUB API
+        async function downloadPrivateFile(ghPath, fileName) {
+            if (!githubConfig || !githubConfig.token) {
+                alert("⚠️ Hệ thống chưa được cấu hình GitHub Token để tải file từ Repo Private!");
+                return;
+            }
+
+            try {
+                showToast("⏳ Đang giải mã và tải tệp...", "success");
+                const apiUrl = `https://api.github.com/repos/${githubConfig.owner}/${githubConfig.repo}/contents/${encodeURI(ghPath)}`;
+                
+                const res = await fetch(apiUrl, {
+                    headers: {
+                        'Authorization': 'token ' + githubConfig.token,
+                        'Accept': 'application/vnd.github+json'
+                    }
+                });
+
+                if (!res.ok) throw new Error("Không thể lấy dữ liệu từ Repo GitHub Private");
+
+                const json = await res.json();
+                const base64Clean = json.content.replace(/\n/g, '');
+                
+                // Giải mã Base64 sang Blob
+                const byteCharacters = atob(base64Clean);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray]);
+
+                // Trigger tải về
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                showToast("✅ Tải tệp thành công!", "success");
+            } catch (err) {
+                console.error(err);
+                showToast("❌ Lỗi tải tệp: " + err.message, "error");
+            }
         }
 
         function clearDetail() {
@@ -1022,7 +919,6 @@
             `;
         }
 
-        // ========== DELETE ==========
         function deleteQuestion(id) {
             if (!confirm('Xóa câu hỏi này?')) return;
 
@@ -1032,12 +928,9 @@
                     showToast('🗑️ Đã xóa câu hỏi!', 'success');
                     if (selectedId === id) clearDetail();
                 })
-                .catch(error => {
-                    showToast('❌ ' + error.message, 'error');
-                });
+                .catch(error => { showToast('❌ ' + error.message, 'error'); });
         }
 
-        // ========== CLEAR ALL ==========
         function clearAll() {
             if (!confirm('⚠️ Xóa TẤT CẢ câu hỏi?')) return;
 
@@ -1047,19 +940,14 @@
                     showToast('🗑️ Đã xóa tất cả.', 'success');
                     clearDetail();
                 })
-                .catch(error => {
-                    showToast('❌ ' + error.message, 'error');
-                });
+                .catch(error => { showToast('❌ ' + error.message, 'error'); });
         }
 
-        // ========== UPDATE STATS ==========
         function updateStats() {
             const data = allQuestions;
             totalCount.textContent = data.length;
 
-            const fieldCount = {};
-            const nameCount = {};
-            const areaCount = {};
+            const fieldCount = {}, nameCount = {}, areaCount = {};
             data.forEach(q => {
                 fieldCount[q.field] = (fieldCount[q.field] || 0) + 1;
                 nameCount[q.fullName] = (nameCount[q.fullName] || 0) + 1;
@@ -1088,7 +976,7 @@
             topArea.textContent = topA;
         }
 
-        // ========== EXPORT ==========
+        // XUẤT EXCEL
         function exportSummary() {
             if (allQuestions.length === 0) {
                 showToast('⚠️ Chưa có câu hỏi để xuất!', 'error');
@@ -1098,10 +986,17 @@
             const data = [...allQuestions].sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
             const mainData = [
-                ['STT', 'Họ và tên', 'Số điện thoại', 'Địa chỉ', 'Khu vực', 'Lĩnh vực', 'Nội dung câu hỏi', 'Thời gian gửi']
+                ['STT', 'Họ và tên', 'Số điện thoại', 'Địa chỉ', 'Khu vực', 'Lĩnh vực', 'Nội dung câu hỏi', 'Tệp đính kèm', 'Thời gian gửi']
             ];
 
             data.forEach((q, index) => {
+                let fileStr = 'Không';
+                if (q.files && q.files.length > 0) {
+                    fileStr = q.files.map(f => f.name || f.ghPath).join('; ');
+                } else if (q.fileUrl || q.file || q.ghPath) {
+                    fileStr = q.fileName || q.ghPath || 'Có file';
+                }
+
                 mainData.push([
                     index + 1,
                     q.fullName || '',
@@ -1110,75 +1005,27 @@
                     q.area || '',
                     q.field || '',
                     q.question || '',
+                    fileStr,
                     q.created || ''
                 ]);
             });
 
-            const fieldStats = {};
-            const areaStats = {};
-            data.forEach(q => {
-                fieldStats[q.field] = (fieldStats[q.field] || 0) + 1;
-                if (q.area && q.area.trim()) {
-                    areaStats[q.area] = (areaStats[q.area] || 0) + 1;
-                }
-            });
-
-            const total = data.length;
-            const statData = [
-                ['📊 THỐNG KÊ CÂU HỎI'],
-                [],
-                ['1. THỐNG KÊ THEO LĨNH VỰC'],
-                ['Lĩnh vực', 'Số lượng', 'Tỷ lệ (%)']
-            ];
-
-            for (const [f, count] of Object.entries(fieldStats)) {
-                const percent = ((count / total) * 100).toFixed(1);
-                statData.push([f, count, percent]);
-            }
-
-            if (Object.keys(areaStats).length > 0) {
-                statData.push([]);
-                statData.push(['2. THỐNG KÊ THEO KHU VỰC']);
-                statData.push(['Khu vực', 'Số lượng', 'Tỷ lệ (%)']);
-                for (const [area, count] of Object.entries(areaStats)) {
-                    const percent = ((count / total) * 100).toFixed(1);
-                    statData.push([area, count, percent]);
-                }
-            }
-
-            statData.push([]);
-            statData.push(['📅 Thời gian xuất:', new Date().toLocaleString('vi-VN')]);
-            statData.push(['📬 Tổng số câu hỏi:', total]);
-
             const wb = XLSX.utils.book_new();
-
-            const ws1 = XLSX.utils.aoa_to_sheet(mainData);
-            ws1['!cols'] = [
-                { wch: 6 }, { wch: 22 }, { wch: 18 },
-                { wch: 30 }, { wch: 15 }, { wch: 20 },
-                { wch: 50 }, { wch: 22 }
+            const ws = XLSX.utils.aoa_to_sheet(mainData);
+            ws['!cols'] = [
+                { wch: 6 }, { wch: 22 }, { wch: 18 }, { wch: 30 },
+                { wch: 15 }, { wch: 20 }, { wch: 50 }, { wch: 25 }, { wch: 22 }
             ];
-            XLSX.utils.book_append_sheet(wb, ws1, 'Câu hỏi');
-
-            const ws2 = XLSX.utils.aoa_to_sheet(statData);
-            ws2['!cols'] = [{ wch: 30 }, { wch: 15 }, { wch: 15 }];
-            XLSX.utils.book_append_sheet(wb, ws2, 'Thống kê');
+            XLSX.utils.book_append_sheet(wb, ws, 'Câu hỏi');
 
             const filename = `tong_hop_cau_hoi_${new Date().toISOString().slice(0,10)}.xlsx`;
             XLSX.writeFile(wb, filename);
-            showToast('📨 Đã xuất file Excel!', 'success');
+            showToast('📨 Đã xuất file Excel thành công!', 'success');
         }
 
-        // ========== HELPERS ==========
         function escapeHtml(text) {
             if (!text) return '';
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            };
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
             return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
         }
 
@@ -1186,12 +1033,10 @@
             toast.textContent = message;
             toast.className = 'toast show ' + type;
             clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
+            toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 3000);
         }
 
-        console.log('📊 Dashboard sẵn sàng!');
+        console.log('📊 Dashboard đã sẵn sàng!');
     </script>
 </body>
 </html>
