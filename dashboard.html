@@ -626,14 +626,16 @@
 
         // ĐỌC CẤU HÌNH GITHUB ĐỂ TẢI FILE PRIVATE
         async function loadGithubConfig() {
-            try {
-                const snap = await database.ref('sharedConfig/githubConfig').once('value');
-                githubConfig = snap.val();
-                console.log("✅ Đã tải GitHub Config thành công");
-            } catch(e) { 
-                console.warn('⚠️ Không lấy được GitHub Config:', e); 
-            }
+    try {
+        const snap = await database.ref('sharedConfig/githubConfig').once('value');
+        githubConfig = snap.val();
+        if (githubConfig) {
+            console.log("✅ Đã kết nối thành công tới GitHub Token:", githubConfig.owner);
         }
+    } catch(e) { 
+        console.warn('⚠️ Lỗi kết nối GitHub Config:', e); 
+    }
+}
 
         // LOAD CÂU HỎI TỪ FIREBASE REALTIME
         function loadQuestions() {
@@ -648,7 +650,8 @@
                 </tr>
             `;
 
-            const ref = database.ref('questions/public');
+            // SỬA CHÍNH XÁC ĐƯỜNG DẪN TRỎ VÀO "questions/public/items"
+            const ref = database.ref('questions/public/items');
             ref.on('value', snapshot => {
                 const data = snapshot.val();
                 if (!data) {
@@ -744,9 +747,9 @@
                 html += `
                     <tr class="${isActive ? 'active' : ''}" onclick="selectQuestion('${q.id}')">
                         <td>${index + 1}</td>
-                        <td><span class="truncate" title="${escapeHtml(q.fullName)}">${escapeHtml(q.fullName)}</span></td>
-                        <td>${escapeHtml(q.phone)}</td>
-                        <td><span class="field-tag">${escapeHtml(q.field)}</span></td>
+                        <td><span class="truncate" title="${escapeHtml(q.fullName || 'Chưa nhập')}">${escapeHtml(q.fullName || '—')}</span></td>
+                        <td>${escapeHtml(q.phone || '—')}</td>
+                        <td><span class="field-tag">${escapeHtml(q.field || 'Chung')}</span></td>
                         <td>${q.area ? `<span class="area-tag">${escapeHtml(q.area)}</span>` : '—'}</td>
                         <td>${fileBadge}</td>
                         <td>
@@ -819,11 +822,11 @@
                 <div class="detail-grid">
                     <div class="detail-item">
                         <span class="label">Họ và tên</span>
-                        <span class="value"><strong>${escapeHtml(q.fullName)}</strong></span>
+                        <span class="value"><strong>${escapeHtml(q.fullName || '—')}</strong></span>
                     </div>
                     <div class="detail-item">
                         <span class="label">Số điện thoại</span>
-                        <span class="value">${escapeHtml(q.phone)}</span>
+                        <span class="value">${escapeHtml(q.phone || '—')}</span>
                     </div>
                     <div class="detail-item">
                         <span class="label">Địa chỉ</span>
@@ -835,7 +838,7 @@
                     </div>
                     <div class="detail-item">
                         <span class="label">Lĩnh vực</span>
-                        <span class="value"><span class="field-tag">${escapeHtml(q.field)}</span></span>
+                        <span class="value"><span class="field-tag">${escapeHtml(q.field || 'Chung')}</span></span>
                     </div>
                     <div class="detail-item">
                         <span class="label">Thời gian gửi</span>
@@ -843,7 +846,7 @@
                     </div>
                     <div class="detail-item full-width">
                         <span class="label">Nội dung câu hỏi</span>
-                        <div class="question-full">${escapeHtml(q.question)}</div>
+                        <div class="question-full">${escapeHtml(q.question || 'Chưa có nội dung')}</div>
                     </div>
                     <div class="detail-item full-width" style="margin-top: 6px;">
                         <span class="label">📎 Tệp đính kèm</span>
@@ -857,48 +860,66 @@
         }
 
         async function downloadPrivateFile(ghPath, fileName) {
-            if (!githubConfig || !githubConfig.token) {
-                alert("⚠️ Hệ thống chưa được cấu hình GitHub Token để tải file từ Repo Private!");
-                return;
-            }
-
-            try {
-                showToast("⏳ Đang giải mã và tải tệp...", "success");
-                const apiUrl = `https://api.github.com/repos/${githubConfig.owner}/${githubConfig.repo}/contents/${encodeURI(ghPath)}`;
-                
-                const res = await fetch(apiUrl, {
-                    headers: {
-                        'Authorization': 'token ' + githubConfig.token,
-                        'Accept': 'application/vnd.github+json'
-                    }
-                });
-
-                if (!res.ok) throw new Error("Không thể lấy dữ liệu từ Repo GitHub Private");
-
-                const json = await res.json();
-                const base64Clean = json.content.replace(/\n/g, '');
-                
-                const byteCharacters = atob(base64Clean);
-                const byteNumbers = new Array(byteCharacters.length);
-                for (let i = 0; i < byteCharacters.length; i++) {
-                    byteNumbers[i] = byteCharacters.charCodeAt(i);
-                }
-                const byteArray = new Uint8Array(byteNumbers);
-                const blob = new Blob([byteArray]);
-
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = fileName;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-
-                showToast("✅ Tải tệp thành công!", "success");
-            } catch (err) {
-                console.error(err);
-                showToast("❌ Lỗi tải tệp: " + err.message, "error");
-            }
+    // Nếu biến githubConfig chưa load kịp, thử đọc lại trực tiếp từ Firebase
+    if (!githubConfig || !githubConfig.token) {
+        try {
+            const snap = await database.ref('sharedConfig/githubConfig').once('value');
+            githubConfig = snap.val();
+        } catch (e) {
+            console.error("Lỗi đọc config:", e);
         }
+    }
+
+    // Kiểm tra lần cuối
+    if (!githubConfig || !githubConfig.token) {
+        alert("⚠️ Không thể lấy thông tin Token từ Database! Vui lòng kiểm tra lại kết nối.");
+        return;
+    }
+
+    try {
+        showToast("⏳ Đang tải tệp từ GitHub Private...", "success");
+
+        // Loại bỏ dấu / ở đầu nếu có
+        const cleanPath = ghPath.replace(/^\//, '');
+        const apiUrl = `https://api.github.com/repos/${githubConfig.owner}/${githubConfig.repo}/contents/${encodeURI(cleanPath)}`;
+
+        const res = await fetch(apiUrl, {
+            headers: {
+                'Authorization': 'token ' + githubConfig.token,
+                'Accept': 'application/vnd.github+json'
+            }
+        });
+
+        if (!res.ok) {
+            throw new Error(`Mã lỗi GitHub: ${res.status} (${res.statusText})`);
+        }
+
+        const json = await res.json();
+        
+        // Giải mã Base64 từ GitHub
+        const base64Clean = json.content.replace(/\n/g, '');
+        const byteCharacters = atob(base64Clean);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray]);
+
+        // Tạo link tải xuống tự động
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName || 'Tep_Dinh_Kem';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        showToast("✅ Tải tệp thành công!", "success");
+    } catch (err) {
+        console.error(err);
+        showToast("❌ Lỗi tải tệp: " + err.message, "error");
+    }
+}
 
         function clearDetail() {
             selectedId = null;
@@ -914,7 +935,8 @@
         function deleteQuestion(id) {
             if (!confirm('Xóa câu hỏi này?')) return;
 
-            const ref = database.ref(`questions/public/${id}`);
+            // Sửa đường dẫn xóa chính xác
+            const ref = database.ref(`questions/public/items/${id}`);
             ref.remove()
                 .then(() => {
                     showToast('🗑️ Đã xóa câu hỏi!', 'success');
@@ -926,7 +948,8 @@
         function clearAll() {
             if (!confirm('⚠️ Xóa TẤT CẢ câu hỏi?')) return;
 
-            const ref = database.ref('questions/public');
+            // Sửa đường dẫn xóa sạch chính xác
+            const ref = database.ref('questions/public/items');
             ref.remove()
                 .then(() => {
                     showToast('🗑️ Đã xóa tất cả.', 'success');
@@ -941,8 +964,8 @@
 
             const fieldCount = {}, nameCount = {}, areaCount = {};
             data.forEach(q => {
-                fieldCount[q.field] = (fieldCount[q.field] || 0) + 1;
-                nameCount[q.fullName] = (nameCount[q.fullName] || 0) + 1;
+                if(q.field) fieldCount[q.field] = (fieldCount[q.field] || 0) + 1;
+                if(q.fullName) nameCount[q.fullName] = (nameCount[q.fullName] || 0) + 1;
                 if (q.area && q.area.trim()) {
                     areaCount[q.area] = (areaCount[q.area] || 0) + 1;
                 }
