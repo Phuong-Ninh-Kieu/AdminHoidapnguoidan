@@ -861,31 +861,48 @@
 
         async function downloadPrivateFile(ghPath, fileName) {
     try {
-        // 1. Kiểm tra xem user đã đăng nhập Firebase Auth chưa
+        showToast("⏳ Đang lấy thông tin cấu hình...", "success");
+
+        let config = null;
         const user = firebase.auth().currentUser;
-        if (!user) {
-            alert("⚠️ Bạn cần đăng nhập để thực hiện thao tác này!");
-            return;
+
+        // 1. Ưu tiên đọc Token theo User ID nếu đã đăng nhập
+        if (user) {
+            try {
+                const userSnap = await database.ref(`users/${user.uid}/githubConfig`).once('value');
+                if (userSnap.exists()) {
+                    config = userSnap.val();
+                }
+            } catch (e) {
+                console.warn("Không thể đọc cấu hình User:", e);
+            }
         }
 
-        showToast("⏳ Đang lấy cấu hình GitHub của tài khoản...", "success");
-
-        // 2. Lấy Token ĐÚNG THEO USER ID (uid)
-        const snap = await database.ref(`users/${user.uid}/githubConfig`).once('value');
-        const config = snap.val();
-
+        // 2. Nếu chưa lấy được theo User, thử đọc sharedConfig
         if (!config || !config.token) {
-            alert("⚠️ Tài khoản của bạn chưa được cấu hình GitHub Token! Vui lòng vào Cài đặt để cập nhật Token cá nhân.");
+            try {
+                const sharedSnap = await database.ref('sharedConfig/githubConfig').once('value');
+                if (sharedSnap.exists()) {
+                    config = sharedSnap.val();
+                }
+            } catch (e) {
+                console.warn("Không thể đọc sharedConfig do thiếu quyền Rules:", e);
+            }
+        }
+
+        // 3. Trích xuất thông tin (Token/Owner/Repo)
+        const token = config && config.token ? String(config.token).trim() : "";
+        const owner = config && config.owner ? String(config.owner).trim() : "Phuong-Ninh-Kieu";
+        const repo = config && config.repo ? String(config.repo).trim() : "Storage-Private";
+
+        if (!token) {
+            alert("⚠️ Không tìm thấy GitHub Token! Vui lòng kiểm tra lại cấu hình tài khoản hoặc cập nhật Token trên Database.");
             return;
         }
 
-        const token = String(config.token).trim();
-        const owner = String(config.owner).trim();
-        const repo = String(config.repo).trim();
+        showToast("⏳ Đang lấy tệp từ GitHub...", "success");
 
-        showToast("⏳ Đang tải tệp từ GitHub cá nhân...", "success");
-
-        // 3. Gọi GitHub API
+        // 4. Gọi API GitHub để tải file
         const cleanPath = String(ghPath).replace(/^\//, '').trim();
         const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURI(cleanPath)}`;
 
@@ -897,14 +914,15 @@
         });
 
         if (!res.ok) {
-            if (res.status === 401) throw new Error("Token GitHub của bạn đã hết hạn hoặc không đúng!");
-            if (res.status === 404) throw new Error("Không tìm thấy file trên Repository của bạn!");
-            throw new Error(`Lỗi kết nối GitHub API (${res.status})`);
+            if (res.status === 401) throw new Error("Token GitHub bị sai hoặc hết hạn (Lỗi 401)!");
+            if (res.status === 404) throw new Error("Không tìm thấy file trên GitHub (Lỗi 404)!");
+            throw new Error(`Lỗi kết nối GitHub API: status ${res.status}`);
         }
 
         const json = await res.json();
+        if (!json.content) throw new Error("Nội dung tệp rỗng!");
 
-        // 4. Giải mã Base64 và tải file xuống
+        // 5. Giải mã Base64 và kích hoạt tải về
         const base64Clean = json.content.replace(/\n/g, '');
         const byteCharacters = atob(base64Clean);
         const byteNumbers = new Array(byteCharacters.length);
@@ -923,7 +941,7 @@
 
         showToast("✅ Tải tệp thành công!", "success");
     } catch (err) {
-        console.error("Lỗi download:", err);
+        console.error("Lỗi downloadPrivateFile:", err);
         alert("❌ " + err.message);
     }
 }
