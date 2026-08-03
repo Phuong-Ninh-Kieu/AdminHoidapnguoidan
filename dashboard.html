@@ -861,35 +861,26 @@
 
         async function downloadPrivateFile(ghPath, fileName) {
     try {
-        showToast("⏳ Đang chuẩn bị tải tệp...", "success");
+        showToast("⏳ Đang kết nối Firebase lấy Token...", "success");
 
-        // 1. Thử lấy từ biến githubConfig hoặc đọc từ Firebase
-        let config = githubConfig;
+        // Đọc thông tin cấu hình từ Firebase Realtime Database
+        const snap = await database.ref('sharedConfig/githubConfig').once('value');
+        const config = snap.val();
 
         if (!config || !config.token) {
-            try {
-                const snap = await database.ref('sharedConfig/githubConfig').once('value');
-                config = snap.val();
-            } catch (e) {
-                console.warn("Chưa đọc được từ Firebase, chuyển sang dùng cấu hình mặc định.", e);
-            }
-        }
-
-        // 2. CẤU HÌNH DỰ PHÒNG (Dựa trên ảnh Firebase của bạn)
-        // Nếu Firebase trả về null, code sẽ tự động dùng thông tin bên dưới này!
-        const token = (config && config.token) ? config.token : "ghp_66vDgofK0v1ubxyrgrrrRcpeMPXSmQQ1eJ5I4";
-        const owner = (config && config.owner) ? config.owner : "Phuong-Ninh-Kieu";
-        const repo = (config && config.repo) ? config.repo : "Storage-Private";
-
-        if (!token) {
-            alert("⚠️ Không thể xác thực GitHub Token!");
+            alert("⚠️ Không tìm thấy Token trên Firebase! Vui lòng kiểm tra lại nút 'sharedConfig/githubConfig'.");
             return;
         }
 
-        showToast("⏳ Đang kết nối GitHub lấy tệp...", "success");
+        // Làm sạch chuỗi token (xóa khoảng trắng thừa nếu có)
+        const token = String(config.token).trim();
+        const owner = String(config.owner || "Phuong-Ninh-Kieu").trim();
+        const repo = String(config.repo || "Storage-Private").trim();
 
-        // Làm sạch đường dẫn
-        const cleanPath = String(ghPath).replace(/^\//, '');
+        showToast("⏳ Đang tải file từ GitHub...", "success");
+
+        // Làm sạch đường dẫn file
+        const cleanPath = String(ghPath).replace(/^\//, '').trim();
         const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURI(cleanPath)}`;
 
         const res = await fetch(apiUrl, {
@@ -900,21 +891,21 @@
         });
 
         if (!res.ok) {
-            if (res.status === 404) {
-                throw new Error("Không tìm thấy file trên GitHub (Lỗi 404). Hãy kiểm tra lại ghPath!");
-            } else if (res.status === 401) {
-                throw new Error("Token GitHub bị hết hạn hoặc không có quyền (Lỗi 401)!");
+            if (res.status === 401) {
+                throw new Error("Token (lưu trên Firebase) bị sai hoặc đã bị hủy. Hãy tạo token mới và dán lại vào Firebase!");
+            } else if (res.status === 404) {
+                throw new Error("Không tìm thấy file trên GitHub! Kiểm tra lại đường dẫn: " + cleanPath);
             }
-            throw new Error(`Lỗi kết nối GitHub API: status ${res.status}`);
+            throw new Error(`Lỗi kết nối GitHub API (${res.status})`);
         }
 
         const json = await res.json();
-        
+
         if (!json.content) {
-            throw new Error("Nội dung tệp rỗng hoặc không đúng định dạng!");
+            throw new Error("Tệp rỗng hoặc không đúng định dạng!");
         }
 
-        // Giải mã dữ liệu file Base64 từ GitHub API
+        // Giải mã dữ liệu file Base64 từ GitHub
         const base64Clean = json.content.replace(/\n/g, '');
         const byteCharacters = atob(base64Clean);
         const byteNumbers = new Array(byteCharacters.length);
@@ -924,7 +915,7 @@
         const byteArray = new Uint8Array(byteNumbers);
         const blob = new Blob([byteArray]);
 
-        // Tạo đường link tải file tự động xuống trình duyệt
+        // Tạo đường link tải xuống
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = fileName || cleanPath.split('/').pop() || 'Tep_Dinh_Kem';
@@ -934,7 +925,7 @@
 
         showToast("✅ Tải tệp thành công!", "success");
     } catch (err) {
-        console.error("Lỗi downloadPrivateFile:", err);
+        console.error("Lỗi download:", err);
         alert("❌ " + err.message);
     }
 }
