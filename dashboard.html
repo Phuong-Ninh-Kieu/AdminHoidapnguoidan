@@ -627,49 +627,51 @@
 
         // ĐỌC CẤU HÌNH GITHUB ĐỂ TẢI FILE PRIVATE
         async function loadGithubConfig() {
-            try {
-                const snap = await database.ref('questions/public/sharedConfig/githubConfig').once('value');
-                githubConfig = snap.val();
-            } catch(e) { console.warn('Không lấy được GitHub Config:', e); }
-        }
-
+    try {
+        const snap = await database.ref('sharedConfig/githubConfig').once('value');
+        githubConfig = snap.val();
+        console.log("✅ Đã tải GitHub Config thành công");
+    } catch(e) { 
+        console.warn('⚠️ Không lấy được GitHub Config:', e); 
+    }
+}
         // LOAD CÂU HỎI TỪ FIREBASE REALTIME
         function loadQuestions() {
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="7">
-                        <div class="loading-state">
-                            <div class="spinner"></div>
-                            <p style="margin-top:6px; color:#94a3b8; font-size:12px;">Đang tải dữ liệu...</p>
-                        </div>
-                    </td>
-                </tr>
-            `;
+    tableBody.innerHTML = `
+        <tr>
+            <td colspan="7">
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p style="margin-top:6px; color:#94a3b8; font-size:12px;">Đang tải dữ liệu...</p>
+                </div>
+            </td>
+        </tr>
+    `;
 
-            // Khớp đúng cấu hình rule public của bạn
-            const ref = database.ref('questions/public');
-            ref.on('value', snapshot => {
-                const data = snapshot.val();
-                if (!data) {
-                    allQuestions = [];
-                    renderTable();
-                    updateStats();
-                    return;
-                }
-
-                // Lọc bỏ node sharedConfig nếu có
-                allQuestions = Object.keys(data)
-                    .filter(key => key !== 'sharedConfig')
-                    .map(key => ({ id: key, ...data[key] }));
-
-                allQuestions.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-
-                updateFilters();
-                renderTable();
-                updateStats();
-            });
+    const ref = database.ref('questions/public');
+    ref.on('value', snapshot => {
+        const data = snapshot.val();
+        if (!data) {
+            allQuestions = [];
+            renderTable();
+            updateStats();
+            return;
         }
 
+        // Chuyển đổi dữ liệu Object sang Array
+        allQuestions = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+
+        // Sắp xếp theo thời gian mới nhất
+        allQuestions.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+        updateFilters();
+        renderTable();
+        updateStats();
+    }, error => {
+        console.error("Lỗi Firebase Database:", error);
+        showToast("❌ Lỗi tải dữ liệu: " + error.message, "error");
+    });
+}
         function updateFilters() {
             const fieldSet = new Set();
             const areaSet = new Set();
