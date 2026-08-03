@@ -232,7 +232,7 @@
         }
 
         .search-bar select {
-            padding: 6px 10px;
+            padding: 6px 8px;
             border: 2px solid #e2e8f0;
             border-radius: 8px;
             font-size: 12px;
@@ -484,22 +484,22 @@
             <div class="stat-card accent-red">
                 <span class="stat-icon">📂</span>
                 <div class="stat-info">
-                    <div class="number" id="topField">—</div>
-                    <div class="label">Lĩnh vực nhiều nhất</div>
+                    <div class="number" id="topField">0</div>
+                    <div class="label">Tổng số lĩnh vực</div>
                 </div>
             </div>
             <div class="stat-card accent-yellow">
                 <span class="stat-icon">👤</span>
                 <div class="stat-info">
-                    <div class="number" id="topPerson">—</div>
-                    <div class="label">Người gửi nhiều nhất</div>
+                    <div class="number" id="topPerson">0</div>
+                    <div class="label">Số lượng người gửi</div>
                 </div>
             </div>
             <div class="stat-card accent-blue">
                 <span class="stat-icon">📍</span>
                 <div class="stat-info">
                     <div class="number" id="topArea">—</div>
-                    <div class="label">Khu vực nhiều nhất</div>
+                    <div class="label">Khu vực gửi nhiều nhất</div>
                 </div>
             </div>
         </div>
@@ -520,9 +520,40 @@
                 <!-- Search & Filter -->
                 <div class="search-bar">
                     <input type="text" id="searchInput" placeholder="🔍 Tìm kiếm..." oninput="filterQuestions()">
+                    
+                    <!-- BỘ LỌC THỜI GIAN THEO NĂM, THÁNG, TUẦN -->
+                    <select id="yearFilter" onchange="filterQuestions()">
+                        <option value="">📅 Tất cả năm</option>
+                    </select>
+
+                    <select id="monthFilter" onchange="filterQuestions()">
+                        <option value="">📅 Tất cả tháng</option>
+                        <option value="1">Tháng 1</option>
+                        <option value="2">Tháng 2</option>
+                        <option value="3">Tháng 3</option>
+                        <option value="4">Tháng 4</option>
+                        <option value="5">Tháng 5</option>
+                        <option value="6">Tháng 6</option>
+                        <option value="7">Tháng 7</option>
+                        <option value="8">Tháng 8</option>
+                        <option value="9">Tháng 9</option>
+                        <option value="10">Tháng 10</option>
+                        <option value="11">Tháng 11</option>
+                        <option value="12">Tháng 12</option>
+                    </select>
+
+                    <select id="weekFilter" onchange="filterQuestions()">
+                        <option value="">📅 Tất cả tuần</option>
+                        <option value="1">Tuần 1 (Ngày 1-7)</option>
+                        <option value="2">Tuần 2 (Ngày 8-14)</option>
+                        <option value="3">Tuần 3 (Ngày 15-21)</option>
+                        <option value="4">Tuần 4 (Ngày 22 trở đi)</option>
+                    </select>
+
                     <select id="fieldFilter" onchange="filterQuestions()">
                         <option value="">📂 Tất cả lĩnh vực</option>
                     </select>
+                    
                     <select id="areaFilter" onchange="filterQuestions()">
                         <option value="">📍 Tất cả khu vực</option>
                     </select>
@@ -599,6 +630,10 @@
         const tableBody = document.getElementById('tableBody');
         const detailContent = document.getElementById('detailContent');
         const searchInput = document.getElementById('searchInput');
+        
+        const yearFilter = document.getElementById('yearFilter');
+        const monthFilter = document.getElementById('monthFilter');
+        const weekFilter = document.getElementById('weekFilter');
         const fieldFilter = document.getElementById('fieldFilter');
         const areaFilter = document.getElementById('areaFilter');
         const toast = document.getElementById('toast');
@@ -624,18 +659,17 @@
             auth.signOut().then(() => { window.location.href = 'index.html'; });
         }
 
-        // ĐỌC CẤU HÌNH GITHUB ĐỂ TẢI FILE PRIVATE
         async function loadGithubConfig() {
-    try {
-        const snap = await database.ref('sharedConfig/githubConfig').once('value');
-        githubConfig = snap.val();
-        if (githubConfig) {
-            console.log("✅ Đã kết nối thành công tới GitHub Token:", githubConfig.owner);
+            try {
+                const snap = await database.ref('sharedConfig/githubConfig').once('value');
+                githubConfig = snap.val();
+                if (githubConfig) {
+                    console.log("✅ Đã kết nối thành công tới GitHub Token:", githubConfig.owner);
+                }
+            } catch(e) { 
+                console.warn('⚠️ Lỗi kết nối GitHub Config:', e); 
+            }
         }
-    } catch(e) { 
-        console.warn('⚠️ Lỗi kết nối GitHub Config:', e); 
-    }
-}
 
         // LOAD CÂU HỎI TỪ FIREBASE REALTIME
         function loadQuestions() {
@@ -650,14 +684,13 @@
                 </tr>
             `;
 
-            // SỬA CHÍNH XÁC ĐƯỜNG DẪN TRỎ VÀO "questions/public/items"
             const ref = database.ref('questions/public/items');
             ref.on('value', snapshot => {
                 const data = snapshot.val();
                 if (!data) {
                     allQuestions = [];
                     renderTable();
-                    updateStats();
+                    updateStats([]);
                     return;
                 }
 
@@ -665,22 +698,41 @@
                 allQuestions.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
                 updateFilters();
-                renderTable();
-                updateStats();
+                filterQuestions();
             }, error => {
                 console.error("Lỗi Firebase Database:", error);
                 showToast("❌ Lỗi tải dữ liệu: " + error.message, "error");
             });
         }
 
+        // CẬP NHẬT CÁC ĐIỀU KIỆN LỌC (CÓ COMBOBOX NĂM TỰ ĐỘNG)
         function updateFilters() {
             const fieldSet = new Set();
             const areaSet = new Set();
+            const yearSet = new Set();
+
             allQuestions.forEach(q => {
                 if (q.field) fieldSet.add(q.field);
                 if (q.area && q.area.trim()) areaSet.add(q.area);
+                
+                // Trích xuất Năm từ timestamp hoặc created
+                let d = q.timestamp ? new Date(q.timestamp) : (q.created ? new Date(q.created) : null);
+                if (d && !isNaN(d.getTime())) {
+                    yearSet.add(d.getFullYear());
+                }
             });
 
+            // Update Năm Combobox
+            const currentYear = yearFilter.value;
+            yearFilter.innerHTML = '<option value="">📅 Tất cả năm</option>';
+            [...yearSet].sort((a,b) => b - a).forEach(y => {
+                const opt = document.createElement('option');
+                opt.value = y; opt.textContent = `Năm ${y}`;
+                yearFilter.appendChild(opt);
+            });
+            yearFilter.value = currentYear;
+
+            // Update Lĩnh vực
             const currentField = fieldFilter.value;
             fieldFilter.innerHTML = '<option value="">📂 Tất cả lĩnh vực</option>';
             [...fieldSet].sort().forEach(f => {
@@ -690,6 +742,7 @@
             });
             fieldFilter.value = currentField;
 
+            // Update Khu vực
             const currentArea = areaFilter.value;
             areaFilter.innerHTML = '<option value="">📍 Tất cả khu vực</option>';
             [...areaSet].sort().forEach(a => {
@@ -700,8 +753,44 @@
             areaFilter.value = currentArea;
         }
 
+        // KIỂM TRẢ THỜI GIAN THEO NĂM, THÁNG, TUẦN
+        function checkDateMatch(timestamp, createdStr, yVal, mVal, wVal) {
+            if (!yVal && !mVal && !wVal) return true;
+
+            let date = timestamp ? new Date(timestamp) : (createdStr ? new Date(createdStr) : null);
+            if (!date || isNaN(date.getTime())) return true;
+
+            // 1. Lọc theo Năm
+            if (yVal && date.getFullYear() !== parseInt(yVal)) {
+                return false;
+            }
+
+            // 2. Lọc theo Tháng (1 - 12)
+            if (mVal && (date.getMonth() + 1) !== parseInt(mVal)) {
+                return false;
+            }
+
+            // 3. Lọc theo Tuần trong Tháng (Tuần 1 đến Tuần 4)
+            if (wVal) {
+                const day = date.getDate();
+                let week = 1;
+                if (day > 21) week = 4;
+                else if (day > 14) week = 3;
+                else if (day > 7) week = 2;
+
+                if (week !== parseInt(wVal)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         function filterQuestions() {
             const keyword = searchInput.value.toLowerCase().trim();
+            const yVal = yearFilter.value;
+            const mVal = monthFilter.value;
+            const wVal = weekFilter.value;
             const fieldVal = fieldFilter.value;
             const areaVal = areaFilter.value;
 
@@ -710,16 +799,20 @@
                     (q.fullName && q.fullName.toLowerCase().includes(keyword)) ||
                     (q.phone && q.phone.includes(keyword)) ||
                     (q.question && q.question.toLowerCase().includes(keyword));
+                
+                const matchDate = checkDateMatch(q.timestamp, q.created, yVal, mVal, wVal);
                 const matchField = !fieldVal || q.field === fieldVal;
                 const matchArea = !areaVal || q.area === areaVal;
-                return matchKeyword && matchField && matchArea;
+
+                return matchKeyword && matchDate && matchField && matchArea;
             });
 
             renderTable();
+            updateStats(filteredQuestions);
         }
 
         function renderTable() {
-            const data = searchInput.value || fieldFilter.value || areaFilter.value ? filteredQuestions : allQuestions;
+            const data = filteredQuestions;
 
             if (data.length === 0) {
                 tableBody.innerHTML = `
@@ -860,82 +953,79 @@
         }
 
         async function downloadPrivateFile(ghPath, fileName, itemGithubRepo) {
-    try {
-        showToast("⏳ Đang lấy cấu hình từ Firebase...", "success");
+            try {
+                showToast("⏳ Đang lấy cấu hình từ Firebase...", "success");
 
-        // 1. Lấy Repo từ tham số truyền vào hoặc dùng mặc định
-        let owner = "Phuong-Ninh-Kieu";
-        let repo = "Storage-Private";
-        if (itemGithubRepo && itemGithubRepo.includes('/')) {
-            const parts = itemGithubRepo.split('/');
-            owner = parts[0].trim();
-            repo = parts[1].trim();
-        }
+                let owner = "Phuong-Ninh-Kieu";
+                let repo = "Storage-Private";
+                if (itemGithubRepo && itemGithubRepo.includes('/')) {
+                    const parts = itemGithubRepo.split('/');
+                    owner = parts[0].trim();
+                    repo = parts[1].trim();
+                }
 
-        // 2. ĐỌC CHUẨN ĐƯỜNG DẪN CỦA BẠN: questions/public/sharedConfig/githubConfig
-        let token = "";
-        try {
-            const snap = await database.ref('questions/public/sharedConfig/githubConfig').once('value');
-            if (snap.exists()) {
-                const config = snap.val();
-                token = config.token || "";
-                if (config.owner) owner = config.owner;
-                if (config.repo) repo = config.repo;
+                let token = "";
+                try {
+                    const snap = await database.ref('questions/public/sharedConfig/githubConfig').once('value');
+                    if (snap.exists()) {
+                        const config = snap.val();
+                        token = config.token || "";
+                        if (config.owner) owner = config.owner;
+                        if (config.repo) repo = config.repo;
+                    }
+                } catch (e) {
+                    console.warn("Lỗi đọc Firebase:", e);
+                }
+
+                if (!token) {
+                    alert("⚠️ Không tìm thấy Token trong 'questions/public/sharedConfig/githubConfig'. Vui lòng kiểm tra lại giá trị token trên Firebase!");
+                    return;
+                }
+
+                showToast("⏳ Đang tải tệp từ GitHub...", "success");
+
+                const cleanPath = String(ghPath).replace(/^\//, '').trim();
+                const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURI(cleanPath)}`;
+
+                const res = await fetch(apiUrl, {
+                    headers: {
+                        'Authorization': 'token ' + String(token).trim(),
+                        'Accept': 'application/vnd.github+json'
+                    }
+                });
+
+                if (!res.ok) {
+                    if (res.status === 401) throw new Error("Token GitHub bị sai hoặc đã bị hết hạn (Lỗi 401)!");
+                    if (res.status === 404) throw new Error("Không tìm thấy tệp trên GitHub (Lỗi 404)!");
+                    throw new Error(`Lỗi kết nối GitHub API (${res.status})`);
+                }
+
+                const json = await res.json();
+                if (!json.content) throw new Error("Nội dung tệp rỗng!");
+
+                const base64Clean = json.content.replace(/\n/g, '');
+                const byteCharacters = atob(base64Clean);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray]);
+
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = fileName || cleanPath.split('/').pop() || 'Tep_Dinh_Kem';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                showToast("✅ Tải tệp thành công!", "success");
+            } catch (err) {
+                console.error("Lỗi downloadPrivateFile:", err);
+                alert("❌ " + err.message);
             }
-        } catch (e) {
-            console.warn("Lỗi đọc Firebase:", e);
         }
 
-        if (!token) {
-            alert("⚠️ Không tìm thấy Token trong 'questions/public/sharedConfig/githubConfig'. Vui lòng kiểm tra lại giá trị token trên Firebase!");
-            return;
-        }
-
-        showToast("⏳ Đang tải tệp từ GitHub...", "success");
-
-        // 3. Gọi GitHub API
-        const cleanPath = String(ghPath).replace(/^\//, '').trim();
-        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURI(cleanPath)}`;
-
-        const res = await fetch(apiUrl, {
-            headers: {
-                'Authorization': 'token ' + String(token).trim(),
-                'Accept': 'application/vnd.github+json'
-            }
-        });
-
-        if (!res.ok) {
-            if (res.status === 401) throw new Error("Token GitHub bị sai hoặc đã bị hết hạn (Lỗi 401)!");
-            if (res.status === 404) throw new Error("Không tìm thấy tệp trên GitHub (Lỗi 404)!");
-            throw new Error(`Lỗi kết nối GitHub API (${res.status})`);
-        }
-
-        const json = await res.json();
-        if (!json.content) throw new Error("Nội dung tệp rỗng!");
-
-        // 4. Giải mã Base64 và tải xuống
-        const base64Clean = json.content.replace(/\n/g, '');
-        const byteCharacters = atob(base64Clean);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray]);
-
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = fileName || cleanPath.split('/').pop() || 'Tep_Dinh_Kem';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        showToast("✅ Tải tệp thành công!", "success");
-    } catch (err) {
-        console.error("Lỗi downloadPrivateFile:", err);
-        alert("❌ " + err.message);
-    }
-}
         function clearDetail() {
             selectedId = null;
             renderTable();
@@ -950,7 +1040,6 @@
         function deleteQuestion(id) {
             if (!confirm('Xóa câu hỏi này?')) return;
 
-            // Sửa đường dẫn xóa chính xác
             const ref = database.ref(`questions/public/items/${id}`);
             ref.remove()
                 .then(() => {
@@ -963,7 +1052,6 @@
         function clearAll() {
             if (!confirm('⚠️ Xóa TẤT CẢ câu hỏi?')) return;
 
-            // Sửa đường dẫn xóa sạch chính xác
             const ref = database.ref('questions/public/items');
             ref.remove()
                 .then(() => {
@@ -973,46 +1061,51 @@
                 .catch(error => { showToast('❌ ' + error.message, 'error'); });
         }
 
-        function updateStats() {
-            const data = allQuestions;
+        // CẬP NHẬT TỔNG HỢP THỐNG KÊ
+        function updateStats(data = []) {
             totalCount.textContent = data.length;
 
-            const fieldCount = {}, nameCount = {}, areaCount = {};
+            const fieldSet = new Set();
+            const nameSet = new Set();
+            const areaCount = {};
+
             data.forEach(q => {
-                if(q.field) fieldCount[q.field] = (fieldCount[q.field] || 0) + 1;
-                if(q.fullName) nameCount[q.fullName] = (nameCount[q.fullName] || 0) + 1;
+                if (q.field && q.field.trim()) {
+                    fieldSet.add(q.field.trim());
+                }
+                if (q.fullName && q.fullName.trim()) {
+                    nameSet.add(q.fullName.trim().toLowerCase());
+                }
                 if (q.area && q.area.trim()) {
-                    areaCount[q.area] = (areaCount[q.area] || 0) + 1;
+                    const areaName = q.area.trim();
+                    areaCount[areaName] = (areaCount[areaName] || 0) + 1;
                 }
             });
 
-            let topF = '—', topFVal = 0;
-            for (const [f, count] of Object.entries(fieldCount)) {
-                if (count > topFVal) { topFVal = count; topF = f; }
-            }
+            // 1. Số lượng lĩnh vực
+            topField.textContent = fieldSet.size;
 
-            let topP = '—', topPVal = 0;
-            for (const [name, count] of Object.entries(nameCount)) {
-                if (count > topPVal) { topPVal = count; topP = name; }
-            }
+            // 2. Số lượng người gửi
+            topPerson.textContent = nameSet.size;
 
+            // 3. Khu vực gửi nhiều nhất
             let topA = '—', topAVal = 0;
             for (const [area, count] of Object.entries(areaCount)) {
-                if (count > topAVal) { topAVal = count; topA = area; }
+                if (count > topAVal) { 
+                    topAVal = count; 
+                    topA = area; 
+                }
             }
-
-            topField.textContent = topF;
-            topPerson.textContent = topP;
-            topArea.textContent = topA;
+            topArea.textContent = topAVal > 0 ? `${topA} (${topAVal})` : '—';
         }
 
         function exportSummary() {
-            if (allQuestions.length === 0) {
+            if (filteredQuestions.length === 0) {
                 showToast('⚠️ Chưa có câu hỏi để xuất!', 'error');
                 return;
             }
 
-            const data = [...allQuestions].sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+            const data = [...filteredQuestions].sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
             const mainData = [
                 ['STT', 'Họ và tên', 'Số điện thoại', 'Địa chỉ', 'Khu vực', 'Lĩnh vực', 'Nội dung câu hỏi', 'Tệp đính kèm', 'Thời gian gửi']
