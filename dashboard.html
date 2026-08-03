@@ -35,7 +35,7 @@
             flex-direction: column;
         }
 
-        /* ===== HEADER - CỐ ĐỊNH - NHỎ GỌN ===== */
+        /* ===== HEADER ===== */
         .header {
             background: linear-gradient(135deg, #1e293b, #334155);
             color: white;
@@ -97,7 +97,7 @@
             background: rgba(255, 255, 255, 0.25);
         }
 
-        /* ===== STATS - CỐ ĐỊNH - NHỎ GỌN ===== */
+        /* ===== STATS ===== */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -151,7 +151,7 @@
         .stat-card.accent-yellow { border-left-color: #fbbf24; }
         .stat-card.accent-blue { border-left-color: #3b82f6; }
 
-        /* ===== MAIN LAYOUT - PHẦN CUỘN ===== */
+        /* ===== MAIN LAYOUT ===== */
         .main-grid {
             display: grid;
             grid-template-columns: 1fr 360px;
@@ -389,7 +389,6 @@
             margin-top: 2px;
         }
 
-        /* KHU VỰC HIỂN THỊ TỆP ĐÍNH KÈM */
         .attachment-list {
             display: flex;
             flex-direction: column;
@@ -627,51 +626,50 @@
 
         // ĐỌC CẤU HÌNH GITHUB ĐỂ TẢI FILE PRIVATE
         async function loadGithubConfig() {
-    try {
-        const snap = await database.ref('sharedConfig/githubConfig').once('value');
-        githubConfig = snap.val();
-        console.log("✅ Đã tải GitHub Config thành công");
-    } catch(e) { 
-        console.warn('⚠️ Không lấy được GitHub Config:', e); 
-    }
-}
-        // LOAD CÂU HỎI TỪ FIREBASE REALTIME
-        function loadQuestions() {
-    tableBody.innerHTML = `
-        <tr>
-            <td colspan="7">
-                <div class="loading-state">
-                    <div class="spinner"></div>
-                    <p style="margin-top:6px; color:#94a3b8; font-size:12px;">Đang tải dữ liệu...</p>
-                </div>
-            </td>
-        </tr>
-    `;
-
-    const ref = database.ref('questions/public');
-    ref.on('value', snapshot => {
-        const data = snapshot.val();
-        if (!data) {
-            allQuestions = [];
-            renderTable();
-            updateStats();
-            return;
+            try {
+                const snap = await database.ref('sharedConfig/githubConfig').once('value');
+                githubConfig = snap.val();
+                console.log("✅ Đã tải GitHub Config thành công");
+            } catch(e) { 
+                console.warn('⚠️ Không lấy được GitHub Config:', e); 
+            }
         }
 
-        // Chuyển đổi dữ liệu Object sang Array
-        allQuestions = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+        // LOAD CÂU HỎI TỪ FIREBASE REALTIME
+        function loadQuestions() {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="7">
+                        <div class="loading-state">
+                            <div class="spinner"></div>
+                            <p style="margin-top:6px; color:#94a3b8; font-size:12px;">Đang tải dữ liệu...</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
 
-        // Sắp xếp theo thời gian mới nhất
-        allQuestions.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+            const ref = database.ref('questions/public');
+            ref.on('value', snapshot => {
+                const data = snapshot.val();
+                if (!data) {
+                    allQuestions = [];
+                    renderTable();
+                    updateStats();
+                    return;
+                }
 
-        updateFilters();
-        renderTable();
-        updateStats();
-    }, error => {
-        console.error("Lỗi Firebase Database:", error);
-        showToast("❌ Lỗi tải dữ liệu: " + error.message, "error");
-    });
-}
+                allQuestions = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                allQuestions.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+                updateFilters();
+                renderTable();
+                updateStats();
+            }, error => {
+                console.error("Lỗi Firebase Database:", error);
+                showToast("❌ Lỗi tải dữ liệu: " + error.message, "error");
+            });
+        }
+
         function updateFilters() {
             const fieldSet = new Set();
             const areaSet = new Set();
@@ -738,7 +736,6 @@
             data.forEach((q, index) => {
                 const isActive = q.id === selectedId;
                 
-                // Kiểm tra xem có file đính kèm hay không
                 const fileCount = (q.files && q.files.length) || (q.fileUrl || q.file ? 1 : 0);
                 const fileBadge = fileCount > 0 
                     ? `<span class="file-badge">📎 ${fileCount}</span>` 
@@ -765,7 +762,6 @@
             }
         }
 
-        // HÀM HIỂN THỊ CHI TIẾT & FILE ĐÍNH KÈM
         function selectQuestion(id) {
             const q = allQuestions.find(item => item.id === id);
             if (!q) return;
@@ -775,10 +771,8 @@
 
             let areaDisplay = q.area ? `<span class="area-tag">${escapeHtml(q.area)}</span>` : '—';
 
-            // Xử lý Render danh sách file
             let filesHtml = '<span style="color:#94a3b8; font-size:12px;">Không có file đính kèm</span>';
             
-            // Trường hợp 1: Dạng mảng `files`
             if (q.files && Array.isArray(q.files) && q.files.length > 0) {
                 filesHtml = '<div class="attachment-list">';
                 q.files.forEach((f, idx) => {
@@ -799,7 +793,6 @@
                 });
                 filesHtml += '</div>';
             } 
-            // Trường hợp 2: Dạng thuộc tính lẻ `fileUrl` hoặc `file`
             else if (q.fileUrl || q.file || q.ghPath) {
                 const targetUrl = q.fileUrl || q.file;
                 const fileName = escapeHtml(q.fileName || 'Tệp_đính_kèm');
@@ -863,7 +856,6 @@
             `;
         }
 
-        // XỬ LÝ TẢI TỆP TỪ REPO PRIVATE QUA GITHUB API
         async function downloadPrivateFile(ghPath, fileName) {
             if (!githubConfig || !githubConfig.token) {
                 alert("⚠️ Hệ thống chưa được cấu hình GitHub Token để tải file từ Repo Private!");
@@ -886,7 +878,6 @@
                 const json = await res.json();
                 const base64Clean = json.content.replace(/\n/g, '');
                 
-                // Giải mã Base64 sang Blob
                 const byteCharacters = atob(base64Clean);
                 const byteNumbers = new Array(byteCharacters.length);
                 for (let i = 0; i < byteCharacters.length; i++) {
@@ -895,7 +886,6 @@
                 const byteArray = new Uint8Array(byteNumbers);
                 const blob = new Blob([byteArray]);
 
-                // Trigger tải về
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
                 link.download = fileName;
@@ -978,7 +968,6 @@
             topArea.textContent = topA;
         }
 
-        // XUẤT EXCEL
         function exportSummary() {
             if (allQuestions.length === 0) {
                 showToast('⚠️ Chưa có câu hỏi để xuất!', 'error');
