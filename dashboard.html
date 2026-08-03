@@ -860,43 +860,61 @@
         }
 
         async function downloadPrivateFile(ghPath, fileName) {
-    // Nếu biến githubConfig chưa load kịp, thử đọc lại trực tiếp từ Firebase
-    if (!githubConfig || !githubConfig.token) {
-        try {
-            const snap = await database.ref('sharedConfig/githubConfig').once('value');
-            githubConfig = snap.val();
-        } catch (e) {
-            console.error("Lỗi đọc config:", e);
-        }
-    }
-
-    // Kiểm tra lần cuối
-    if (!githubConfig || !githubConfig.token) {
-        alert("⚠️ Không thể lấy thông tin Token từ Database! Vui lòng kiểm tra lại kết nối.");
-        return;
-    }
-
     try {
-        showToast("⏳ Đang tải tệp từ GitHub Private...", "success");
+        showToast("⏳ Đang chuẩn bị tải tệp...", "success");
 
-        // Loại bỏ dấu / ở đầu nếu có
-        const cleanPath = ghPath.replace(/^\//, '');
-        const apiUrl = `https://api.github.com/repos/${githubConfig.owner}/${githubConfig.repo}/contents/${encodeURI(cleanPath)}`;
+        // 1. Thử lấy từ biến githubConfig hoặc đọc từ Firebase
+        let config = githubConfig;
+
+        if (!config || !config.token) {
+            try {
+                const snap = await database.ref('sharedConfig/githubConfig').once('value');
+                config = snap.val();
+            } catch (e) {
+                console.warn("Chưa đọc được từ Firebase, chuyển sang dùng cấu hình mặc định.", e);
+            }
+        }
+
+        // 2. CẤU HÌNH DỰ PHÒNG (Dựa trên ảnh Firebase của bạn)
+        // Nếu Firebase trả về null, code sẽ tự động dùng thông tin bên dưới này!
+        const token = (config && config.token) ? config.token : "ghp_66vDgofK0v1ubxyrgrrrRcpeMPXSmQQ1eJ5I4";
+        const owner = (config && config.owner) ? config.owner : "Phuong-Ninh-Kieu";
+        const repo = (config && config.repo) ? config.repo : "Storage-Private";
+
+        if (!token) {
+            alert("⚠️ Không thể xác thực GitHub Token!");
+            return;
+        }
+
+        showToast("⏳ Đang kết nối GitHub lấy tệp...", "success");
+
+        // Làm sạch đường dẫn
+        const cleanPath = String(ghPath).replace(/^\//, '');
+        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURI(cleanPath)}`;
 
         const res = await fetch(apiUrl, {
             headers: {
-                'Authorization': 'token ' + githubConfig.token,
+                'Authorization': 'token ' + token,
                 'Accept': 'application/vnd.github+json'
             }
         });
 
         if (!res.ok) {
-            throw new Error(`Mã lỗi GitHub: ${res.status} (${res.statusText})`);
+            if (res.status === 404) {
+                throw new Error("Không tìm thấy file trên GitHub (Lỗi 404). Hãy kiểm tra lại ghPath!");
+            } else if (res.status === 401) {
+                throw new Error("Token GitHub bị hết hạn hoặc không có quyền (Lỗi 401)!");
+            }
+            throw new Error(`Lỗi kết nối GitHub API: status ${res.status}`);
         }
 
         const json = await res.json();
         
-        // Giải mã Base64 từ GitHub
+        if (!json.content) {
+            throw new Error("Nội dung tệp rỗng hoặc không đúng định dạng!");
+        }
+
+        // Giải mã dữ liệu file Base64 từ GitHub API
         const base64Clean = json.content.replace(/\n/g, '');
         const byteCharacters = atob(base64Clean);
         const byteNumbers = new Array(byteCharacters.length);
@@ -906,18 +924,18 @@
         const byteArray = new Uint8Array(byteNumbers);
         const blob = new Blob([byteArray]);
 
-        // Tạo link tải xuống tự động
+        // Tạo đường link tải file tự động xuống trình duyệt
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = fileName || 'Tep_Dinh_Kem';
+        link.download = fileName || cleanPath.split('/').pop() || 'Tep_Dinh_Kem';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
 
         showToast("✅ Tải tệp thành công!", "success");
     } catch (err) {
-        console.error(err);
-        showToast("❌ Lỗi tải tệp: " + err.message, "error");
+        console.error("Lỗi downloadPrivateFile:", err);
+        alert("❌ " + err.message);
     }
 }
 
