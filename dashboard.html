@@ -861,25 +861,31 @@
 
         async function downloadPrivateFile(ghPath, fileName) {
     try {
-        showToast("⏳ Đang kết nối Firebase lấy Token...", "success");
-
-        // Đọc thông tin cấu hình từ Firebase Realtime Database
-        const snap = await database.ref('sharedConfig/githubConfig').once('value');
-        const config = snap.val();
-
-        if (!config || !config.token) {
-            alert("⚠️ Không tìm thấy Token trên Firebase! Vui lòng kiểm tra lại nút 'sharedConfig/githubConfig'.");
+        // 1. Kiểm tra xem user đã đăng nhập Firebase Auth chưa
+        const user = firebase.auth().currentUser;
+        if (!user) {
+            alert("⚠️ Bạn cần đăng nhập để thực hiện thao tác này!");
             return;
         }
 
-        // Làm sạch chuỗi token (xóa khoảng trắng thừa nếu có)
+        showToast("⏳ Đang lấy cấu hình GitHub của tài khoản...", "success");
+
+        // 2. Lấy Token ĐÚNG THEO USER ID (uid)
+        const snap = await database.ref(`users/${user.uid}/githubConfig`).once('value');
+        const config = snap.val();
+
+        if (!config || !config.token) {
+            alert("⚠️ Tài khoản của bạn chưa được cấu hình GitHub Token! Vui lòng vào Cài đặt để cập nhật Token cá nhân.");
+            return;
+        }
+
         const token = String(config.token).trim();
-        const owner = String(config.owner || "Phuong-Ninh-Kieu").trim();
-        const repo = String(config.repo || "Storage-Private").trim();
+        const owner = String(config.owner).trim();
+        const repo = String(config.repo).trim();
 
-        showToast("⏳ Đang tải file từ GitHub...", "success");
+        showToast("⏳ Đang tải tệp từ GitHub cá nhân...", "success");
 
-        // Làm sạch đường dẫn file
+        // 3. Gọi GitHub API
         const cleanPath = String(ghPath).replace(/^\//, '').trim();
         const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURI(cleanPath)}`;
 
@@ -891,21 +897,14 @@
         });
 
         if (!res.ok) {
-            if (res.status === 401) {
-                throw new Error("Token (lưu trên Firebase) bị sai hoặc đã bị hủy. Hãy tạo token mới và dán lại vào Firebase!");
-            } else if (res.status === 404) {
-                throw new Error("Không tìm thấy file trên GitHub! Kiểm tra lại đường dẫn: " + cleanPath);
-            }
+            if (res.status === 401) throw new Error("Token GitHub của bạn đã hết hạn hoặc không đúng!");
+            if (res.status === 404) throw new Error("Không tìm thấy file trên Repository của bạn!");
             throw new Error(`Lỗi kết nối GitHub API (${res.status})`);
         }
 
         const json = await res.json();
 
-        if (!json.content) {
-            throw new Error("Tệp rỗng hoặc không đúng định dạng!");
-        }
-
-        // Giải mã dữ liệu file Base64 từ GitHub
+        // 4. Giải mã Base64 và tải file xuống
         const base64Clean = json.content.replace(/\n/g, '');
         const byteCharacters = atob(base64Clean);
         const byteNumbers = new Array(byteCharacters.length);
@@ -915,7 +914,6 @@
         const byteArray = new Uint8Array(byteNumbers);
         const blob = new Blob([byteArray]);
 
-        // Tạo đường link tải xuống
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = fileName || cleanPath.split('/').pop() || 'Tep_Dinh_Kem';
@@ -929,7 +927,6 @@
         alert("❌ " + err.message);
     }
 }
-
         function clearDetail() {
             selectedId = null;
             renderTable();
