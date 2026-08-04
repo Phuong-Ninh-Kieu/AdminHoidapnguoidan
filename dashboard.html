@@ -118,19 +118,11 @@
             border-left: 3px solid #1e293b;
         }
 
-        .stat-card:hover {
-            transform: translateY(-1px);
-        }
+        .stat-card:hover { transform: translateY(-1px); }
 
-        .stat-card .stat-icon {
-            font-size: 20px;
-            flex-shrink: 0;
-        }
+        .stat-card .stat-icon { font-size: 20px; flex-shrink: 0; }
 
-        .stat-card .stat-info {
-            flex: 1;
-            min-width: 0;
-        }
+        .stat-card .stat-info { flex: 1; min-width: 0; }
 
         .stat-card .number {
             font-size: 18px;
@@ -154,7 +146,7 @@
         /* ===== MAIN LAYOUT ===== */
         .main-grid {
             display: grid;
-            grid-template-columns: 1fr 360px;
+            grid-template-columns: 1fr 380px;
             gap: 12px;
             flex: 1;
             min-height: 0;
@@ -163,7 +155,7 @@
         @media (max-width: 1024px) {
             .main-grid { grid-template-columns: 1fr; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .right-panel { max-height: 380px !important; }
+            .right-panel { max-height: 480px !important; }
         }
 
         @media (max-width: 600px) {
@@ -171,7 +163,7 @@
             body { padding: 8px; }
         }
 
-        /* ===== LEFT COLUMN ===== */
+        /* ===== LEFT PANEL ===== */
         .left-panel {
             background: white;
             border-radius: 12px;
@@ -295,6 +287,18 @@
             color: #1e40af;
         }
 
+        /* Status Tags */
+        .status-tag {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            display: inline-block;
+            white-space: nowrap;
+        }
+        .status-tag.answered { background: #dcfce7; color: #15803d; }
+        .status-tag.pending { background: #fef3c7; color: #b45309; }
+
         .file-badge {
             display: inline-flex;
             align-items: center;
@@ -376,18 +380,71 @@
 
         .detail-item { display: flex; flex-direction: column; }
         .detail-item.full-width { grid-column: 1 / -1; }
-        .detail-item .label { font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 2px; }
-        .detail-item .value { font-size: 13px; color: #1e293b; word-break: break-word; font-weight: 500; }
+        .detail-item .label { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 2px; }
+        .detail-item .value { font-size: 12px; color: #1e293b; word-break: break-word; font-weight: 500; }
 
         .question-full {
             background: #f8fafc;
-            padding: 10px 12px;
+            padding: 8px 10px;
             border-radius: 8px;
             border-left: 3px solid #1e293b;
             font-size: 12px;
-            line-height: 1.6;
+            line-height: 1.5;
             margin-top: 2px;
         }
+
+        /* ===== ANSWER FORM STYLES ===== */
+        .answer-box {
+            background: #f0fdf4;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #bbf7d0;
+            margin-top: 6px;
+        }
+
+        .answer-textarea {
+            width: 100%;
+            height: 90px;
+            padding: 8px;
+            border: 1px solid #86efac;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: inherit;
+            resize: vertical;
+            outline: none;
+            background: #ffffff;
+            color: #14532d;
+            box-sizing: border-box;
+        }
+
+        .answer-textarea:focus {
+            border-color: #16a34a;
+            box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2);
+        }
+
+        .answer-file-input {
+            margin-top: 6px;
+            font-size: 11px;
+            width: 100%;
+        }
+
+        .btn-save-answer {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 16px;
+            font-weight: 600;
+            font-size: 11px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-save-answer:hover { background: #15803d; }
 
         .attachment-list {
             display: flex;
@@ -402,11 +459,11 @@
             justify-content: space-between;
             background: #f0f9ff;
             border: 1px solid #bae6fd;
-            padding: 8px 12px;
-            border-radius: 8px;
+            padding: 6px 10px;
+            border-radius: 6px;
             color: #0284c7;
             text-decoration: none;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             cursor: pointer;
             transition: 0.2s;
@@ -414,11 +471,20 @@
 
         .attachment-btn:hover { background: #e0f2fe; }
 
+        .attachment-btn.answer-file {
+            background: #ecfdf5;
+            border-color: #a7f3d0;
+            color: #047857;
+        }
+        .attachment-btn.answer-file:hover { background: #d1fae5; }
+
         .detail-actions {
             margin-top: 10px;
             padding-top: 10px;
             border-top: 1px solid #e2e8f0;
             display: flex;
+            justify-content: space-between;
+            align-items: center;
             gap: 6px;
             flex-shrink: 0;
         }
@@ -521,7 +587,12 @@
                 <div class="search-bar">
                     <input type="text" id="searchInput" placeholder="🔍 Tìm kiếm..." oninput="filterQuestions()">
                     
-                    <!-- BỘ LỌC THỜI GIAN THEO NĂM, THÁNG, TUẦN -->
+                    <select id="statusFilter" onchange="filterQuestions()">
+                        <option value="">💡 Tất cả trạng thái</option>
+                        <option value="answered">✅ Đã trả lời</option>
+                        <option value="pending">⏳ Chưa trả lời</option>
+                    </select>
+
                     <select id="yearFilter" onchange="filterQuestions()">
                         <option value="">📅 Tất cả năm</option>
                     </select>
@@ -569,13 +640,14 @@
                                 <th>SĐT</th>
                                 <th>Lĩnh vực</th>
                                 <th>Khu vực</th>
+                                <th>Trạng thái</th>
                                 <th>File</th>
                                 <th style="width:28px;"></th>
                             </tr>
                         </thead>
                         <tbody id="tableBody">
                             <tr>
-                                <td colspan="7">
+                                <td colspan="8">
                                     <div class="empty-state">
                                         <div class="icon">📭</div>
                                         <p>Chưa có câu hỏi nào</p>
@@ -587,16 +659,16 @@
                 </div>
             </div>
 
-            <!-- RIGHT: Detail Panel -->
+            <!-- RIGHT: Detail Panel & Reply Form -->
             <div class="right-panel" id="detailPanel">
                 <div class="detail-header">
-                    <h3>📄 Chi tiết câu hỏi</h3>
+                    <h3>📄 Chi tiết & Trả lời</h3>
                     <button class="close-detail" onclick="clearDetail()">✕</button>
                 </div>
                 <div id="detailContent">
                     <div class="detail-empty">
                         <div class="icon">👆</div>
-                        <p>Chọn một câu hỏi để xem chi tiết</p>
+                        <p>Chọn một câu hỏi để xem chi tiết và nhập câu trả lời</p>
                     </div>
                 </div>
             </div>
@@ -631,6 +703,7 @@
         const detailContent = document.getElementById('detailContent');
         const searchInput = document.getElementById('searchInput');
         
+        const statusFilter = document.getElementById('statusFilter');
         const yearFilter = document.getElementById('yearFilter');
         const monthFilter = document.getElementById('monthFilter');
         const weekFilter = document.getElementById('weekFilter');
@@ -642,7 +715,6 @@
         let filteredQuestions = [];
         let selectedId = null;
         let toastTimeout = null;
-        let githubConfig = null;
 
         // AUTH
         auth.onAuthStateChanged(user => {
@@ -651,7 +723,6 @@
                 return;
             }
             userEmail.textContent = user.email;
-            loadGithubConfig();
             loadQuestions();
         });
 
@@ -659,23 +730,11 @@
             auth.signOut().then(() => { window.location.href = 'index.html'; });
         }
 
-        async function loadGithubConfig() {
-            try {
-                const snap = await database.ref('sharedConfig/githubConfig').once('value');
-                githubConfig = snap.val();
-                if (githubConfig) {
-                    console.log("✅ Đã kết nối thành công tới GitHub Token:", githubConfig.owner);
-                }
-            } catch(e) { 
-                console.warn('⚠️ Lỗi kết nối GitHub Config:', e); 
-            }
-        }
-
         // LOAD CÂU HỎI TỪ FIREBASE REALTIME
         function loadQuestions() {
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="7">
+                    <td colspan="8">
                         <div class="loading-state">
                             <div class="spinner"></div>
                             <p style="margin-top:6px; color:#94a3b8; font-size:12px;">Đang tải dữ liệu...</p>
@@ -699,13 +758,16 @@
 
                 updateFilters();
                 filterQuestions();
+                
+                if (selectedId) {
+                    selectQuestion(selectedId, false);
+                }
             }, error => {
                 console.error("Lỗi Firebase Database:", error);
                 showToast("❌ Lỗi tải dữ liệu: " + error.message, "error");
             });
         }
 
-        // CẬP NHẬT CÁC ĐIỀU KIỆN LỌC (CÓ COMBOBOX NĂM TỰ ĐỘNG)
         function updateFilters() {
             const fieldSet = new Set();
             const areaSet = new Set();
@@ -715,14 +777,12 @@
                 if (q.field) fieldSet.add(q.field);
                 if (q.area && q.area.trim()) areaSet.add(q.area);
                 
-                // Trích xuất Năm từ timestamp hoặc created
                 let d = q.timestamp ? new Date(q.timestamp) : (q.created ? new Date(q.created) : null);
                 if (d && !isNaN(d.getTime())) {
                     yearSet.add(d.getFullYear());
                 }
             });
 
-            // Update Năm Combobox
             const currentYear = yearFilter.value;
             yearFilter.innerHTML = '<option value="">📅 Tất cả năm</option>';
             [...yearSet].sort((a,b) => b - a).forEach(y => {
@@ -732,7 +792,6 @@
             });
             yearFilter.value = currentYear;
 
-            // Update Lĩnh vực
             const currentField = fieldFilter.value;
             fieldFilter.innerHTML = '<option value="">📂 Tất cả lĩnh vực</option>';
             [...fieldSet].sort().forEach(f => {
@@ -742,7 +801,6 @@
             });
             fieldFilter.value = currentField;
 
-            // Update Khu vực
             const currentArea = areaFilter.value;
             areaFilter.innerHTML = '<option value="">📍 Tất cả khu vực</option>';
             [...areaSet].sort().forEach(a => {
@@ -753,24 +811,15 @@
             areaFilter.value = currentArea;
         }
 
-        // KIỂM TRẢ THỜI GIAN THEO NĂM, THÁNG, TUẦN
         function checkDateMatch(timestamp, createdStr, yVal, mVal, wVal) {
             if (!yVal && !mVal && !wVal) return true;
 
             let date = timestamp ? new Date(timestamp) : (createdStr ? new Date(createdStr) : null);
             if (!date || isNaN(date.getTime())) return true;
 
-            // 1. Lọc theo Năm
-            if (yVal && date.getFullYear() !== parseInt(yVal)) {
-                return false;
-            }
+            if (yVal && date.getFullYear() !== parseInt(yVal)) return false;
+            if (mVal && (date.getMonth() + 1) !== parseInt(mVal)) return false;
 
-            // 2. Lọc theo Tháng (1 - 12)
-            if (mVal && (date.getMonth() + 1) !== parseInt(mVal)) {
-                return false;
-            }
-
-            // 3. Lọc theo Tuần trong Tháng (Tuần 1 đến Tuần 4)
             if (wVal) {
                 const day = date.getDate();
                 let week = 1;
@@ -778,16 +827,26 @@
                 else if (day > 14) week = 3;
                 else if (day > 7) week = 2;
 
-                if (week !== parseInt(wVal)) {
-                    return false;
-                }
+                if (week !== parseInt(wVal)) return false;
             }
 
             return true;
         }
 
+        function isQuestionAnswered(q) {
+            if (q.status === 'answered' || q.isAnswered === true) return true;
+            if (q.answer && typeof q.answer === 'string' && q.answer.trim().length > 0) return true;
+            if (q.reply && typeof q.reply === 'string' && q.reply.trim().length > 0) return true;
+            if (q.answerText && typeof q.answerText === 'string' && q.answerText.trim().length > 0) return true;
+            if (q.answerFile || q.answerFileUrl || q.answerGhPath || q.replyFile || q.replyFileUrl || q.replyGhPath) return true;
+            if ((q.answerFiles && q.answerFiles.length > 0) || (q.replyFiles && q.replyFiles.length > 0)) return true;
+
+            return false;
+        }
+
         function filterQuestions() {
             const keyword = searchInput.value.toLowerCase().trim();
+            const statusVal = statusFilter.value;
             const yVal = yearFilter.value;
             const mVal = monthFilter.value;
             const wVal = weekFilter.value;
@@ -800,11 +859,16 @@
                     (q.phone && q.phone.includes(keyword)) ||
                     (q.question && q.question.toLowerCase().includes(keyword));
                 
+                const answered = isQuestionAnswered(q);
+                const matchStatus = !statusVal || 
+                    (statusVal === 'answered' && answered) || 
+                    (statusVal === 'pending' && !answered);
+
                 const matchDate = checkDateMatch(q.timestamp, q.created, yVal, mVal, wVal);
                 const matchField = !fieldVal || q.field === fieldVal;
                 const matchArea = !areaVal || q.area === areaVal;
 
-                return matchKeyword && matchDate && matchField && matchArea;
+                return matchKeyword && matchStatus && matchDate && matchField && matchArea;
             });
 
             renderTable();
@@ -817,7 +881,7 @@
             if (data.length === 0) {
                 tableBody.innerHTML = `
                     <tr>
-                        <td colspan="7">
+                        <td colspan="8">
                             <div class="empty-state">
                                 <div class="icon">📭</div>
                                 <p>Không tìm thấy câu hỏi nào</p>
@@ -831,7 +895,12 @@
             let html = '';
             data.forEach((q, index) => {
                 const isActive = q.id === selectedId;
+                const answered = isQuestionAnswered(q);
                 
+                const statusBadge = answered 
+                    ? `<span class="status-tag answered">✅ Đã trả lời</span>`
+                    : `<span class="status-tag pending">⏳ Chưa trả lời</span>`;
+
                 const fileCount = (q.files && q.files.length) || (q.fileUrl || q.file ? 1 : 0);
                 const fileBadge = fileCount > 0 
                     ? `<span class="file-badge">📎 ${fileCount}</span>` 
@@ -844,6 +913,7 @@
                         <td>${escapeHtml(q.phone || '—')}</td>
                         <td><span class="field-tag">${escapeHtml(q.field || 'Chung')}</span></td>
                         <td>${q.area ? `<span class="area-tag">${escapeHtml(q.area)}</span>` : '—'}</td>
+                        <td>${statusBadge}</td>
                         <td>${fileBadge}</td>
                         <td>
                             <button class="delete-btn" onclick="event.stopPropagation(); deleteQuestion('${q.id}')" title="Xóa">✕</button>
@@ -858,61 +928,87 @@
             }
         }
 
-        function selectQuestion(id) {
-            const q = allQuestions.find(item => item.id === id);
-            if (!q) return;
+        function renderFilesHtml(files, singleUrl, singleGhPath, singleName, isAnswer = false) {
+            let filesHtml = `<span style="color:#94a3b8; font-size:11px;">Không có file đính kèm</span>`;
+            const extraClass = isAnswer ? 'answer-file' : '';
 
-            selectedId = id;
-            renderTable();
-
-            let areaDisplay = q.area ? `<span class="area-tag">${escapeHtml(q.area)}</span>` : '—';
-
-            let filesHtml = '<span style="color:#94a3b8; font-size:12px;">Không có file đính kèm</span>';
-            
-            if (q.files && Array.isArray(q.files) && q.files.length > 0) {
+            if (files && Array.isArray(files) && files.length > 0) {
                 filesHtml = '<div class="attachment-list">';
-                q.files.forEach((f, idx) => {
-                    const fileName = escapeHtml(f.name || `Tệp_${idx + 1}`);
+                files.forEach((f, idx) => {
+                    const fileName = escapeHtml(f.name || f.fileName || f.filename || `Tệp_${idx + 1}`);
                     if (f.ghPath) {
                         filesHtml += `
-                            <div class="attachment-btn" onclick="downloadPrivateFile('${f.ghPath}', '${fileName}')">
+                            <div class="attachment-btn ${extraClass}" onclick="downloadPrivateFile('${f.ghPath}', '${fileName}')">
                                 <span>📄 ${fileName}</span>
                                 <span>⬇️ Tải về</span>
                             </div>`;
-                    } else if (f.url) {
+                    } else if (f.url || f.fileUrl || f.link) {
                         filesHtml += `
-                            <a href="${f.url}" target="_blank" class="attachment-btn">
+                            <a href="${f.url || f.fileUrl || f.link}" download="${fileName}" target="_blank" class="attachment-btn ${extraClass}">
                                 <span>📄 ${fileName}</span>
                                 <span>👁️ Xem/Tải</span>
                             </a>`;
                     }
                 });
                 filesHtml += '</div>';
-            } 
-            else if (q.fileUrl || q.file || q.ghPath) {
-                const targetUrl = q.fileUrl || q.file;
-                const fileName = escapeHtml(q.fileName || 'Tệp_đính_kèm');
-                if (q.ghPath) {
+            } else if (singleUrl || singleGhPath) {
+                const fileName = escapeHtml(singleName || 'Tệp_đính_kèm');
+                if (singleGhPath) {
                     filesHtml = `
                         <div class="attachment-list">
-                            <div class="attachment-btn" onclick="downloadPrivateFile('${q.ghPath}', '${fileName}')">
+                            <div class="attachment-btn ${extraClass}" onclick="downloadPrivateFile('${singleGhPath}', '${fileName}')">
                                 <span>📄 ${fileName}</span>
                                 <span>⬇️ Tải về</span>
                             </div>
                         </div>`;
-                } else if (targetUrl) {
+                } else if (singleUrl) {
                     filesHtml = `
                         <div class="attachment-list">
-                            <a href="${targetUrl}" target="_blank" class="attachment-btn">
+                            <a href="${singleUrl}" download="${fileName}" target="_blank" class="attachment-btn ${extraClass}">
                                 <span>📄 ${fileName}</span>
                                 <span>👁️ Xem/Tải</span>
                             </a>
                         </div>`;
                 }
             }
+            return filesHtml;
+        }
+
+        function selectQuestion(id, shouldRenderTable = true) {
+            const q = allQuestions.find(item => item.id === id);
+            if (!q) return;
+
+            selectedId = id;
+            if (shouldRenderTable) renderTable();
+
+            let areaDisplay = q.area ? `<span class="area-tag">${escapeHtml(q.area)}</span>` : '—';
+            const answered = isQuestionAnswered(q);
+
+            const statusDisplay = answered 
+                ? `<span class="status-tag answered">✅ Đã trả lời</span>`
+                : `<span class="status-tag pending">⏳ Chưa trả lời</span>`;
+
+            const answerText = q.answer || q.reply || q.answerText || '';
+            const answerTime = q.answeredAt || q.replyCreated || q.updatedAt || q.replyTime || '';
+
+            const answerFiles = q.answerFiles || q.replyFiles || [];
+            const answerFileUrl = q.answerFileUrl || q.replyFileUrl || q.answerFile || q.replyFile || q.answerUrl || q.answerLink || q.replyUrl || q.replyLink;
+            const answerGhPath = q.answerGhPath || q.replyGhPath;
+            const answerFileName = q.answerFileName || q.replyFileName || q.answerName || q.replyName;
+
+            const questionFilesHtml = renderFilesHtml(q.files, q.fileUrl || q.file, q.ghPath, q.fileName);
+            const answerFilesHtml = renderFilesHtml(answerFiles, answerFileUrl, answerGhPath, answerFileName, true);
 
             detailContent.innerHTML = `
                 <div class="detail-grid">
+                    <div class="detail-item">
+                        <span class="label">Trạng thái</span>
+                        <span class="value">${statusDisplay}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Thời gian gửi</span>
+                        <span class="value" style="color:#64748b;">${escapeHtml(q.created) || '—'}</span>
+                    </div>
                     <div class="detail-item">
                         <span class="label">Họ và tên</span>
                         <span class="value"><strong>${escapeHtml(q.fullName || '—')}</strong></span>
@@ -929,22 +1025,42 @@
                         <span class="label">Khu vực</span>
                         <span class="value">${areaDisplay}</span>
                     </div>
-                    <div class="detail-item">
+                    <div class="detail-item full-width">
                         <span class="label">Lĩnh vực</span>
                         <span class="value"><span class="field-tag">${escapeHtml(q.field || 'Chung')}</span></span>
                     </div>
-                    <div class="detail-item">
-                        <span class="label">Thời gian gửi</span>
-                        <span class="value" style="color:#64748b;">${escapeHtml(q.created) || '—'}</span>
-                    </div>
-                    <div class="detail-item full-width">
-                        <span class="label">Nội dung câu hỏi</span>
+
+                    <div class="detail-item full-width" style="margin-top: 4px;">
+                        <span class="label">❓ Nội dung câu hỏi</span>
                         <div class="question-full">${escapeHtml(q.question || 'Chưa có nội dung')}</div>
                     </div>
                     <div class="detail-item full-width" style="margin-top: 6px;">
-                        <span class="label">📎 Tệp đính kèm</span>
-                        ${filesHtml}
+                        <span class="label">📎 Tệp đính kèm câu hỏi</span>
+                        ${questionFilesHtml}
                     </div>
+
+                    <!-- KHUNG TRẢ LỜI & UPLOAD FILE -->
+                    <div class="detail-item full-width" style="margin-top: 10px;">
+                        <span class="label" style="color:#16a34a;">💬 Soạn/Cập nhật câu trả lời ${answerTime ? `(Lưu gần nhất: ${escapeHtml(answerTime)})` : ''}</span>
+                        <div class="answer-box">
+                            <textarea id="replyTextInput" class="answer-textarea" placeholder="Nhập câu trả lời tại đây...">${escapeHtml(answerText)}</textarea>
+                            
+                            <div style="margin-top:8px;">
+                                <label style="font-size:10px; font-weight:700; color:#166534; display:block;">📎 Tệp đính kèm câu trả lời (lưu vào Storage-Private):</label>
+                                <input type="file" id="replyFileInput" class="answer-file-input">
+                            </div>
+
+                            <button class="btn-save-answer" onclick="saveAnswer('${q.id}')">
+                                💾 Lưu câu trả lời & Tải file lên kho GitHub
+                            </button>
+                        </div>
+                    </div>
+
+                    ${answered ? `
+                    <div class="detail-item full-width" style="margin-top: 8px;">
+                        <span class="label">📄 File trả lời hiện có</span>
+                        ${answerFilesHtml}
+                    </div>` : ''}
                 </div>
                 <div class="detail-actions">
                     <button class="btn-delete-detail" onclick="deleteQuestion('${q.id}')">🗑️ Xóa câu hỏi</button>
@@ -952,19 +1068,126 @@
             `;
         }
 
-        async function downloadPrivateFile(ghPath, fileName, itemGithubRepo) {
+        // HÀM UPLOAD FILE CÂU TRẢ LỜI LÊN GITHUB STORAGE-PRIVATE (TẠO THƯ MỤC answers/)
+        async function uploadAnswerFileToGithub(file) {
+            let owner = "Phuong-Ninh-Kieu";
+            let repo = "Storage-Private";
+            let token = "";
+
+            const snap = await database.ref('questions/public/sharedConfig/githubConfig').once('value');
+            if (snap.exists()) {
+                const config = snap.val();
+                token = config.token || "";
+                if (config.owner) owner = config.owner;
+                if (config.repo) repo = config.repo;
+            }
+
+            if (!token) {
+                throw new Error("Chưa cấu hình Github Token, không thể đẩy file lên kho.");
+            }
+
+            const base64Data = await readFileAsDataURL(file);
+            const cleanBase64 = base64Data.split(',')[1];
+
+            const timeStamp = Date.now();
+            const safeFileName = file.name.replace(/[^a-zA-Z0-9_.-]/g, '_');
+            const ghPath = `answers/${timeStamp}_${safeFileName}`;
+
+            const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${ghPath}`;
+
+            const res = await fetch(apiUrl, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': 'token ' + String(token).trim(),
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/vnd.github+json'
+                },
+                body: JSON.stringify({
+                    message: `Upload answer file via Dashboard: ${safeFileName}`,
+                    content: cleanBase64
+                })
+            });
+
+            if (!res.ok) {
+                const errJson = await res.json().catch(() => ({}));
+                throw new Error(`Lỗi upload GitHub (${res.status}): ${errJson.message || 'Không xác định'}`);
+            }
+
+            return {
+                ghPath: ghPath,
+                fileName: file.name
+            };
+        }
+
+        // HÀM LƯU CÂU TRẢ LỜI VÀ TỰ ĐỘNG TẢI FILE LÊN KHO GITHUB
+        async function saveAnswer(questionId) {
+            const replyText = document.getElementById('replyTextInput').value.trim();
+            const fileInput = document.getElementById('replyFileInput');
+            const file = fileInput.files[0];
+
+            if (!replyText && !file) {
+                showToast("⚠️ Vui lòng nhập câu trả lời hoặc chọn file đính kèm!", "error");
+                return;
+            }
+
             try {
-                showToast("⏳ Đang lấy cấu hình từ Firebase...", "success");
+                const nowStr = new Date().toLocaleString('vi-VN');
+                const updateData = {
+                    answer: replyText,
+                    reply: replyText,
+                    answerText: replyText,
+                    answeredAt: nowStr,
+                    replyTime: nowStr,
+                    isAnswered: true,
+                    status: 'answered'
+                };
+
+                // Đẩy file lên GitHub Storage-Private nếu người dùng chọn file
+                if (file) {
+                    if (file.size > 25 * 1024 * 1024) { // Giới hạn 25MB
+                        showToast("⚠️ File quá lớn (vượt 25MB). Vui lòng chọn file nhẹ hơn!", "error");
+                        return;
+                    }
+
+                    showToast("⏳ Đang tải file lên kho GitHub Storage-Private...", "success");
+                    
+                    const uploadedFile = await uploadAnswerFileToGithub(file);
+
+                    updateData.answerGhPath = uploadedFile.ghPath;
+                    updateData.replyGhPath = uploadedFile.ghPath;
+                    updateData.answerFileName = uploadedFile.fileName;
+                    updateData.replyFileName = uploadedFile.fileName;
+                }
+
+                showToast("⏳ Đang lưu dữ liệu...", "success");
+
+                // Cập nhật Database
+                await database.ref(`questions/public/items/${questionId}`).update(updateData);
+                
+                showToast("✅ Đã lưu câu trả lời & tải file lên kho thành công!", "success");
+            } catch (err) {
+                console.error("Lỗi khi lưu câu trả lời:", err);
+                showToast("❌ " + err.message, "error");
+            }
+        }
+
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function downloadPrivateFile(ghPath, fileName) {
+            try {
+                showToast("⏳ Đang tải tệp từ GitHub...", "success");
 
                 let owner = "Phuong-Ninh-Kieu";
                 let repo = "Storage-Private";
-                if (itemGithubRepo && itemGithubRepo.includes('/')) {
-                    const parts = itemGithubRepo.split('/');
-                    owner = parts[0].trim();
-                    repo = parts[1].trim();
-                }
-
                 let token = "";
+
                 try {
                     const snap = await database.ref('questions/public/sharedConfig/githubConfig').once('value');
                     if (snap.exists()) {
@@ -978,11 +1201,9 @@
                 }
 
                 if (!token) {
-                    alert("⚠️ Không tìm thấy Token trong 'questions/public/sharedConfig/githubConfig'. Vui lòng kiểm tra lại giá trị token trên Firebase!");
+                    alert("⚠️ Chưa cấu hình Github Token!");
                     return;
                 }
-
-                showToast("⏳ Đang tải tệp từ GitHub...", "success");
 
                 const cleanPath = String(ghPath).replace(/^\//, '').trim();
                 const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURI(cleanPath)}`;
@@ -994,14 +1215,10 @@
                     }
                 });
 
-                if (!res.ok) {
-                    if (res.status === 401) throw new Error("Token GitHub bị sai hoặc đã bị hết hạn (Lỗi 401)!");
-                    if (res.status === 404) throw new Error("Không tìm thấy tệp trên GitHub (Lỗi 404)!");
-                    throw new Error(`Lỗi kết nối GitHub API (${res.status})`);
-                }
+                if (!res.ok) throw new Error(`Lỗi kết nối GitHub (${res.status})`);
 
                 const json = await res.json();
-                if (!json.content) throw new Error("Nội dung tệp rỗng!");
+                if (!json.content) throw new Error("File rỗng!");
 
                 const base64Clean = json.content.replace(/\n/g, '');
                 const byteCharacters = atob(base64Clean);
@@ -1014,7 +1231,7 @@
 
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = fileName || cleanPath.split('/').pop() || 'Tep_Dinh_Kem';
+                link.download = fileName || 'Tep_Dinh_Kem';
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -1032,36 +1249,147 @@
             detailContent.innerHTML = `
                 <div class="detail-empty">
                     <div class="icon">👆</div>
-                    <p>Chọn một câu hỏi để xem chi tiết</p>
+                    <p>Chọn một câu hỏi để xem chi tiết và nhập câu trả lời</p>
                 </div>
             `;
         }
 
-        function deleteQuestion(id) {
-            if (!confirm('Xóa câu hỏi này?')) return;
+        // HÀM XÓA FILE TRÊN GITHUB REPOSITORY PRIVATE
+        async function deletePrivateFile(ghPath) {
+            if (!ghPath) return;
 
-            const ref = database.ref(`questions/public/items/${id}`);
-            ref.remove()
+            try {
+                let owner = "Phuong-Ninh-Kieu";
+                let repo = "Storage-Private";
+                let token = "";
+
+                const snap = await database.ref('questions/public/sharedConfig/githubConfig').once('value');
+                if (snap.exists()) {
+                    const config = snap.val();
+                    token = config.token || "";
+                    if (config.owner) owner = config.owner;
+                    if (config.repo) repo = config.repo;
+                }
+
+                if (!token) {
+                    console.warn("Chưa cấu hình Github Token, không thể xóa file trên GitHub.");
+                    return;
+                }
+
+                const cleanPath = String(ghPath).replace(/^\//, '').trim();
+                const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURI(cleanPath)}`;
+
+                // 1. Lấy thông tin SHA của file từ GitHub
+                const getRes = await fetch(apiUrl, {
+                    headers: {
+                        'Authorization': 'token ' + String(token).trim(),
+                        'Accept': 'application/vnd.github+json'
+                    }
+                });
+
+                if (!getRes.ok) {
+                    console.warn(`File không tồn tại hoặc đã bị xóa trên GitHub: ${cleanPath}`);
+                    return;
+                }
+
+                const fileData = await getRes.json();
+                const sha = fileData.sha;
+
+                // 2. Gửi request DELETE tới GitHub API
+                const deleteRes = await fetch(apiUrl, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': 'token ' + String(token).trim(),
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/vnd.github+json'
+                    },
+                    body: JSON.stringify({
+                        message: `Delete file via Dashboard: ${cleanPath}`,
+                        sha: sha
+                    })
+                });
+
+                if (deleteRes.ok) {
+                    console.log(`✅ Đã xóa file trên GitHub: ${cleanPath}`);
+                } else {
+                    console.error(`❌ Lỗi xóa file GitHub (${deleteRes.status}): ${cleanPath}`);
+                }
+            } catch (err) {
+                console.error("Lỗi trong quá trình xóa file trên GitHub:", err);
+            }
+        }
+
+        // XÓA 1 CÂU HỎI VÀ TOÀN BỘ FILE LIÊN QUAN TRÊN GITHUB
+        async function deleteQuestion(id) {
+            if (!confirm('Xóa câu hỏi này và TẤT CẢ file đính kèm trên GitHub?')) return;
+
+            const q = allQuestions.find(item => item.id === id);
+            if (!q) return;
+
+            showToast("⏳ Đang kiểm tra & xóa file trên GitHub...", "success");
+
+            const pathsToDelete = [];
+
+            if (q.ghPath) pathsToDelete.push(q.ghPath);
+            if (q.files && Array.isArray(q.files)) {
+                q.files.forEach(f => { if (f.ghPath) pathsToDelete.push(f.ghPath); });
+            }
+            if (q.answerGhPath) pathsToDelete.push(q.answerGhPath);
+            if (q.replyGhPath) pathsToDelete.push(q.replyGhPath);
+            if (q.answerFiles && Array.isArray(q.answerFiles)) {
+                q.answerFiles.forEach(f => { if (f.ghPath) pathsToDelete.push(f.ghPath); });
+            }
+            if (q.replyFiles && Array.isArray(q.replyFiles)) {
+                q.replyFiles.forEach(f => { if (f.ghPath) pathsToDelete.push(f.ghPath); });
+            }
+
+            for (const path of pathsToDelete) {
+                await deletePrivateFile(path);
+            }
+
+            database.ref(`questions/public/items/${id}`).remove()
                 .then(() => {
-                    showToast('🗑️ Đã xóa câu hỏi!', 'success');
+                    showToast('🗑️ Đã xóa thành công câu hỏi và file trên GitHub!', 'success');
                     if (selectedId === id) clearDetail();
                 })
                 .catch(error => { showToast('❌ ' + error.message, 'error'); });
         }
 
-        function clearAll() {
-            if (!confirm('⚠️ Xóa TẤT CẢ câu hỏi?')) return;
+        // XÓA TẤT CẢ CÂU HỎI VÀ XÓA TOÀN BỘ FILE TRÊN GITHUB
+        async function clearAll() {
+            if (!confirm('⚠️ Xóa TẤT CẢ câu hỏi và TẤT CẢ file đính kèm trên GitHub? Hành động này không thể hoàn tác!')) return;
 
-            const ref = database.ref('questions/public/items');
-            ref.remove()
+            showToast("⏳ Đang xóa toàn bộ file đính kèm trên GitHub...", "success");
+
+            for (const q of allQuestions) {
+                const pathsToDelete = [];
+
+                if (q.ghPath) pathsToDelete.push(q.ghPath);
+                if (q.files && Array.isArray(q.files)) {
+                    q.files.forEach(f => { if (f.ghPath) pathsToDelete.push(f.ghPath); });
+                }
+                if (q.answerGhPath) pathsToDelete.push(q.answerGhPath);
+                if (q.replyGhPath) pathsToDelete.push(q.replyGhPath);
+                if (q.answerFiles && Array.isArray(q.answerFiles)) {
+                    q.answerFiles.forEach(f => { if (f.ghPath) pathsToDelete.push(f.ghPath); });
+                }
+                if (q.replyFiles && Array.isArray(q.replyFiles)) {
+                    q.replyFiles.forEach(f => { if (f.ghPath) pathsToDelete.push(f.ghPath); });
+                }
+
+                for (const path of pathsToDelete) {
+                    await deletePrivateFile(path);
+                }
+            }
+
+            database.ref('questions/public/items').remove()
                 .then(() => {
-                    showToast('🗑️ Đã xóa tất cả.', 'success');
+                    showToast('🗑️ Đã xóa sạch toàn bộ dữ liệu & file trên GitHub.', 'success');
                     clearDetail();
                 })
                 .catch(error => { showToast('❌ ' + error.message, 'error'); });
         }
 
-        // CẬP NHẬT TỔNG HỢP THỐNG KÊ
         function updateStats(data = []) {
             totalCount.textContent = data.length;
 
@@ -1070,25 +1398,17 @@
             const areaCount = {};
 
             data.forEach(q => {
-                if (q.field && q.field.trim()) {
-                    fieldSet.add(q.field.trim());
-                }
-                if (q.fullName && q.fullName.trim()) {
-                    nameSet.add(q.fullName.trim().toLowerCase());
-                }
+                if (q.field && q.field.trim()) fieldSet.add(q.field.trim());
+                if (q.fullName && q.fullName.trim()) nameSet.add(q.fullName.trim().toLowerCase());
                 if (q.area && q.area.trim()) {
                     const areaName = q.area.trim();
                     areaCount[areaName] = (areaCount[areaName] || 0) + 1;
                 }
             });
 
-            // 1. Số lượng lĩnh vực
             topField.textContent = fieldSet.size;
-
-            // 2. Số lượng người gửi
             topPerson.textContent = nameSet.size;
 
-            // 3. Khu vực gửi nhiều nhất
             let topA = '—', topAVal = 0;
             for (const [area, count] of Object.entries(areaCount)) {
                 if (count > topAVal) { 
@@ -1108,7 +1428,7 @@
             const data = [...filteredQuestions].sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
             const mainData = [
-                ['STT', 'Họ và tên', 'Số điện thoại', 'Địa chỉ', 'Khu vực', 'Lĩnh vực', 'Nội dung câu hỏi', 'Tệp đính kèm', 'Thời gian gửi']
+                ['STT', 'Họ và tên', 'Số điện thoại', 'Địa chỉ', 'Khu vực', 'Lĩnh vực', 'Trạng thái', 'Nội dung câu hỏi', 'Tệp câu hỏi', 'Nội dung trả lời', 'Tệp trả lời', 'Thời gian gửi']
             ];
 
             data.forEach((q, index) => {
@@ -1119,6 +1439,18 @@
                     fileStr = q.fileName || q.ghPath || 'Có file';
                 }
 
+                const answered = isQuestionAnswered(q);
+                const statusStr = answered ? 'Đã trả lời' : 'Chưa trả lời';
+                const ansText = q.answer || q.reply || q.answerText || '';
+
+                let ansFileStr = 'Không';
+                const answerFiles = q.answerFiles || q.replyFiles || [];
+                if (answerFiles.length > 0) {
+                    ansFileStr = answerFiles.map(f => f.name || f.ghPath).join('; ');
+                } else if (q.answerFileUrl || q.replyFileUrl || q.answerGhPath || q.replyGhPath || q.answerFile || q.replyFile) {
+                    ansFileStr = q.answerFileName || q.replyFileName || q.answerGhPath || q.replyGhPath || 'Có file';
+                }
+
                 mainData.push([
                     index + 1,
                     q.fullName || '',
@@ -1126,8 +1458,11 @@
                     q.address || '',
                     q.area || '',
                     q.field || '',
+                    statusStr,
                     q.question || '',
                     fileStr,
+                    ansText,
+                    ansFileStr,
                     q.created || ''
                 ]);
             });
@@ -1136,7 +1471,8 @@
             const ws = XLSX.utils.aoa_to_sheet(mainData);
             ws['!cols'] = [
                 { wch: 6 }, { wch: 22 }, { wch: 18 }, { wch: 30 },
-                { wch: 15 }, { wch: 20 }, { wch: 50 }, { wch: 25 }, { wch: 22 }
+                { wch: 15 }, { wch: 20 }, { wch: 15 }, { wch: 40 },
+                { wch: 20 }, { wch: 40 }, { wch: 20 }, { wch: 22 }
             ];
             XLSX.utils.book_append_sheet(wb, ws, 'Câu hỏi');
 
