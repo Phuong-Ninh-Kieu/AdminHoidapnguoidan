@@ -54,7 +54,8 @@
         .header-left {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            flex-wrap: wrap;
         }
 
         .header-left h1 {
@@ -65,6 +66,44 @@
         .header-left h1 .highlight {
             color: #fbbf24;
         }
+
+        .propaganda-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .btn-add-propaganda {
+            background: #f59e0b;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 11px;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-add-propaganda:hover { background: #d97706; }
+
+        .btn-manage-propaganda {
+            background: #0284c7;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 11px;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-manage-propaganda:hover { background: #0369a1; }
 
         .header-right {
             display: flex;
@@ -119,9 +158,7 @@
         }
 
         .stat-card:hover { transform: translateY(-1px); }
-
         .stat-card .stat-icon { font-size: 20px; flex-shrink: 0; }
-
         .stat-card .stat-info { flex: 1; min-width: 0; }
 
         .stat-card .number {
@@ -501,6 +538,99 @@
         .btn-delete-detail { background: #dc2626; color: white; }
         .btn-delete-detail:hover { background: #b91c1c; }
 
+        /* ===== MODAL CHUNG ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-overlay.active { display: flex; }
+        
+        .modal-box {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            width: 450px;
+            max-width: 90%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .modal-box.large {
+            width: 650px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-box h3 { margin-bottom: 12px; font-size: 16px; color: #1e293b; }
+        .modal-box label { font-size: 11px; font-weight: 700; color: #64748b; display: block; margin-bottom: 4px; }
+        .modal-box input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            font-size: 12px;
+        }
+        .modal-buttons { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+        .modal-buttons button {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        .btn-cancel-modal { background: #e2e8f0; color: #334155; }
+        .btn-submit-modal { background: #16a34a; color: white; }
+
+        /* Bảng danh sách tuyên truyền trong Modal Quản lý */
+        .propaganda-list-container {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 50vh;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        .prop-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .prop-table th {
+            background: #f8fafc;
+            color: #475569;
+            padding: 8px 10px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+        }
+        .prop-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #1e293b;
+        }
+        .prop-table tr:hover { background: #f1f5f9; }
+
+        .btn-action-sm {
+            padding: 3px 8px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .btn-edit-item { background: #e0f2fe; color: #0284c7; margin-right: 4px; }
+        .btn-edit-item:hover { background: #bae6fd; }
+        .btn-del-item { background: #fee2e2; color: #dc2626; }
+        .btn-del-item:hover { background: #fecaca; }
+
         /* ===== TOAST ===== */
         .toast {
             position: fixed;
@@ -515,7 +645,7 @@
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
             opacity: 0;
             transition: all 0.4s ease;
-            z-index: 999;
+            z-index: 2000;
             font-size: 13px;
         }
 
@@ -531,6 +661,12 @@
             <div class="header-left">
                 <img src="logo-mat-tran-to-quoc-viet-nam-01.png" alt="Logo" style="width:28px; height:28px; border-radius:4px;" onerror="this.style.display='none'">
                 <h1><span class="highlight">Mặt trận Tổ quốc Việt Nam Phường Ninh Kiều</span></h1>
+                
+                <!-- KHU VỰC NÚT THÊM & QUẢN LÝ TUYÊN TRUYỀN -->
+                <div class="propaganda-actions">
+                    <button class="btn-add-propaganda" onclick="openPropagandaModal()">📢 Thêm bài tuyên truyền</button>
+                    <button class="btn-manage-propaganda" onclick="openManagePropagandaModal()">⚙️ Quản lý các bài tuyên truyền</button>
+                </div>
             </div>
             <div class="header-right">
                 <span class="user-email" id="userEmail">admin@email.com</span>
@@ -675,6 +811,67 @@
         </div>
     </div>
 
+    <!-- MODAL NHẬP BÀI TUYÊN TRUYỀN MỚI -->
+    <div class="modal-overlay" id="propagandaModal">
+        <div class="modal-box">
+            <h3>📢 Thêm bài tuyên truyền mới</h3>
+            <label>Tiêu đề bài viết:</label>
+            <input type="text" id="propTitle" placeholder="Ví dụ: Kế hoạch tổ chức Đại hội...">
+            
+            <label>Đường dẫn bài viết (Link Firebase / URL):</label>
+            <input type="text" id="propLink" placeholder="https://...">
+
+            <div class="modal-buttons">
+                <button class="btn-cancel-modal" onclick="closePropagandaModal()">Hủy</button>
+                <button class="btn-submit-modal" onclick="savePropaganda()">Lưu lại</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL QUẢN LÝ BÀI TUYÊN TRUYỀN (SỬA / XÓA) -->
+    <div class="modal-overlay" id="managePropagandaModal">
+        <div class="modal-box large">
+            <h3>⚙️ Quản lý danh sách bài tuyên truyền (Lưu ý chỉ nên để khoảng 10 bài viết)</h3>
+            <div class="propaganda-list-container">
+                <table class="prop-table">
+                    <thead>
+                        <tr>
+                            <th>Tiêu đề</th>
+                            <th>Đường dẫn</th>
+                            <th style="width: 100px; text-align: center;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="managePropListBody">
+                        <tr>
+                            <td colspan="3" style="text-align: center; color: #94a3b8;">Đang tải dữ liệu...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-cancel-modal" onclick="closeManagePropagandaModal()">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL SỬA BÀI TUYÊN TRUYỀN -->
+    <div class="modal-overlay" id="editPropagandaModal">
+        <div class="modal-box">
+            <h3>✏️ Chỉnh sửa bài tuyên truyền</h3>
+            <input type="hidden" id="editPropId">
+            <label>Tiêu đề bài viết:</label>
+            <input type="text" id="editPropTitle" placeholder="Tiêu đề...">
+            
+            <label>Đường dẫn bài viết (Link):</label>
+            <input type="text" id="editPropLink" placeholder="https://...">
+
+            <div class="modal-buttons">
+                <button class="btn-cancel-modal" onclick="closeEditPropModal()">Hủy</button>
+                <button class="btn-submit-modal" onclick="updatePropaganda()">Cập nhật</button>
+            </div>
+        </div>
+    </div>
+
     <div id="toast" class="toast"></div>
 
     <script>
@@ -711,6 +908,19 @@
         const areaFilter = document.getElementById('areaFilter');
         const toast = document.getElementById('toast');
 
+        // Modal refs
+        const propagandaModal = document.getElementById('propagandaModal');
+        const propTitle = document.getElementById('propTitle');
+        const propLink = document.getElementById('propLink');
+
+        const managePropagandaModal = document.getElementById('managePropagandaModal');
+        const managePropListBody = document.getElementById('managePropListBody');
+
+        const editPropagandaModal = document.getElementById('editPropagandaModal');
+        const editPropId = document.getElementById('editPropId');
+        const editPropTitle = document.getElementById('editPropTitle');
+        const editPropLink = document.getElementById('editPropLink');
+
         let allQuestions = [];
         let filteredQuestions = [];
         let selectedId = null;
@@ -728,6 +938,135 @@
 
         function logout() {
             auth.signOut().then(() => { window.location.href = 'index.html'; });
+        }
+
+        // --- CÁC HÀM XỬ LÝ BÀI TUYÊN TRUYỀN ---
+        function openPropagandaModal() {
+            propTitle.value = '';
+            propLink.value = '';
+            propagandaModal.classList.add('active');
+        }
+
+        function closePropagandaModal() {
+            propagandaModal.classList.remove('active');
+        }
+
+        async function savePropaganda() {
+            const title = propTitle.value.trim();
+            const link = propLink.value.trim();
+
+            if (!title || !link) {
+                showToast("⚠️ Vui lòng nhập đầy đủ tiêu đề và đường link!", "error");
+                return;
+            }
+
+            try {
+                showToast("⏳ Đang lưu bài tuyên truyền lên Firebase...", "success");
+                
+                const newRef = database.ref('questions/public/propaganda').push();
+                await newRef.set({
+                    title: title,
+                    link: link,
+                    timestamp: Date.now()
+                });
+
+                showToast("✅ Đã lưu bài tuyên truyền thành công!", "success");
+                closePropagandaModal();
+            } catch (err) {
+                console.error("Lỗi lưu tuyên truyền:", err);
+                showToast("❌ Lỗi: " + err.message, "error");
+            }
+        }
+
+        // Mở danh sách Quản lý tuyên truyền (Sửa, Xóa)
+        async function openManagePropagandaModal() {
+            managePropagandaModal.classList.add('active');
+            managePropListBody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #94a3b8;">Đang tải dữ liệu...</td></tr>`;
+
+            try {
+                const snap = await database.ref('questions/public/propaganda').once('value');
+                const data = snap.val();
+
+                if (!data) {
+                    managePropListBody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #94a3b8;">Chưa có bài viết tuyên truyền nào.</td></tr>`;
+                    return;
+                }
+
+                let html = '';
+                Object.keys(data).forEach(key => {
+                    let item = data[key];
+                    html += `
+                        <tr>
+                            <td><strong>${escapeHtml(item.title || 'Không tiêu đề')}</strong></td>
+                            <td><a href="${item.link || '#'}" target="_blank" style="color: #0284c7; text-decoration: none; max-width: 250px; display: inline-block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${item.link}">${item.link || '—'}</a></td>
+                            <td style="text-align: center; white-space: nowrap;">
+                                <button class="btn-action-sm btn-edit-item" onclick="openEditPropModal('${key}', '${escapeAttr(item.title)}', '${escapeAttr(item.link)}')">✏️ Sửa</button>
+                                <button class="btn-action-sm btn-del-item" onclick="deletePropagandaItem('${key}')">🗑️ Xóa</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                managePropListBody.innerHTML = html;
+            } catch (err) {
+                console.error("Lỗi tải danh sách quản lý tuyên truyền:", err);
+                managePropListBody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #dc2626;">Lỗi tải dữ liệu.</td></tr>`;
+            }
+        }
+
+        function closeManagePropagandaModal() {
+            managePropagandaModal.classList.remove('active');
+        }
+
+        function openEditPropModal(id, title, link) {
+            editPropId.value = id;
+            editPropTitle.value = title;
+            editPropLink.value = link;
+            editPropagandaModal.classList.add('active');
+        }
+
+        function closeEditPropModal() {
+            editPropagandaModal.classList.remove('active');
+        }
+
+        async function updatePropaganda() {
+            const id = editPropId.value;
+            const title = editPropTitle.value.trim();
+            const link = editPropLink.value.trim();
+
+            if (!title || !link) {
+                showToast("⚠️ Vui lòng không để trống thông tin!", "error");
+                return;
+            }
+
+            try {
+                showToast("⏳ Đang cập nhật...", "success");
+                await database.ref(`questions/public/propaganda/${id}`).update({
+                    title: title,
+                    link: link,
+                    updatedAt: Date.now()
+                });
+
+                showToast("✅ Cập nhật bài tuyên truyền thành công!", "success");
+                closeEditPropModal();
+                openManagePropagandaModal(); // Refresh lại bảng quản lý
+            } catch (err) {
+                console.error("Lỗi cập nhật tuyên truyền:", err);
+                showToast("❌ Lỗi: " + err.message, "error");
+            }
+        }
+
+        async function deletePropagandaItem(id) {
+            if (!confirm("Bạn có chắc chắn muốn xóa bài tuyên truyền này không?")) return;
+
+            try {
+                showToast("⏳ Đang xóa...", "success");
+                await database.ref(`questions/public/propaganda/${id}`).remove();
+                showToast("🗑️ Đã xóa bài tuyên truyền!", "success");
+                openManagePropagandaModal(); // Refresh lại bảng quản lý
+            } catch (err) {
+                console.error("Lỗi xóa tuyên truyền:", err);
+                showToast("❌ Lỗi: " + err.message, "error");
+            }
         }
 
         // LOAD CÂU HỎI TỪ FIREBASE REALTIME
@@ -1068,7 +1407,6 @@
             `;
         }
 
-        // HÀM UPLOAD FILE CÂU TRẢ LỜI LÊN GITHUB STORAGE-PRIVATE (TẠO THƯ MỤC answers/)
         async function uploadAnswerFileToGithub(file) {
             let owner = "Phuong-Ninh-Kieu";
             let repo = "Storage-Private";
@@ -1119,7 +1457,6 @@
             };
         }
 
-        // HÀM LƯU CÂU TRẢ LỜI VÀ TỰ ĐỘNG TẢI FILE LÊN KHO GITHUB
         async function saveAnswer(questionId) {
             const replyText = document.getElementById('replyTextInput').value.trim();
             const fileInput = document.getElementById('replyFileInput');
@@ -1142,15 +1479,13 @@
                     status: 'answered'
                 };
 
-                // Đẩy file lên GitHub Storage-Private nếu người dùng chọn file
                 if (file) {
-                    if (file.size > 25 * 1024 * 1024) { // Giới hạn 25MB
+                    if (file.size > 25 * 1024 * 1024) {
                         showToast("⚠️ File quá lớn (vượt 25MB). Vui lòng chọn file nhẹ hơn!", "error");
                         return;
                     }
 
                     showToast("⏳ Đang tải file lên kho GitHub Storage-Private...", "success");
-                    
                     const uploadedFile = await uploadAnswerFileToGithub(file);
 
                     updateData.answerGhPath = uploadedFile.ghPath;
@@ -1161,10 +1496,8 @@
 
                 showToast("⏳ Đang lưu dữ liệu...", "success");
 
-                // Cập nhật Database
                 await database.ref(`questions/public/items/${questionId}`).update(updateData);
-                
-                showToast("✅ Đã lưu câu trả lời & tải file lên kho thành công!", "success");
+                showToast("✅ Đã lưu câu trả lời thành công!", "success");
             } catch (err) {
                 console.error("Lỗi khi lưu câu trả lời:", err);
                 showToast("❌ " + err.message, "error");
@@ -1254,7 +1587,6 @@
             `;
         }
 
-        // HÀM XÓA FILE TRÊN GITHUB REPOSITORY PRIVATE
         async function deletePrivateFile(ghPath) {
             if (!ghPath) return;
 
@@ -1271,15 +1603,11 @@
                     if (config.repo) repo = config.repo;
                 }
 
-                if (!token) {
-                    console.warn("Chưa cấu hình Github Token, không thể xóa file trên GitHub.");
-                    return;
-                }
+                if (!token) return;
 
                 const cleanPath = String(ghPath).replace(/^\//, '').trim();
                 const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURI(cleanPath)}`;
 
-                // 1. Lấy thông tin SHA của file từ GitHub
                 const getRes = await fetch(apiUrl, {
                     headers: {
                         'Authorization': 'token ' + String(token).trim(),
@@ -1287,16 +1615,10 @@
                     }
                 });
 
-                if (!getRes.ok) {
-                    console.warn(`File không tồn tại hoặc đã bị xóa trên GitHub: ${cleanPath}`);
-                    return;
-                }
-
+                if (!getRes.ok) return;
                 const fileData = await getRes.json();
-                const sha = fileData.sha;
 
-                // 2. Gửi request DELETE tới GitHub API
-                const deleteRes = await fetch(apiUrl, {
+                await fetch(apiUrl, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': 'token ' + String(token).trim(),
@@ -1305,21 +1627,14 @@
                     },
                     body: JSON.stringify({
                         message: `Delete file via Dashboard: ${cleanPath}`,
-                        sha: sha
+                        sha: fileData.sha
                     })
                 });
-
-                if (deleteRes.ok) {
-                    console.log(`✅ Đã xóa file trên GitHub: ${cleanPath}`);
-                } else {
-                    console.error(`❌ Lỗi xóa file GitHub (${deleteRes.status}): ${cleanPath}`);
-                }
             } catch (err) {
-                console.error("Lỗi trong quá trình xóa file trên GitHub:", err);
+                console.error("Lỗi xóa file GitHub:", err);
             }
         }
 
-        // XÓA 1 CÂU HỎI VÀ TOÀN BỘ FILE LIÊN QUAN TRÊN GITHUB
         async function deleteQuestion(id) {
             if (!confirm('Xóa câu hỏi này và TẤT CẢ file đính kèm trên GitHub?')) return;
 
@@ -1329,19 +1644,12 @@
             showToast("⏳ Đang kiểm tra & xóa file trên GitHub...", "success");
 
             const pathsToDelete = [];
-
             if (q.ghPath) pathsToDelete.push(q.ghPath);
             if (q.files && Array.isArray(q.files)) {
                 q.files.forEach(f => { if (f.ghPath) pathsToDelete.push(f.ghPath); });
             }
             if (q.answerGhPath) pathsToDelete.push(q.answerGhPath);
             if (q.replyGhPath) pathsToDelete.push(q.replyGhPath);
-            if (q.answerFiles && Array.isArray(q.answerFiles)) {
-                q.answerFiles.forEach(f => { if (f.ghPath) pathsToDelete.push(f.ghPath); });
-            }
-            if (q.replyFiles && Array.isArray(q.replyFiles)) {
-                q.replyFiles.forEach(f => { if (f.ghPath) pathsToDelete.push(f.ghPath); });
-            }
 
             for (const path of pathsToDelete) {
                 await deletePrivateFile(path);
@@ -1349,42 +1657,25 @@
 
             database.ref(`questions/public/items/${id}`).remove()
                 .then(() => {
-                    showToast('🗑️ Đã xóa thành công câu hỏi và file trên GitHub!', 'success');
+                    showToast('🗑️ Đã xóa thành công câu hỏi!', 'success');
                     if (selectedId === id) clearDetail();
                 })
                 .catch(error => { showToast('❌ ' + error.message, 'error'); });
         }
 
-        // XÓA TẤT CẢ CÂU HỎI VÀ XÓA TOÀN BỘ FILE TRÊN GITHUB
         async function clearAll() {
-            if (!confirm('⚠️ Xóa TẤT CẢ câu hỏi và TẤT CẢ file đính kèm trên GitHub? Hành động này không thể hoàn tác!')) return;
+            if (!confirm('⚠️ Xóa TẤT CẢ câu hỏi và TẤT CẢ file đính kèm trên GitHub?')) return;
 
-            showToast("⏳ Đang xóa toàn bộ file đính kèm trên GitHub...", "success");
+            showToast("⏳ Đang xóa toàn bộ...", "success");
 
             for (const q of allQuestions) {
-                const pathsToDelete = [];
-
-                if (q.ghPath) pathsToDelete.push(q.ghPath);
-                if (q.files && Array.isArray(q.files)) {
-                    q.files.forEach(f => { if (f.ghPath) pathsToDelete.push(f.ghPath); });
-                }
-                if (q.answerGhPath) pathsToDelete.push(q.answerGhPath);
-                if (q.replyGhPath) pathsToDelete.push(q.replyGhPath);
-                if (q.answerFiles && Array.isArray(q.answerFiles)) {
-                    q.answerFiles.forEach(f => { if (f.ghPath) pathsToDelete.push(f.ghPath); });
-                }
-                if (q.replyFiles && Array.isArray(q.replyFiles)) {
-                    q.replyFiles.forEach(f => { if (f.ghPath) pathsToDelete.push(f.ghPath); });
-                }
-
-                for (const path of pathsToDelete) {
-                    await deletePrivateFile(path);
-                }
+                if (q.ghPath) await deletePrivateFile(q.ghPath);
+                if (q.answerGhPath) await deletePrivateFile(q.answerGhPath);
             }
 
             database.ref('questions/public/items').remove()
                 .then(() => {
-                    showToast('🗑️ Đã xóa sạch toàn bộ dữ liệu & file trên GitHub.', 'success');
+                    showToast('🗑️ Đã xóa sạch toàn bộ dữ liệu.', 'success');
                     clearDetail();
                 })
                 .catch(error => { showToast('❌ ' + error.message, 'error'); });
@@ -1447,8 +1738,8 @@
                 const answerFiles = q.answerFiles || q.replyFiles || [];
                 if (answerFiles.length > 0) {
                     ansFileStr = answerFiles.map(f => f.name || f.ghPath).join('; ');
-                } else if (q.answerFileUrl || q.replyFileUrl || q.answerGhPath || q.replyGhPath || q.answerFile || q.replyFile) {
-                    ansFileStr = q.answerFileName || q.replyFileName || q.answerGhPath || q.replyGhPath || 'Có file';
+                } else if (q.answerFileUrl || q.replyFileUrl || q.answerGhPath || q.replyGhPath) {
+                    ansFileStr = q.answerFileName || q.replyFileName || 'Có file';
                 }
 
                 mainData.push([
@@ -1485,6 +1776,11 @@
             if (!text) return '';
             const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
             return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+        function escapeAttr(text) {
+            if (!text) return '';
+            return String(text).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         }
 
         function showToast(message, type = 'success') {
