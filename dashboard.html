@@ -293,7 +293,7 @@
         }
         .btn-primary-custom:hover { background: #15803d; }
 
-        /* ===== TAB 2: DANH SÁCH CÂU HỎI (NỘI DUNG CŨ) ===== */
+        /* ===== TAB 2: DANH SÁCH CÂU HỎI ===== */
         .panel-header {
             display: flex;
             justify-content: space-between;
@@ -468,6 +468,35 @@
             text-overflow: ellipsis;
             display: block;
         }
+
+        /* Pagination Styling */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+            flex-shrink: 0;
+            font-size: 12px;
+            color: #475569;
+        }
+        .pagination-controls {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        .page-btn {
+            background: #e2e8f0;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 11px;
+            cursor: pointer;
+            color: #1e293b;
+            transition: 0.2s;
+        }
+        .page-btn:hover:not(:disabled) { background: #cbd5e1; }
+        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .empty-state, .loading-state { text-align: center; padding: 30px 20px; color: #94a3b8; }
         .spinner {
@@ -830,6 +859,16 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Pagination Controls -->
+                <div class="pagination-container" id="paginationContainer">
+                    <span id="pageInfo">Hiển thị 0 - 0 của 0 mục</span>
+                    <div class="pagination-controls">
+                        <button class="page-btn" id="prevPageBtn" onclick="changePage(-1)">◀ Trang trước</button>
+                        <span id="pageNumDisplay" style="font-weight: 600;">Trang 1 / 1</span>
+                        <button class="page-btn" id="nextPageBtn" onclick="changePage(1)">Trang sau ▶</button>
+                    </div>
+                </div>
             </div>
 
             <!-- TAB 3: TUYÊN TRUYỀN (Có 2 sub-tab con) -->
@@ -956,8 +995,12 @@
         const editPropTitle = document.getElementById('editPropTitle');
         const editPropLink = document.getElementById('editPropLink');
 
+        // Phân trang
         let allQuestions = [];
         let filteredQuestions = [];
+        let currentPage = 1;
+        const itemsPerPage = 15; // Mỗi trang 15 câu[cite: 1]
+
         let selectedId = null;
         let toastTimeout = null;
         let myChart = null;
@@ -996,7 +1039,6 @@
         }
 
         function switchSubTab(subIndex) {
-            document.querySelectorAll('.sub-nav-btn').forEach((btn, idx) => {}); // safety
             const subBtns = document.querySelectorAll('.sub-tab-btn');
             subBtns.forEach((btn, idx) => {
                 if (idx + 1 === subIndex) btn.classList.add('active');
@@ -1227,14 +1269,38 @@
                 return matchKeyword && matchStatus && matchDate && matchField && matchArea;
             });
 
+            currentPage = 1; // Reset về trang đầu tiên khi lọc dữ liệu
             renderTable();
-            updateDashboardAndStats(allQuestions); // Dashboard thống kê toàn bộ hoặc bộ lọc tổng
+            updateDashboardAndStats(allQuestions);
+        }
+
+        // ===== PHÂN TRANG & RENDER BẢNG =====
+        function changePage(direction) {
+            const totalPages = Math.ceil(filteredQuestions.length / itemsPerPage) || 1;
+            currentPage += direction;
+            if (currentPage < 1) currentPage = 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            renderTable();
         }
 
         function renderTable() {
-            const data = filteredQuestions;
+            const totalItems = filteredQuestions.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
 
-            if (data.length === 0) {
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedData = filteredQuestions.slice(startIndex, endIndex);
+
+            // Cập nhật thông tin phân trang giao diện
+            document.getElementById('pageInfo').textContent = totalItems === 0 
+                ? 'Hiển thị 0 - 0 của 0 mục' 
+                : `Hiển thị ${startIndex + 1} - ${Math.min(endIndex, totalItems)} của ${totalItems} mục`;
+            document.getElementById('pageNumDisplay').textContent = `Trang ${currentPage} / ${totalPages}`;
+            document.getElementById('prevPageBtn').disabled = currentPage <= 1;
+            document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
+
+            if (paginatedData.length === 0) {
                 tableBody.innerHTML = `
                     <tr>
                         <td colspan="8">
@@ -1249,17 +1315,18 @@
             }
 
             let html = '';
-            data.forEach((q, index) => {
+            paginatedData.forEach((q, index) => {
+                const absoluteIndex = startIndex + index + 1;
                 const isActive = q.id === selectedId;
                 const answered = isQuestionAnswered(q);
                 
                 let statusReadHtml = q.isRead 
-    ? `<span style="color: #166534; font-weight: 600; display:block; font-size:10px; margin-top:2px;">👁️ Đã xem (${q.readAt || ''})</span>` 
-    : `<span style="color: #d97706; font-weight: 600; display:block; font-size:10px; margin-top:2px;">⏳ Chưa xem</span>`;
+                    ? `<span style="color: #166534; font-weight: 600; display:block; font-size:10px; margin-top:2px;">👁️ Đã xem (${q.readAt || ''})</span>` 
+                    : `<span style="color: #d97706; font-weight: 600; display:block; font-size:10px; margin-top:2px;">⏳ Chưa xem</span>`;
 
-const statusBadge = answered 
-    ? `<span class="status-tag answered">✅ Đã trả lời</span>${statusReadHtml}`
-    : `<span class="status-tag pending">⏳ Chưa trả lời</span>`;
+                const statusBadge = answered 
+                    ? `<span class="status-tag answered">✅ Đã trả lời</span>${statusReadHtml}`
+                    : `<span class="status-tag pending">⏳ Chưa trả lời</span>`;
 
                 const fileCount = (q.files && q.files.length) || (q.fileUrl || q.file ? 1 : 0);
                 const fileBadge = fileCount > 0 
@@ -1272,7 +1339,7 @@ const statusBadge = answered
 
                 html += `
                     <tr class="${isActive ? 'active' : ''}" onclick="selectQuestion('${q.id}')">
-                        <td>${index + 1}</td>
+                        <td>${absoluteIndex}</td>
                         <td><span class="truncate" title="${escapeHtml(q.fullName || 'Chưa nhập')}">${escapeHtml(q.fullName || '—')}</span></td>
                         <td>${escapeHtml(q.phone || '—')}</td>
                         <td><span class="field-tag">${escapeHtml(q.field || 'Chung')}</span></td>
@@ -1329,12 +1396,10 @@ const statusBadge = answered
             }
             dashTopField.textContent = maxFVal > 0 ? `${topF} (${maxFVal})` : '—';
 
-            // Vẽ biểu đồ cột theo thời gian (Thống kê theo Tháng hoặc Ngày gần nhất)
             renderTimeChart(data);
         }
 
         function renderTimeChart(data) {
-            // Thống kê số lượng PAKN theo tháng trong năm hiện tại hoặc các tháng gần nhất
             const monthlyStats = {};
             data.forEach(q => {
                 let d = q.timestamp ? new Date(q.timestamp) : (q.created ? new Date(q.created) : null);
@@ -1450,14 +1515,13 @@ const statusBadge = answered
             let areaDisplay = q.area ? `<span class="area-tag">${escapeHtml(q.area)}</span>` : '—';
             const answered = isQuestionAnswered(q);
 
-            // 🟢 ĐOẠN MÃ HIỂN THỊ TRẠNG THÁI ĐÃ XEM TRONG MODAL CHI TIẾT
-let statusReadHtml = q.isRead 
-    ? `<div style="color: #166534; font-weight: 600; font-size: 11px; margin-top: 4px;">👁️ Người dân đã xem: ${q.readAt || ''}</div>` 
-    : `<div style="color: #d97706; font-weight: 600; font-size: 11px; margin-top: 4px;">⏳ Người dân chưa xem phản hồi này</div>`;
+            let statusReadHtml = q.isRead 
+                ? `<div style="color: #166534; font-weight: 600; font-size: 11px; margin-top: 4px;">👁️ Người dân đã xem: ${q.readAt || ''}</div>` 
+                : `<div style="color: #d97706; font-weight: 600; font-size: 11px; margin-top: 4px;">⏳ Người dân chưa xem phản hồi này</div>`;
 
-const statusDisplay = answered 
-    ? `<span class="status-tag answered">✅ Đã trả lời</span>${statusReadHtml}`
-    : `<span class="status-tag pending">⏳ Chưa trả lời</span>`;
+            const statusDisplay = answered 
+                ? `<span class="status-tag answered">✅ Đã trả lời</span>${statusReadHtml}`
+                : `<span class="status-tag pending">⏳ Chưa trả lời</span>`;
 
             const answerText = q.answer || q.reply || q.answerText || '';
             const answerTime = q.answeredAt || q.replyCreated || q.updatedAt || q.replyTime || '';
