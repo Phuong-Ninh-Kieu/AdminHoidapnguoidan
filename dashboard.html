@@ -1,0 +1,1930 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Dashboard - Quản trị câu hỏi & Tuyên truyền</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <!-- Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Chart.js cho biểu đồ cột -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f1f5f9;
+            height: 100vh;
+            overflow: hidden;
+            padding: 12px;
+        }
+
+        .dashboard {
+            max-width: 1440px;
+            height: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 10px rgba(30, 41, 59, 0.2);
+            flex-shrink: 0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .header-left h1 {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .header-left h1 .highlight {
+            color: #fbbf24;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .header-right .user-email {
+            background: rgba(255, 255, 255, 0.12);
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-weight: 500;
+            font-size: 12px;
+        }
+
+        .header-right .logout-btn {
+            background: rgba(255, 255, 255, 0.12);
+            border: none;
+            color: white;
+            padding: 4px 14px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .header-right .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* ===== NAVIGATION TABS ===== */
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+            border-bottom: 2px solid #cbd5e1;
+            padding-bottom: 6px;
+        }
+
+        .nav-tab-btn {
+            background: #e2e8f0;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-tab-btn:hover {
+            background: #cbd5e1;
+        }
+
+        .nav-tab-btn.active {
+            background: #1e293b;
+            color: white;
+        }
+
+        /* ===== TAB CONTENT CONTAINER ===== */
+        .tab-content-container {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-pane {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            min-height: 0;
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .tab-pane.active {
+            display: flex;
+        }
+
+        /* ===== TAB 1: BẢNG ĐIỀU KHIỂN ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-shrink: 0;
+        }
+
+        .stat-card {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 12px 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-left: 4px solid #1e293b;
+        }
+
+        .stat-card .stat-icon { font-size: 24px; flex-shrink: 0; }
+        .stat-card .stat-info { flex: 1; min-width: 0; }
+
+        .stat-card .number {
+            font-size: 20px;
+            font-weight: 800;
+            color: #1e293b;
+            line-height: 1.2;
+        }
+
+        .stat-card .label {
+            font-size: 12px;
+            color: #64748b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .stat-card.accent-green { border-left-color: #16a34a; }
+        .stat-card.accent-yellow { border-left-color: #f59e0b; }
+        .stat-card.accent-purple { border-left-color: #8b5cf6; }
+
+        .chart-container {
+            flex: 1;
+            min-height: 0;
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-header {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .chart-wrapper {
+            flex: 1;
+            position: relative;
+            min-height: 0;
+        }
+
+        /* ===== TAB 3: TUYÊN TRUYỀN SUB-TABS ===== */
+        .sub-nav-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 14px;
+            flex-shrink: 0;
+        }
+
+        .sub-tab-btn {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 12px;
+            color: #475569;
+            cursor: pointer;
+        }
+
+        .sub-tab-btn.active {
+            background: #0284c7;
+            color: white;
+            border-color: #0284c7;
+        }
+
+        .sub-tab-pane {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            min-height: 0;
+            overflow-y: auto;
+        }
+        .sub-tab-pane.active {
+            display: flex;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+            max-width: 600px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .btn-primary-custom {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-primary-custom:hover { background: #15803d; }
+
+        /* ===== TAB 2: DANH SÁCH CÂU HỎI ===== */
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+
+        .panel-header h2 { font-size: 15px; color: #1e293b; }
+        .panel-header .actions { display: flex; gap: 5px; flex-wrap: wrap; }
+        .panel-header .actions button {
+            padding: 4px 12px;
+            border: none;
+            border-radius: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 11px;
+        }
+
+        .btn-export { background: #16a34a; color: white; }
+        .btn-export:hover { background: #15803d; }
+        .btn-refresh { background: #3b82f6; color: white; }
+        .btn-refresh:hover { background: #2563eb; }
+        .btn-clear { background: #dc2626; color: white; }
+        .btn-clear:hover { background: #b91c1c; }
+
+        .search-bar {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .search-bar input {
+            flex: 1;
+            min-width: 120px;
+            padding: 6px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 12px;
+            background: #f8fafc;
+        }
+
+        .search-bar select {
+            padding: 6px 8px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 12px;
+            background: #f8fafc;
+            cursor: pointer;
+        }
+
+        .table-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            min-height: 0;
+        }
+
+        .question-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .question-table thead { position: sticky; top: 0; z-index: 10; }
+        .question-table th {
+            background: #1e293b;
+            color: white;
+            padding: 7px 10px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        .question-table td {
+            padding: 6px 10px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #1e293b;
+            vertical-align: middle;
+            font-size: 12px;
+        }
+
+        .question-table tbody tr { cursor: pointer; transition: background 0.15s; }
+        .question-table tbody tr:hover { background: #f1f5f9; }
+        .question-table tbody tr.active { background: #e0e7ff; }
+
+        .field-tag {
+            padding: 1px 8px;
+            background: #e2e8f0;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .area-tag {
+            padding: 1px 8px;
+            background: #dbeafe;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 600;
+            color: #1e40af;
+        }
+
+        .status-tag {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            display: inline-block;
+            white-space: nowrap;
+        }
+        .status-tag.answered { background: #dcfce7; color: #15803d; }
+        .status-tag.pending { background: #fef3c7; color: #b45309; }
+
+        .file-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            background: #fef3c7;
+            color: #b45309;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .table-actions-cell {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .action-reply-btn {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            transition: 0.2s;
+        }
+        .action-reply-btn:hover { background: #15803d; }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 13px;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .delete-btn:hover { color: #dc2626; background: #fef2f2; }
+
+        .truncate {
+            max-width: 150px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+        }
+
+        /* Pagination Styling */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+            flex-shrink: 0;
+            font-size: 12px;
+            color: #475569;
+        }
+        .pagination-controls {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        .page-btn {
+            background: #e2e8f0;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 11px;
+            cursor: pointer;
+            color: #1e293b;
+            transition: 0.2s;
+        }
+        .page-btn:hover:not(:disabled) { background: #cbd5e1; }
+        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .empty-state, .loading-state { text-align: center; padding: 30px 20px; color: #94a3b8; }
+        .spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid #e2e8f0;
+            border-top: 3px solid #1e293b;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* ===== MODAL POPUP CHI TIẾT & TRẢ LỜI ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-overlay.active { display: flex; }
+        
+        .modal-box {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            width: 450px;
+            max-width: 90%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        .modal-box.detail-modal {
+            width: 750px;
+            max-width: 95vw;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+            flex-shrink: 0;
+        }
+
+        .detail-modal-header h3 { font-size: 16px; color: #1e293b; font-weight: 700; }
+        .close-modal-btn { background: none; border: none; font-size: 20px; color: #94a3b8; cursor: pointer; }
+        .close-modal-btn:hover { color: #dc2626; }
+
+        #detailModalContent {
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
+            padding-right: 4px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 14px;
+            margin-bottom: 10px;
+        }
+
+        .detail-item { display: flex; flex-direction: column; }
+        .detail-item.full-width { grid-column: 1 / -1; }
+        .detail-item .label { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 2px; }
+        .detail-item .value { font-size: 12px; color: #1e293b; word-break: break-word; font-weight: 500; }
+
+        .question-full {
+            background: #f8fafc;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border-left: 3px solid #1e293b;
+            font-size: 12px;
+            line-height: 1.5;
+            margin-top: 2px;
+        }
+
+        .answer-box {
+            background: #f0fdf4;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #bbf7d0;
+            margin-top: 6px;
+        }
+
+        .answer-textarea {
+            width: 100%;
+            height: 100px;
+            padding: 8px;
+            border: 1px solid #86efac;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: inherit;
+            resize: vertical;
+            outline: none;
+            background: #ffffff;
+            color: #14532d;
+            box-sizing: border-box;
+        }
+
+        .answer-file-input {
+            margin-top: 6px;
+            font-size: 11px;
+            width: 100%;
+        }
+
+        .btn-save-answer {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 16px;
+            font-weight: 600;
+            font-size: 11px;
+            cursor: pointer;
+            margin-top: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-save-answer:hover { background: #15803d; }
+
+        .attachment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .attachment-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            padding: 6px 10px;
+            border-radius: 6px;
+            color: #0284c7;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .attachment-btn.answer-file {
+            background: #ecfdf5;
+            border-color: #a7f3d0;
+            color: #047857;
+        }
+
+        .detail-actions {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn-delete-detail { background: #dc2626; color: white; padding: 6px 14px; border: none; border-radius: 16px; font-weight: 600; cursor: pointer; font-size: 11px; }
+
+        /* Quản lý tuyên truyền list */
+        .propaganda-list-container {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 50vh;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        .prop-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .prop-table th {
+            background: #f8fafc;
+            color: #475569;
+            padding: 8px 10px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+        }
+        .prop-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #1e293b;
+        }
+        .prop-table tr:hover { background: #f1f5f9; }
+
+        .btn-action-sm {
+            padding: 3px 8px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .btn-edit-item { background: #e0f2fe; color: #0284c7; margin-right: 4px; }
+        .btn-del-item { background: #fee2e2; color: #dc2626; }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1e293b;
+            color: white;
+            padding: 10px 22px;
+            border-radius: 12px;
+            font-weight: 600;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: all 0.4s ease;
+            z-index: 2000;
+            font-size: 13px;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast.success { background: #16a34a; }
+        .toast.error { background: #dc2626; }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- ===== HEADER ===== -->
+        <header class="header">
+            <div class="header-left">
+                <img src="logo-mat-tran-to-quoc-viet-nam-01.png" alt="Logo" style="width:28px; height:28px; border-radius:4px;" onerror="this.style.display='none'">
+                <h1><span class="highlight">Mặt trận Tổ quốc Việt Nam Phường Ninh Kiều</span></h1>
+            </div>
+            <div class="header-right">
+                <span class="user-email" id="userEmail">admin@email.com</span>
+                <button class="logout-btn" onclick="logout()">🚪 Đăng xuất</button>
+            </div>
+        </header>
+
+        <!-- ===== MAIN NAVIGATION TABS ===== -->
+        <div class="nav-tabs">
+            <button class="nav-tab-btn active" onclick="switchTab(1)">📊 Bảng điều khiển</button>
+            <button class="nav-tab-btn" onclick="switchTab(2)">📋 Danh sách câu hỏi</button>
+            <button class="nav-tab-btn" onclick="switchTab(3)">📢 Tuyên truyền</button>
+        </div>
+
+        <!-- ===== TAB CONTENT CONTAINER ===== -->
+        <div class="tab-content-container">
+
+            <!-- TAB 1: BẢNG ĐIỀU KHIỂN -->
+            <div class="tab-pane active" id="tab1">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-icon">📬</span>
+                        <div class="stat-info">
+                            <div class="number" id="dashTotal">0</div>
+                            <div class="label">Tổng số PAKN phản ánh</div>
+                        </div>
+                    </div>
+                    <div class="stat-card accent-green">
+                        <span class="stat-icon">✅</span>
+                        <div class="stat-info">
+                            <div class="number" id="dashAnswered">0</div>
+                            <div class="label">Tổng số PAKN đã xử lý</div>
+                        </div>
+                    </div>
+                    <div class="stat-card accent-yellow">
+                        <span class="stat-icon">🔥</span>
+                        <div class="stat-info">
+                            <div class="number" id="dashToday">0</div>
+                            <div class="label">Số PAKN mới gửi trong ngày</div>
+                        </div>
+                    </div>
+                    <div class="stat-card accent-purple">
+                        <span class="stat-icon">📂</span>
+                        <div class="stat-info">
+                            <div class="number" id="dashTopField" style="font-size: 14px; margin-top: 2px;">—</div>
+                            <div class="label">Lĩnh vực tập trung nhiều nhất</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-header">📈 Xử lý phản ánh, kiến nghị theo thời gian</div>
+                    <div class="chart-wrapper">
+                        <canvas id="timeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: DANH SÁCH CÂU HỎI -->
+            <div class="tab-pane" id="tab2">
+                <div class="panel-header">
+                    <h2>📋 Danh sách toàn bộ phản ánh, kiến nghị</h2>
+                    <div class="actions">
+                        <button class="btn-export" onclick="exportSummary()">📨 Xuất Excel</button>
+                        <button class="btn-refresh" onclick="loadQuestions()">🔄</button>
+                        <button class="btn-clear" onclick="clearAll()">🗑️ Xóa tất cả</button>
+                    </div>
+                </div>
+
+                <!-- Search & Filter -->
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="🔍 Tìm kiếm theo tên, SĐT, nội dung..." oninput="filterQuestions()">
+                    
+                    <select id="statusFilter" onchange="filterQuestions()">
+                        <option value="">💡 Tất cả trạng thái</option>
+                        <option value="answered">✅ Đã trả lời</option>
+                        <option value="pending">⏳ Chưa trả lời</option>
+                    </select>
+
+                    <select id="yearFilter" onchange="filterQuestions()">
+                        <option value="">📅 Tất cả năm</option>
+                    </select>
+
+                    <select id="monthFilter" onchange="filterQuestions()">
+                        <option value="">📅 Tất cả tháng</option>
+                        <option value="1">Tháng 1</option><option value="2">Tháng 2</option><option value="3">Tháng 3</option><option value="4">Tháng 4</option><option value="5">Tháng 5</option><option value="6">Tháng 6</option><option value="7">Tháng 7</option><option value="8">Tháng 8</option><option value="9">Tháng 9</option><option value="10">Tháng 10</option><option value="11">Tháng 11</option><option value="12">Tháng 12</option>
+                    </select>
+
+                    <select id="fieldFilter" onchange="filterQuestions()">
+                        <option value="">📂 Tất cả lĩnh vực</option>
+                    </select>
+                    
+                    <select id="areaFilter" onchange="filterQuestions()">
+                        <option value="">📍 Tất cả khu vực</option>
+                    </select>
+                </div>
+
+                <!-- Table -->
+                <div class="table-wrapper">
+                    <table class="question-table">
+                        <thead>
+                            <tr>
+                                <th style="width:24px;">#</th>
+                                <th>Họ tên</th>
+                                <th>SĐT</th>
+                                <th>Lĩnh vực</th>
+                                <th>Khu vực</th>
+                                <th>Trạng thái</th>
+                                <th>File</th>
+                                <th style="width:110px;">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <tr>
+                                <td colspan="8">
+                                    <div class="empty-state">
+                                        <div class="icon">📭</div>
+                                        <p>Chưa có câu hỏi nào</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination Controls -->
+                <div class="pagination-container" id="paginationContainer">
+                    <span id="pageInfo">Hiển thị 0 - 0 của 0 mục</span>
+                    <div class="pagination-controls">
+                        <button class="page-btn" id="prevPageBtn" onclick="changePage(-1)">◀ Trang trước</button>
+                        <span id="pageNumDisplay" style="font-weight: 600;">Trang 1 / 1</span>
+                        <button class="page-btn" id="nextPageBtn" onclick="changePage(1)">Trang sau ▶</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: TUYÊN TRUYỀN (Có 2 sub-tab con) -->
+            <div class="tab-pane" id="tab3">
+                <div class="sub-nav-tabs">
+                    <button class="sub-tab-btn active" onclick="switchSubTab(1)">➕ Thêm bài tuyên truyền</button>
+                    <button class="sub-tab-btn" onclick="switchSubTab(2)">⚙️ Quản lý các bài tuyên truyền</button>
+                </div>
+
+                <!-- Sub-tab 3.1: Thêm bài tuyên truyền -->
+                <div class="sub-tab-pane active" id="subTab1">
+                    <div class="form-group">
+                        <label>Tiêu đề bài viết tuyên truyền:</label>
+                        <input type="text" id="propTitle" placeholder="Ví dụ: Kế hoạch tổ chức Đại hội...">
+                    </div>
+                    <div class="form-group">
+                        <label>Đường dẫn bài viết (Link Firebase / URL):</label>
+                        <input type="text" id="propLink" placeholder="https://...">
+                    </div>
+                    <button class="btn-primary-custom" onclick="savePropaganda()">💾 Lưu bài tuyên truyền</button>
+                </div>
+
+                <!-- Sub-tab 3.2: Quản lý bài tuyên truyền -->
+                <div class="sub-tab-pane" id="subTab2">
+                    <div class="propaganda-list-container">
+                        <table class="prop-table">
+                            <thead>
+                                <tr>
+                                    <th>Tiêu đề</th>
+                                    <th>Đường dẫn</th>
+                                    <th style="width: 110px; text-align: center;">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="managePropListBody">
+                                <tr>
+                                    <td colspan="3" style="text-align: center; color: #94a3b8;">Đang tải dữ liệu...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL POPUP CHI TIẾT & TRẢ LỜI -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal-box detail-modal">
+            <div class="detail-modal-header">
+                <h3>📄 Chi tiết & Trả lời câu hỏi</h3>
+                <button class="close-modal-btn" onclick="closeDetailModal()">✕</button>
+            </div>
+            <div id="detailModalContent">
+                <!-- Nội dung chi tiết được render động -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL SỬA BÀI TUYÊN TRUYỀN -->
+    <div class="modal-overlay" id="editPropagandaModal">
+        <div class="modal-box">
+            <h3>✏️ Chỉnh sửa bài tuyên truyền</h3>
+            <input type="hidden" id="editPropId">
+            <div class="form-group" style="max-width:100%;">
+                <label>Tiêu đề bài viết:</label>
+                <input type="text" id="editPropTitle" placeholder="Tiêu đề...">
+            </div>
+            <div class="form-group" style="max-width:100%;">
+                <label>Đường dẫn bài viết (Link):</label>
+                <input type="text" id="editPropLink" placeholder="https://...">
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px;">
+                <button class="sub-tab-btn" onclick="closeEditPropModal()">Hủy</button>
+                <button class="btn-primary-custom" onclick="updatePropaganda()">Cập nhật</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // ========== FIREBASE CONFIG ==========
+        const firebaseConfig = {
+            apiKey: "AIzaSyCAn-dCRdVkbYZYuh_wWWKPe2-5_meQuBA",
+            authDomain: "hoidap-ff5ed.firebaseapp.com",
+            databaseURL: "https://hoidap-ff5ed-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "hoidap-ff5ed",
+            storageBucket: "hoidap-ff5ed.firebasestorage.app",
+            messagingSenderId: "747872918560",
+            appId: "1:747872918560:web:f9f0d5073d083a46e03045"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+        // CẤU HÌNH GOOGLE APPS SCRIPT
+// ============================================================
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxYt2xQl0mFu6gVWykRIMoZ1HOc2e_xVtaE2J3pgh5TXhYBjRVfgADi4TG9OQug0SHs/exec';
+        // DOM REFS
+        const userEmail = document.getElementById('userEmail');
+        const tableBody = document.getElementById('tableBody');
+        const detailModal = document.getElementById('detailModal');
+        const detailModalContent = document.getElementById('detailModalContent');
+        const searchInput = document.getElementById('searchInput');
+        
+        const statusFilter = document.getElementById('statusFilter');
+        const yearFilter = document.getElementById('yearFilter');
+        const monthFilter = document.getElementById('monthFilter');
+        const fieldFilter = document.getElementById('fieldFilter');
+        const areaFilter = document.getElementById('areaFilter');
+        const toast = document.getElementById('toast');
+
+        // Stats UI
+        const dashTotal = document.getElementById('dashTotal');
+        const dashAnswered = document.getElementById('dashAnswered');
+        const dashToday = document.getElementById('dashToday');
+        const dashTopField = document.getElementById('dashTopField');
+
+        // Propaganda UI
+        const propTitle = document.getElementById('propTitle');
+        const propLink = document.getElementById('propLink');
+        const managePropListBody = document.getElementById('managePropListBody');
+        const editPropagandaModal = document.getElementById('editPropagandaModal');
+        const editPropId = document.getElementById('editPropId');
+        const editPropTitle = document.getElementById('editPropTitle');
+        const editPropLink = document.getElementById('editPropLink');
+
+        // Phân trang
+        let allQuestions = [];
+        let filteredQuestions = [];
+        let currentPage = 1;
+        const itemsPerPage = 15; // Mỗi trang 15 câu[cite: 1]
+
+        let selectedId = null;
+        let toastTimeout = null;
+        let myChart = null;
+
+        // AUTH
+        auth.onAuthStateChanged(user => {
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+            userEmail.textContent = user.email;
+            loadQuestions();
+        });
+
+        function logout() {
+            auth.signOut().then(() => { window.location.href = 'index.html'; });
+        }
+
+        // ===== TAB SWITCHING =====
+        function switchTab(tabIndex) {
+            document.querySelectorAll('.nav-tab-btn').forEach((btn, idx) => {
+                if (idx + 1 === tabIndex) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+
+            document.querySelectorAll('.tab-pane').forEach((pane, idx) => {
+                if (idx + 1 === tabIndex) {
+                    pane.classList.add('active');
+                    if (tabIndex === 1) {
+                        setTimeout(() => { if (myChart) myChart.resize(); }, 100);
+                    }
+                } else {
+                    pane.classList.remove('active');
+                }
+            });
+        }
+
+        function switchSubTab(subIndex) {
+            const subBtns = document.querySelectorAll('.sub-tab-btn');
+            subBtns.forEach((btn, idx) => {
+                if (idx + 1 === subIndex) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+
+            const subPanes = document.querySelectorAll('.sub-tab-pane');
+            subPanes.forEach((pane, idx) => {
+                if (idx + 1 === subIndex) pane.classList.add('active');
+                else pane.classList.remove('active');
+            });
+
+            if (subIndex === 2) {
+                loadManagePropagandaList();
+            }
+        }
+
+        // ===== BÀI TUYÊN TRUYỀN LOGIC =====
+        async function savePropaganda() {
+            const title = propTitle.value.trim();
+            const link = propLink.value.trim();
+            if (!title || !link) {
+                showToast("⚠️ Vui lòng nhập đầy đủ tiêu đề và đường link!", "error");
+                return;
+            }
+            try {
+                showToast("⏳ Đang lưu bài tuyên truyền...", "success");
+                const newRef = database.ref('questions/public/propaganda').push();
+                await newRef.set({ title, link, timestamp: Date.now() });
+                showToast("✅ Đã lưu bài tuyên truyền thành công!", "success");
+                propTitle.value = '';
+                propLink.value = '';
+            } catch (err) {
+                showToast("❌ Lỗi: " + err.message, "error");
+            }
+        }
+
+        async function loadManagePropagandaList() {
+            managePropListBody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #94a3b8;">Đang tải dữ liệu...</td></tr>`;
+            try {
+                const snap = await database.ref('questions/public/propaganda').once('value');
+                const data = snap.val();
+                if (!data) {
+                    managePropListBody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #94a3b8;">Chưa có bài viết tuyên truyền nào.</td></tr>`;
+                    return;
+                }
+                let html = '';
+                Object.keys(data).forEach(key => {
+                    let item = data[key];
+                    html += `
+                        <tr>
+                            <td><strong>${escapeHtml(item.title || 'Không tiêu đề')}</strong></td>
+                            <td><a href="${item.link || '#'}" target="_blank" style="color: #0284c7; text-decoration: none; max-width: 250px; display: inline-block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${item.link}">${item.link || '—'}</a></td>
+                            <td style="text-align: center; white-space: nowrap;">
+                                <button class="btn-action-sm btn-edit-item" onclick="openEditPropModal('${key}', '${escapeAttr(item.title)}', '${escapeAttr(item.link)}')">✏️ Sửa</button>
+                                <button class="btn-action-sm btn-del-item" onclick="deletePropagandaItem('${key}')">🗑️ Xóa</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                managePropListBody.innerHTML = html;
+            } catch (err) {
+                managePropListBody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #dc2626;">Lỗi tải dữ liệu.</td></tr>`;
+            }
+        }
+
+        function openEditPropModal(id, title, link) {
+            editPropId.value = id;
+            editPropTitle.value = title;
+            editPropLink.value = link;
+            editPropagandaModal.classList.add('active');
+        }
+        function closeEditPropModal() { editPropagandaModal.classList.remove('active'); }
+
+        async function updatePropaganda() {
+            const id = editPropId.value;
+            const title = editPropTitle.value.trim();
+            const link = editPropLink.value.trim();
+            if (!title || !link) {
+                showToast("⚠️ Vui lòng không để trống thông tin!", "error");
+                return;
+            }
+            try {
+                showToast("⏳ Đang cập nhật...", "success");
+                await database.ref(`questions/public/propaganda/${id}`).update({ title, link, updatedAt: Date.now() });
+                showToast("✅ Cập nhật thành công!", "success");
+                closeEditPropModal();
+                loadManagePropagandaList();
+            } catch (err) {
+                showToast("❌ Lỗi: " + err.message, "error");
+            }
+        }
+
+        async function deletePropagandaItem(id) {
+            if (!confirm("Bạn có chắc chắn muốn xóa bài tuyên truyền này không?")) return;
+            try {
+                showToast("⏳ Đang xóa...", "success");
+                await database.ref(`questions/public/propaganda/${id}`).remove();
+                showToast("🗑️ Đã xóa!", "success");
+                loadManagePropagandaList();
+            } catch (err) {
+                showToast("❌ Lỗi: " + err.message, "error");
+            }
+        }
+
+        // ===== LOAD CÂU HỎI & TÍNH TOÁN DASHBOARD =====
+        function loadQuestions() {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="8">
+                        <div class="loading-state">
+                            <div class="spinner"></div>
+                            <p style="margin-top:6px; color:#94a3b8; font-size:12px;">Đang tải dữ liệu...</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+
+            const ref = database.ref('questions/public/items');
+            ref.on('value', snapshot => {
+                const data = snapshot.val();
+                if (!data) {
+                    allQuestions = [];
+                    renderTable();
+                    updateDashboardAndStats([]);
+                    return;
+                }
+
+                allQuestions = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                allQuestions.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+                updateFilters();
+                filterQuestions();
+                
+                if (selectedId && detailModal.classList.contains('active')) {
+                    selectQuestion(selectedId, false);
+                }
+            }, error => {
+                showToast("❌ Lỗi tải dữ liệu: " + error.message, "error");
+            });
+        }
+
+        function updateFilters() {
+            const fieldSet = new Set();
+            const areaSet = new Set();
+            const yearSet = new Set();
+
+            allQuestions.forEach(q => {
+                if (q.field) fieldSet.add(q.field);
+                if (q.area && q.area.trim()) areaSet.add(q.area);
+                
+                let d = q.timestamp ? new Date(q.timestamp) : (q.created ? new Date(q.created) : null);
+                if (d && !isNaN(d.getTime())) {
+                    yearSet.add(d.getFullYear());
+                }
+            });
+
+            const currentYear = yearFilter.value;
+            yearFilter.innerHTML = '<option value="">📅 Tất cả năm</option>';
+            [...yearSet].sort((a,b) => b - a).forEach(y => {
+                const opt = document.createElement('option');
+                opt.value = y; opt.textContent = `Năm ${y}`;
+                yearFilter.appendChild(opt);
+            });
+            yearFilter.value = currentYear;
+
+            const currentField = fieldFilter.value;
+            fieldFilter.innerHTML = '<option value="">📂 Tất cả lĩnh vực</option>';
+            [...fieldSet].sort().forEach(f => {
+                const opt = document.createElement('option');
+                opt.value = f; opt.textContent = f;
+                fieldFilter.appendChild(opt);
+            });
+            fieldFilter.value = currentField;
+
+            const currentArea = areaFilter.value;
+            areaFilter.innerHTML = '<option value="">📍 Tất cả khu vực</option>';
+            [...areaSet].sort().forEach(a => {
+                const opt = document.createElement('option');
+                opt.value = a; opt.textContent = a;
+                areaFilter.appendChild(opt);
+            });
+            areaFilter.value = currentArea;
+        }
+
+        function checkDateMatch(timestamp, createdStr, yVal, mVal) {
+            if (!yVal && !mVal) return true;
+            let date = timestamp ? new Date(timestamp) : (createdStr ? new Date(createdStr) : null);
+            if (!date || isNaN(date.getTime())) return true;
+            if (yVal && date.getFullYear() !== parseInt(yVal)) return false;
+            if (mVal && (date.getMonth() + 1) !== parseInt(mVal)) return false;
+            return true;
+        }
+
+        function isQuestionAnswered(q) {
+            if (q.status === 'answered' || q.isAnswered === true) return true;
+            if (q.answer && typeof q.answer === 'string' && q.answer.trim().length > 0) return true;
+            if (q.reply && typeof q.reply === 'string' && q.reply.trim().length > 0) return true;
+            if (q.answerText && typeof q.answerText === 'string' && q.answerText.trim().length > 0) return true;
+            if (q.answerFile || q.answerFileUrl || q.answerGhPath || q.replyFile || q.replyFileUrl || q.replyGhPath) return true;
+            if ((q.answerFiles && q.answerFiles.length > 0) || (q.replyFiles && q.replyFiles.length > 0)) return true;
+            return false;
+        }
+
+        function filterQuestions() {
+            const keyword = searchInput.value.toLowerCase().trim();
+            const statusVal = statusFilter.value;
+            const yVal = yearFilter.value;
+            const mVal = monthFilter.value;
+            const fieldVal = fieldFilter.value;
+            const areaVal = areaFilter.value;
+
+            filteredQuestions = allQuestions.filter(q => {
+                const matchKeyword = !keyword || 
+                    (q.fullName && q.fullName.toLowerCase().includes(keyword)) ||
+                    (q.phone && q.phone.includes(keyword)) ||
+                    (q.question && q.question.toLowerCase().includes(keyword));
+                
+                const answered = isQuestionAnswered(q);
+                const matchStatus = !statusVal || 
+                    (statusVal === 'answered' && answered) || 
+                    (statusVal === 'pending' && !answered);
+
+                const matchDate = checkDateMatch(q.timestamp, q.created, yVal, mVal);
+                const matchField = !fieldVal || q.field === fieldVal;
+                const matchArea = !areaVal || q.area === areaVal;
+
+                return matchKeyword && matchStatus && matchDate && matchField && matchArea;
+            });
+
+            currentPage = 1; // Reset về trang đầu tiên khi lọc dữ liệu
+            renderTable();
+            updateDashboardAndStats(allQuestions);
+        }
+
+        // ===== PHÂN TRANG & RENDER BẢNG =====
+        function changePage(direction) {
+            const totalPages = Math.ceil(filteredQuestions.length / itemsPerPage) || 1;
+            currentPage += direction;
+            if (currentPage < 1) currentPage = 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            renderTable();
+        }
+
+        function renderTable() {
+            const totalItems = filteredQuestions.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedData = filteredQuestions.slice(startIndex, endIndex);
+
+            // Cập nhật thông tin phân trang giao diện
+            document.getElementById('pageInfo').textContent = totalItems === 0 
+                ? 'Hiển thị 0 - 0 của 0 mục' 
+                : `Hiển thị ${startIndex + 1} - ${Math.min(endIndex, totalItems)} của ${totalItems} mục`;
+            document.getElementById('pageNumDisplay').textContent = `Trang ${currentPage} / ${totalPages}`;
+            document.getElementById('prevPageBtn').disabled = currentPage <= 1;
+            document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
+
+            if (paginatedData.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <div class="icon">📭</div>
+                                <p>Không tìm thấy câu hỏi nào</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            let html = '';
+            paginatedData.forEach((q, index) => {
+                const absoluteIndex = startIndex + index + 1;
+                const isActive = q.id === selectedId;
+                const answered = isQuestionAnswered(q);
+                
+                let statusReadHtml = q.isRead 
+                    ? `<span style="color: #166534; font-weight: 600; display:block; font-size:10px; margin-top:2px;">👁️ Đã xem (${q.readAt || ''})</span>` 
+                    : `<span style="color: #d97706; font-weight: 600; display:block; font-size:10px; margin-top:2px;">⏳ Chưa xem</span>`;
+
+                const statusBadge = answered 
+                    ? `<span class="status-tag answered">✅ Đã trả lời</span>${statusReadHtml}`
+                    : `<span class="status-tag pending">⏳ Chưa trả lời</span>`;
+
+                const fileCount = (q.files && q.files.length) || (q.fileUrl || q.file ? 1 : 0);
+                const fileBadge = fileCount > 0 
+                    ? `<span class="file-badge">📎 ${fileCount}</span>` 
+                    : '<span style="color:#cbd5e1;">—</span>';
+
+                const actionHtml = !answered 
+                    ? `<button class="action-reply-btn" onclick="event.stopPropagation(); selectQuestion('${q.id}');">💬 Trả lời</button>`
+                    : `<button class="action-reply-btn" style="background:#0284c7;" onclick="event.stopPropagation(); selectQuestion('${q.id}');">✏️ Sửa câu trả lời</button>`;
+
+                html += `
+                    <tr class="${isActive ? 'active' : ''}" onclick="selectQuestion('${q.id}')">
+                        <td>${absoluteIndex}</td>
+                        <td><span class="truncate" title="${escapeHtml(q.fullName || 'Chưa nhập')}">${escapeHtml(q.fullName || '—')}</span></td>
+                        <td>${escapeHtml(q.phone || '—')}</td>
+                        <td><span class="field-tag">${escapeHtml(q.field || 'Chung')}</span></td>
+                        <td>${q.area ? `<span class="area-tag">${escapeHtml(q.area)}</span>` : '—'}</td>
+                        <td>${statusBadge}</td>
+                        <td>${fileBadge}</td>
+                        <td>
+                            <div class="table-actions-cell">
+                                ${actionHtml}
+                                <button class="delete-btn" onclick="event.stopPropagation(); deleteQuestion('${q.id}')" title="Xóa">✕</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            tableBody.innerHTML = html;
+        }
+
+        // ===== CẬP NHẬT DASHBOARD TAB 1 (THỐNG KÊ & BIỂU ĐỒ) =====
+        function updateDashboardAndStats(data = []) {
+            const total = data.length;
+            let answeredCount = 0;
+            let todayCount = 0;
+            const fieldCount = {};
+
+            const todayStr = new Date().toDateString();
+
+            data.forEach(q => {
+                if (isQuestionAnswered(q)) answeredCount++;
+
+                let d = q.timestamp ? new Date(q.timestamp) : (q.created ? new Date(q.created) : null);
+                if (d && !isNaN(d.getTime())) {
+                    if (d.toDateString() === todayStr) {
+                        todayCount++;
+                    }
+                }
+
+                if (q.field && q.field.trim()) {
+                    let f = q.field.trim();
+                    fieldCount[f] = (fieldCount[f] || 0) + 1;
+                }
+            });
+
+            dashTotal.textContent = total;
+            dashAnswered.textContent = answeredCount;
+            dashToday.textContent = todayCount;
+
+            let topF = '—', maxFVal = 0;
+            for (const [field, count] of Object.entries(fieldCount)) {
+                if (count > maxFVal) {
+                    maxFVal = count;
+                    topF = field;
+                }
+            }
+            dashTopField.textContent = maxFVal > 0 ? `${topF} (${maxFVal})` : '—';
+
+            renderTimeChart(data);
+        }
+
+        function renderTimeChart(data) {
+            const monthlyStats = {};
+            data.forEach(q => {
+                let d = q.timestamp ? new Date(q.timestamp) : (q.created ? new Date(q.created) : null);
+                if (d && !isNaN(d.getTime())) {
+                    let monthKey = `Tháng ${d.getMonth() + 1}/${d.getFullYear()}`;
+                    if (!monthlyStats[monthKey]) {
+                        monthlyStats[monthKey] = { total: 0, answered: 0 };
+                    }
+                    monthlyStats[monthKey].total++;
+                    if (isQuestionAnswered(q)) {
+                        monthlyStats[monthKey].answered++;
+                    }
+                }
+            });
+
+            const labels = Object.keys(monthlyStats).sort();
+            const totalData = labels.map(l => monthlyStats[l].total);
+            const answeredData = labels.map(l => monthlyStats[l].answered);
+
+            const ctx = document.getElementById('timeChart').getContext('2d');
+            if (myChart) {
+                myChart.destroy();
+            }
+
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels.length > 0 ? labels : ['Chưa có dữ liệu'],
+                    datasets: [
+                        {
+                            label: 'Tổng số PAKN gửi',
+                            data: labels.length > 0 ? totalData : [0],
+                            backgroundColor: '#3b82f6',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Đã xử lý',
+                            data: labels.length > 0 ? answeredData : [0],
+                            backgroundColor: '#16a34a',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0 }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ===== MODAL CHI TIẾT & TRẢ LỜI CÂU HỎI =====
+        function renderFilesHtml(files, singleUrl, singleGhPath, singleName, isAnswer = false) {
+            let filesHtml = `<span style="color:#94a3b8; font-size:11px;">Không có file đính kèm</span>`;
+            const extraClass = isAnswer ? 'answer-file' : '';
+
+            if (files && Array.isArray(files) && files.length > 0) {
+                filesHtml = '<div class="attachment-list">';
+                files.forEach((f, idx) => {
+                    const fileName = escapeHtml(f.name || f.fileName || f.filename || `Tệp_${idx + 1}`);
+                    if (f.ghPath) {
+                        filesHtml += `
+                            <div class="attachment-btn ${extraClass}" onclick="downloadPrivateFile('${f.ghPath}', '${fileName}')">
+                                <span>📄 ${fileName}</span>
+                                <span>⬇️ Tải về</span>
+                            </div>`;
+                    } else if (f.url || f.fileUrl || f.link) {
+                        filesHtml += `
+                            <a href="${f.url || f.fileUrl || f.link}" download="${fileName}" target="_blank" class="attachment-btn ${extraClass}">
+                                <span>📄 ${fileName}</span>
+                                <span>👁️ Xem/Tải</span>
+                            </a>`;
+                    }
+                });
+                filesHtml += '</div>';
+            } else if (singleUrl || singleGhPath) {
+                const fileName = escapeHtml(singleName || 'Tệp_đính_kèm');
+                if (singleGhPath) {
+                    filesHtml = `
+                        <div class="attachment-list">
+                            <div class="attachment-btn ${extraClass}" onclick="downloadPrivateFile('${singleGhPath}', '${fileName}')">
+                                <span>📄 ${fileName}</span>
+                                <span>⬇️ Tải về</span>
+                            </div>
+                        </div>`;
+                } else if (singleUrl) {
+                    filesHtml = `
+                        <div class="attachment-list">
+                            <a href="${singleUrl}" download="${fileName}" target="_blank" class="attachment-btn ${extraClass}">
+                                <span>📄 ${fileName}</span>
+                                <span>👁️ Xem/Tải</span>
+                            </a>
+                        </div>`;
+                }
+            }
+            return filesHtml;
+        }
+
+        function selectQuestion(id, shouldRenderTable = true) {
+            const q = allQuestions.find(item => item.id === id);
+            if (!q) return;
+
+            selectedId = id;
+            if (shouldRenderTable) renderTable();
+            
+            detailModal.classList.add('active');
+
+            let areaDisplay = q.area ? `<span class="area-tag">${escapeHtml(q.area)}</span>` : '—';
+            const answered = isQuestionAnswered(q);
+
+            let statusReadHtml = q.isRead 
+                ? `<div style="color: #166534; font-weight: 600; font-size: 11px; margin-top: 4px;">👁️ Người dân đã xem: ${q.readAt || ''}</div>` 
+                : `<div style="color: #d97706; font-weight: 600; font-size: 11px; margin-top: 4px;">⏳ Người dân chưa xem phản hồi này</div>`;
+
+            const statusDisplay = answered 
+                ? `<span class="status-tag answered">✅ Đã trả lời</span>${statusReadHtml}`
+                : `<span class="status-tag pending">⏳ Chưa trả lời</span>`;
+
+            const answerText = q.answer || q.reply || q.answerText || '';
+            const answerTime = q.answeredAt || q.replyCreated || q.updatedAt || q.replyTime || '';
+
+            const answerFiles = q.answerFiles || q.replyFiles || [];
+            const answerFileUrl = q.answerFileUrl || q.replyFileUrl || q.answerFile || q.replyFile || q.answerUrl || q.answerLink || q.replyUrl || q.replyLink;
+            const answerGhPath = q.answerGhPath || q.replyGhPath;
+            const answerFileName = q.answerFileName || q.replyFileName || q.answerName || q.replyName;
+
+            const questionFilesHtml = renderFilesHtml(q.files, q.fileUrl || q.file, q.ghPath, q.fileName);
+            const answerFilesHtml = renderFilesHtml(answerFiles, answerFileUrl, answerGhPath, answerFileName, true);
+
+            detailModalContent.innerHTML = `
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <span class="label">Trạng thái</span>
+                        <span class="value">${statusDisplay}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Thời gian gửi</span>
+                        <span class="value" style="color:#64748b;">${escapeHtml(q.created) || '—'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Họ và tên</span>
+                        <span class="value"><strong>${escapeHtml(q.fullName || '—')}</strong></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Số điện thoại</span>
+                        <span class="value">${escapeHtml(q.phone || '—')}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Địa chỉ</span>
+                        <span class="value">${escapeHtml(q.address) || '—'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Khu vực</span>
+                        <span class="value">${areaDisplay}</span>
+                    </div>
+                    <div class="detail-item full-width">
+                        <span class="label">Lĩnh vực</span>
+                        <span class="value"><span class="field-tag">${escapeHtml(q.field || 'Chung')}</span></span>
+                    </div>
+
+                    <div class="detail-item full-width" style="margin-top: 4px;">
+                        <span class="label">❓ Nội dung phản ánh</span>
+                        <div class="question-full">${escapeHtml(q.question || 'Chưa có nội dung')}</div>
+                    </div>
+                    <div class="detail-item full-width" style="margin-top: 6px;">
+                        <span class="label">📎 Tệp đính kèm</span>
+                        ${questionFilesHtml}
+                    </div>
+
+                    <div class="detail-item full-width" style="margin-top: 10px;">
+                        <span class="label" style="color:#16a34a;">💬 Soạn/Cập nhật câu trả lời ${answerTime ? `(Lưu gần nhất: ${escapeHtml(answerTime)})` : ''}</span>
+                        <div class="answer-box">
+                            <textarea id="replyTextInput" class="answer-textarea" placeholder="Nhập hoặc chỉnh sửa câu trả lời tại đây...">${escapeHtml(answerText)}</textarea>
+                            
+                            <div style="margin-top:8px;">
+                                <label style="font-size:10px; font-weight:700; color:#166534; display:block;">📎 Tệp đính kèm câu trả lời:</label>
+                                <input type="file" id="replyFileInput" class="answer-file-input">
+                            </div>
+
+                            <button class="btn-save-answer" onclick="saveAnswer('${q.id}')">
+                                💾 Lưu câu trả lời
+                            </button>
+                        </div>
+                    </div>
+
+                    ${answered ? `
+                    <div class="detail-item full-width" style="margin-top: 8px;">
+                        <span class="label">📄 File trả lời hiện có</span>
+                        ${answerFilesHtml}
+                    </div>` : ''}
+                </div>
+                <div class="detail-actions">
+                    <button class="btn-delete-detail" onclick="deleteQuestion('${q.id}')">🗑️ Xóa phản ánh</button>
+                </div>
+            `;
+        }
+
+        function closeDetailModal() {
+            selectedId = null;
+            detailModal.classList.remove('active');
+            renderTable();
+        }
+
+        async function uploadAnswerFileToGithub(file) {
+            let owner = "Phuong-Ninh-Kieu";
+            let repo = "Storage-Private";
+            let token = "";
+
+            const snap = await database.ref('questions/public/sharedConfig/githubConfig').once('value');
+            if (snap.exists()) {
+                const config = snap.val();
+                token = config.token || "";
+                if (config.owner) owner = config.owner;
+                if (config.repo) repo = config.repo;
+            }
+
+            if (!token) throw new Error("Chưa cấu hình Github Token!");
+
+            const base64Data = await readFileAsDataURL(file);
+            const cleanBase64 = base64Data.split(',')[1];
+
+            const timeStamp = Date.now();
+            const safeFileName = file.name.replace(/[^a-zA-Z0-9_.-]/g, '_');
+            const ghPath = `answers/${timeStamp}_${safeFileName}`;
+            const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${ghPath}`;
+
+            const res = await fetch(apiUrl, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': 'token ' + String(token).trim(),
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/vnd.github+json'
+                },
+                body: JSON.stringify({
+                    message: `Upload answer file: ${safeFileName}`,
+                    content: cleanBase64
+                })
+            });
+
+            if (!res.ok) {
+                const errJson = await res.json().catch(() => ({}));
+                throw new Error(`Lỗi upload GitHub (${res.status}): ${errJson.message || 'Không xác định'}`);
+            }
+
+            return { ghPath: ghPath, fileName: file.name };
+        }
+
+        async function saveAnswer(questionId) {
+    const replyText = document.getElementById('replyTextInput').value.trim();
+    const fileInput = document.getElementById('replyFileInput');
+    const file = fileInput.files[0];
+
+    if (!replyText && !file) {
+        showToast("⚠️ Vui lòng nhập câu trả lời hoặc chọn file đính kèm!", "error");
+        return;
+    }
+
+    try {
+        const nowStr = new Date().toLocaleString('vi-VN');
+        const updateData = {
+            answer: replyText,
+            reply: replyText,
+            answerText: replyText,
+            answeredAt: nowStr,
+            replyTime: nowStr,
+            isAnswered: true,
+            status: 'answered'
+        };
+
+        let fileUploadResult = null;
+        if (file) {
+            showToast("⏳ Đang tải file lên GitHub...", "success");
+            fileUploadResult = await uploadAnswerFileToGithub(file);
+            updateData.answerGhPath = fileUploadResult.ghPath;
+            updateData.replyGhPath = fileUploadResult.ghPath;
+            updateData.answerFileName = fileUploadResult.fileName;
+            updateData.replyFileName = fileUploadResult.fileName;
+        }
+
+        // 1. LƯU LÊN FIREBASE (Giữ nguyên)
+        showToast("⏳ Đang lưu dữ liệu...", "success");
+        await database.ref(`questions/public/items/${questionId}`).update(updateData);
+        
+        // 2. LƯU LÊN GOOGLE SHEETS & DRIVE (Thêm mới)
+        const question = allQuestions.find(q => q.id === questionId);
+        if (question) {
+            const formData = {
+                fullName: question.fullName || '',
+                phone: question.phone || '',
+                question: question.question || '',
+                answer: replyText,
+                answeredAt: nowStr
+            };
+            
+            const fileData = file && fileUploadResult ? {
+                file: file
+            } : null;
+            
+            await updateGoogleSheetAnswer(questionId, formData, fileData);
+        }
+        
+        showToast("✅ Đã lưu câu trả lời thành công!", "success");
+        
+        // Cập nhật lại modal
+        if (selectedId === questionId) {
+            selectQuestion(questionId);
+        }
+        
+    } catch (err) {
+        showToast("❌ " + err.message, "error");
+    }
+}
+
+// HÀM CẬP NHẬT CÂU TRẢ LỜI LÊN GOOGLE SHEETS & DRIVE
+// ============================================================
+async function updateGoogleSheetAnswer(questionId, formData, fileData) {
+    try {
+        const form = new FormData();
+        
+        // Gửi dữ liệu để xác định hàng cần cập nhật
+        form.append('action', 'update_answer');
+        form.append('phone', formData.phone || '');
+        form.append('question', formData.question || '');
+        form.append('answer', formData.answer || '');
+        form.append('answeredAt', formData.answeredAt || '');
+        form.append('fullName', formData.fullName || '');
+        
+        // Xử lý file trả lời (nếu có) → cột K
+        if (fileData && fileData.file) {
+            const reader = new FileReader();
+            const base64 = await new Promise((resolve) => {
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.readAsDataURL(fileData.file);
+            });
+            form.append('fileBase64', base64);
+            form.append('fileName', fileData.file.name);
+            form.append('fileMimeType', fileData.file.type);
+        }
+        
+        await fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: form
+        });
+        
+        return { result: 'success', message: 'Đã cập nhật Google Sheet!' };
+        
+    } catch (error) {
+        console.error('❌ Lỗi khi cập nhật Google Sheet:', error);
+        return { result: 'error', message: error.message };
+    }
+}
+
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function downloadPrivateFile(ghPath, fileName) {
+            try {
+                showToast("⏳ Đang tải tệp...", "success");
+                let owner = "Phuong-Ninh-Kieu";
+                let repo = "Storage-Private";
+                let token = "";
+
+                const snap = await database.ref('questions/public/sharedConfig/githubConfig').once('value');
+                if (snap.exists()) {
+                    const config = snap.val();
+                    token = config.token || "";
+                    if (config.owner) owner = config.owner;
+                    if (config.repo) repo = config.repo;
+                }
+
+                if (!token) { alert("⚠️ Chưa cấu hình Github Token!"); return; }
+
+                const cleanPath = String(ghPath).replace(/^\//, '').trim();
+                const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURI(cleanPath)}`;
+
+                const res = await fetch(apiUrl, {
+                    headers: { 'Authorization': 'token ' + String(token).trim(), 'Accept': 'application/vnd.github+json' }
+                });
+
+                if (!res.ok) throw new Error(`Lỗi kết nối GitHub (${res.status})`);
+                const json = await res.json();
+                if (!json.content) throw new Error("File rỗng!");
+
+                const byteCharacters = atob(json.content.replace(/\n/g, ''));
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) { byteNumbers[i] = byteCharacters.charCodeAt(i); }
+                const blob = new Blob([new Uint8Array(byteNumbers)]);
+
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = fileName || 'Tep_Dinh_Kem';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                showToast("✅ Tải thành công!", "success");
+            } catch (err) { alert("❌ " + err.message); }
+        }
+
+        async function deletePrivateFile(ghPath) {
+            if (!ghPath) return;
+            try {
+                let owner = "Phuong-Ninh-Kieu";
+                let repo = "Storage-Private";
+                let token = "";
+                const snap = await database.ref('questions/public/sharedConfig/githubConfig').once('value');
+                if (snap.exists()) {
+                    const config = snap.val();
+                    token = config.token || "";
+                    if (config.owner) owner = config.owner;
+                    if (config.repo) repo = config.repo;
+                }
+                if (!token) return;
+                const cleanPath = String(ghPath).replace(/^\//, '').trim();
+                const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURI(cleanPath)}`;
+                const getRes = await fetch(apiUrl, {
+                    headers: { 'Authorization': 'token ' + String(token).trim(), 'Accept': 'application/vnd.github+json' }
+                });
+                if (!getRes.ok) return;
+                const fileData = await getRes.json();
+                await fetch(apiUrl, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': 'token ' + String(token).trim(),
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/vnd.github+json'
+                    },
+                    body: JSON.stringify({ message: `Delete file: ${cleanPath}`, sha: fileData.sha })
+                });
+            } catch (err) { console.error("Lỗi xóa file:", err); }
+        }
+
+        async function deleteQuestion(id) {
+            if (!confirm('Xóa phản ánh này và toàn bộ file đính kèm?')) return;
+            const q = allQuestions.find(item => item.id === id);
+            if (!q) return;
+
+            showToast("⏳ Đang xóa...", "success");
+            if (q.ghPath) await deletePrivateFile(q.ghPath);
+            if (q.answerGhPath) await deletePrivateFile(q.answerGhPath);
+
+            database.ref(`questions/public/items/${id}`).remove()
+                .then(() => {
+                    showToast('🗑️ Đã xóa thành công!', 'success');
+                    if (selectedId === id) closeDetailModal();
+                })
+                .catch(error => { showToast('❌ ' + error.message, 'error'); });
+        }
+
+        async function clearAll() {
+            if (!confirm('⚠️ Xóa toàn bộ dữ liệu phản ánh?')) return;
+            showToast("⏳ Đang xóa sạch...", "success");
+            database.ref('questions/public/items').remove()
+                .then(() => {
+                    showToast('🗑️ Đã xóa sạch dữ liệu.', 'success');
+                    closeDetailModal();
+                })
+                .catch(error => { showToast('❌ ' + error.message, 'error'); });
+        }
+
+        function exportSummary() {
+            if (filteredQuestions.length === 0) {
+                showToast('⚠️ Chưa có dữ liệu để xuất!', 'error');
+                return;
+            }
+
+            const data = [...filteredQuestions].sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+            const mainData = [
+                ['STT', 'Họ và tên', 'Số điện thoại', 'Địa chỉ', 'Khu vực', 'Lĩnh vực', 'Trạng thái', 'Nội dung phản ánh', 'Nội dung trả lời', 'Thời gian gửi']
+            ];
+
+            data.forEach((q, index) => {
+                const answered = isQuestionAnswered(q);
+                mainData.push([
+                    index + 1,
+                    q.fullName || '',
+                    q.phone || '',
+                    q.address || '',
+                    q.area || '',
+                    q.field || '',
+                    answered ? 'Đã trả lời' : 'Chưa trả lời',
+                    q.question || '',
+                    q.answer || q.reply || '',
+                    q.created || ''
+                ]);
+            });
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(mainData);
+            XLSX.utils.book_append_sheet(wb, ws, 'Phản ánh');
+            XLSX.writeFile(wb, `danh_sach_phan_anh_${new Date().toISOString().slice(0,10)}.xlsx`);
+            showToast('📨 Đã xuất Excel thành công!', 'success');
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+        function escapeAttr(text) {
+            if (!text) return '';
+            return String(text).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        function showToast(message, type = 'success') {
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+    </script>
+</body>
+</html>
