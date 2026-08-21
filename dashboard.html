@@ -1701,48 +1701,49 @@
         }
 
         async function downloadPrivateFile(ghPath, fileName) {
-            try {
-                showToast("⏳ Đang tải tệp...", "success");
-                let owner = "Phuong-Ninh-Kieu";
-                let repo = "Storage-Private";
-                let token = "";
+    try {
+        showToast("⏳ Đang tải tệp...", "success");
+        let owner = "Phuong-Ninh-Kieu";
+        let repo = "Storage-Private";
+        let token = "";
 
-                const snap = await database.ref('questions/public/sharedConfig/githubConfig').once('value');
-                if (snap.exists()) {
-                    const config = snap.val();
-                    token = config.token || "";
-                    if (config.owner) owner = config.owner;
-                    if (config.repo) repo = config.repo;
-                }
-
-                if (!token) { alert("⚠️ Chưa cấu hình Github Token!"); return; }
-
-                const cleanPath = String(ghPath).replace(/^\//, '').trim();
-                const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURI(cleanPath)}`;
-
-                const res = await fetch(apiUrl, {
-                    headers: { 'Authorization': 'token ' + String(token).trim(), 'Accept': 'application/vnd.github+json' }
-                });
-
-                if (!res.ok) throw new Error(`Lỗi kết nối GitHub (${res.status})`);
-                const json = await res.json();
-                if (!json.content) throw new Error("File rỗng!");
-
-                const byteCharacters = atob(json.content.replace(/\n/g, ''));
-                const byteNumbers = new Array(byteCharacters.length);
-                for (let i = 0; i < byteCharacters.length; i++) { byteNumbers[i] = byteCharacters.charCodeAt(i); }
-                const blob = new Blob([new Uint8Array(byteNumbers)]);
-
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = fileName || 'Tep_Dinh_Kem';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-
-                showToast("✅ Tải thành công!", "success");
-            } catch (err) { alert("❌ " + err.message); }
+        const snap = await database.ref('questions/public/sharedConfig/githubConfig').once('value');
+        if (snap.exists()) {
+            const config = snap.val();
+            token = config.token || "";
+            if (config.owner) owner = config.owner;
+            if (config.repo) repo = config.repo;
         }
+
+        if (!token) { alert("⚠️ Chưa cấu hình Github Token!"); return; }
+
+        const cleanPath = String(ghPath).replace(/^\//, '').trim();
+        // Sử dụng Accept: application/vnd.github.raw+json để GitHub trả về trực tiếp nội dung nhị phân của file
+        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURI(cleanPath)}`;
+
+        const res = await fetch(apiUrl, {
+            headers: { 
+                'Authorization': 'token ' + String(token).trim(), 
+                'Accept': 'application/vnd.github.raw+json' 
+            }
+        });
+
+        if (!res.ok) throw new Error(`Lỗi kết nối GitHub (${res.status})`);
+        
+        // Nhận dữ liệu dưới dạng Blob nguyên bản (chuẩn cho mọi loại file ảnh, docx, excel...)
+        const blob = await res.blob();
+        if (blob.size === 0) throw new Error("File rỗng!");
+
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName || 'Tep_Dinh_Kem';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        showToast("✅ Tải thành công!", "success");
+    } catch (err) { alert("❌ " + err.message); }
+}
 
         async function deletePrivateFile(ghPath) {
             if (!ghPath) return;
