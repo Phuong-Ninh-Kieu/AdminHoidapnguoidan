@@ -968,7 +968,10 @@
         // CẤU HÌNH GOOGLE APPS SCRIPT
 // ============================================================
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxYt2xQl0mFu6gVWykRIMoZ1HOc2e_xVtaE2J3pgh5TXhYBjRVfgADi4TG9OQug0SHs/exec';
+
+        // ============================================================
         // DOM REFS
+        // ============================================================
         const userEmail = document.getElementById('userEmail');
         const tableBody = document.getElementById('tableBody');
         const detailModal = document.getElementById('detailModal');
@@ -982,13 +985,11 @@ const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxYt2xQl0mFu6
         const areaFilter = document.getElementById('areaFilter');
         const toast = document.getElementById('toast');
 
-        // Stats UI
         const dashTotal = document.getElementById('dashTotal');
         const dashAnswered = document.getElementById('dashAnswered');
         const dashToday = document.getElementById('dashToday');
         const dashTopField = document.getElementById('dashTopField');
 
-        // Propaganda UI
         const propTitle = document.getElementById('propTitle');
         const propLink = document.getElementById('propLink');
         const managePropListBody = document.getElementById('managePropListBody');
@@ -997,17 +998,18 @@ const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxYt2xQl0mFu6
         const editPropTitle = document.getElementById('editPropTitle');
         const editPropLink = document.getElementById('editPropLink');
 
-        // Phân trang
         let allQuestions = [];
         let filteredQuestions = [];
         let currentPage = 1;
-        const itemsPerPage = 15; // Mỗi trang 15 câu[cite: 1]
+        const itemsPerPage = 15;
 
         let selectedId = null;
         let toastTimeout = null;
         let myChart = null;
 
+        // ============================================================
         // AUTH
+        // ============================================================
         auth.onAuthStateChanged(user => {
             if (!user) {
                 window.location.href = 'index.html';
@@ -1021,7 +1023,9 @@ const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxYt2xQl0mFu6
             auth.signOut().then(() => { window.location.href = 'index.html'; });
         }
 
-        // ===== TAB SWITCHING =====
+        // ============================================================
+        // TAB SWITCHING
+        // ============================================================
         function switchTab(tabIndex) {
             document.querySelectorAll('.nav-tab-btn').forEach((btn, idx) => {
                 if (idx + 1 === tabIndex) btn.classList.add('active');
@@ -1058,7 +1062,9 @@ const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxYt2xQl0mFu6
             }
         }
 
-        // ===== BÀI TUYÊN TRUYỀN LOGIC =====
+        // ============================================================
+        // BÀI TUYÊN TRUYỀN LOGIC
+        // ============================================================
         async function savePropaganda() {
             const title = propTitle.value.trim();
             const link = propLink.value.trim();
@@ -1146,7 +1152,9 @@ const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxYt2xQl0mFu6
             }
         }
 
-        // ===== LOAD CÂU HỎI & TÍNH TOÁN DASHBOARD =====
+        // ============================================================
+        // LOAD CÂU HỎI
+        // ============================================================
         function loadQuestions() {
             tableBody.innerHTML = `
                 <tr>
@@ -1191,7 +1199,6 @@ const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxYt2xQl0mFu6
             allQuestions.forEach(q => {
                 if (q.field) fieldSet.add(q.field);
                 if (q.area && q.area.trim()) areaSet.add(q.area);
-                
                 let d = q.timestamp ? new Date(q.timestamp) : (q.created ? new Date(q.created) : null);
                 if (d && !isNaN(d.getTime())) {
                     yearSet.add(d.getFullYear());
@@ -1258,25 +1265,24 @@ const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxYt2xQl0mFu6
                     (q.fullName && q.fullName.toLowerCase().includes(keyword)) ||
                     (q.phone && q.phone.includes(keyword)) ||
                     (q.question && q.question.toLowerCase().includes(keyword));
-                
                 const answered = isQuestionAnswered(q);
                 const matchStatus = !statusVal || 
                     (statusVal === 'answered' && answered) || 
                     (statusVal === 'pending' && !answered);
-
                 const matchDate = checkDateMatch(q.timestamp, q.created, yVal, mVal);
                 const matchField = !fieldVal || q.field === fieldVal;
                 const matchArea = !areaVal || q.area === areaVal;
-
                 return matchKeyword && matchStatus && matchDate && matchField && matchArea;
             });
 
-            currentPage = 1; // Reset về trang đầu tiên khi lọc dữ liệu
+            currentPage = 1;
             renderTable();
             updateDashboardAndStats(allQuestions);
         }
 
-        // ===== PHÂN TRANG & RENDER BẢNG =====
+        // ============================================================
+        // PHÂN TRANG & RENDER BẢNG
+        // ============================================================
         function changePage(direction) {
             const totalPages = Math.ceil(filteredQuestions.length / itemsPerPage) || 1;
             currentPage += direction;
@@ -1294,7 +1300,6 @@ const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxYt2xQl0mFu6
             const endIndex = startIndex + itemsPerPage;
             const paginatedData = filteredQuestions.slice(startIndex, endIndex);
 
-            // Cập nhật thông tin phân trang giao diện
             document.getElementById('pageInfo').textContent = totalItems === 0 
                 ? 'Hiển thị 0 - 0 của 0 mục' 
                 : `Hiển thị ${startIndex + 1} - ${Math.min(endIndex, totalItems)} của ${totalItems} mục`;
@@ -1360,7 +1365,9 @@ const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxYt2xQl0mFu6
             tableBody.innerHTML = html;
         }
 
-        // ===== CẬP NHẬT DASHBOARD TAB 1 (THỐNG KÊ & BIỂU ĐỒ) =====
+        // ============================================================
+        // DASHBOARD THỐNG KÊ
+        // ============================================================
         function updateDashboardAndStats(data = []) {
             const total = data.length;
             let answeredCount = 0;
@@ -1371,14 +1378,10 @@ const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxYt2xQl0mFu6
 
             data.forEach(q => {
                 if (isQuestionAnswered(q)) answeredCount++;
-
                 let d = q.timestamp ? new Date(q.timestamp) : (q.created ? new Date(q.created) : null);
                 if (d && !isNaN(d.getTime())) {
-                    if (d.toDateString() === todayStr) {
-                        todayCount++;
-                    }
+                    if (d.toDateString() === todayStr) todayCount++;
                 }
-
                 if (q.field && q.field.trim()) {
                     let f = q.field.trim();
                     fieldCount[f] = (fieldCount[f] || 0) + 1;
@@ -1422,9 +1425,7 @@ const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxYt2xQl0mFu6
             const answeredData = labels.map(l => monthlyStats[l].answered);
 
             const ctx = document.getElementById('timeChart').getContext('2d');
-            if (myChart) {
-                myChart.destroy();
-            }
+            if (myChart) myChart.destroy();
 
             myChart = new Chart(ctx, {
                 type: 'bar',
@@ -1458,7 +1459,9 @@ const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxYt2xQl0mFu6
             });
         }
 
-        // ===== MODAL CHI TIẾT & TRẢ LỜI CÂU HỎI =====
+        // ============================================================
+        // MODAL CHI TIẾT & TRẢ LỜI
+        // ============================================================
         function renderFilesHtml(files, singleUrl, singleGhPath, singleName, isAnswer = false) {
             let filesHtml = `<span style="color:#94a3b8; font-size:11px;">Không có file đính kèm</span>`;
             const extraClass = isAnswer ? 'answer-file' : '';
@@ -1511,7 +1514,6 @@ const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxYt2xQl0mFu6
 
             selectedId = id;
             if (shouldRenderTable) renderTable();
-            
             detailModal.classList.add('active');
 
             let areaDisplay = q.area ? `<span class="area-tag">${escapeHtml(q.area)}</span>` : '—';
@@ -1610,6 +1612,9 @@ const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxYt2xQl0mFu6
             renderTable();
         }
 
+        // ============================================================
+        // UPLOAD FILE ANSWER LÊN GITHUB
+        // ============================================================
         async function uploadAnswerFileToGithub(file) {
             let owner = "Phuong-Ninh-Kieu";
             let repo = "Storage-Private";
@@ -1654,114 +1659,117 @@ const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxYt2xQl0mFu6
             return { ghPath: ghPath, fileName: file.name };
         }
 
+        // ============================================================
+        // HÀM CẬP NHẬT CÂU TRẢ LỜI LÊN GOOGLE SHEETS & DRIVE
+        // ============================================================
+        async function updateGoogleSheetAnswer(questionId, formData, fileData) {
+            try {
+                const form = new FormData();
+                
+                form.append('action', 'update_answer');
+                form.append('questionId', questionId);
+                form.append('phone', formData.phone || '');
+                form.append('question', formData.question || '');
+                form.append('answer', formData.answer || '');
+                form.append('answeredAt', formData.answeredAt || '');
+                form.append('fullName', formData.fullName || '');
+                
+                if (fileData && fileData.file) {
+                    const reader = new FileReader();
+                    const base64 = await new Promise((resolve) => {
+                        reader.onload = () => resolve(reader.result.split(',')[1]);
+                        reader.readAsDataURL(fileData.file);
+                    });
+                    form.append('fileBase64', base64);
+                    form.append('fileName', fileData.file.name);
+                    form.append('fileMimeType', fileData.file.type);
+                }
+                
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: form
+                });
+                
+                return { result: 'success', message: 'Đã cập nhật Google Sheet!' };
+                
+            } catch (error) {
+                console.error('❌ Lỗi khi cập nhật Google Sheet:', error);
+                return { result: 'error', message: error.message };
+            }
+        }
+
+        // ============================================================
+        // HÀM LƯU CÂU TRẢ LỜI
+        // ============================================================
         async function saveAnswer(questionId) {
-    const replyText = document.getElementById('replyTextInput').value.trim();
-    const fileInput = document.getElementById('replyFileInput');
-    const file = fileInput.files[0];
+            const replyText = document.getElementById('replyTextInput').value.trim();
+            const fileInput = document.getElementById('replyFileInput');
+            const file = fileInput.files[0];
 
-    if (!replyText && !file) {
-        showToast("⚠️ Vui lòng nhập câu trả lời hoặc chọn file đính kèm!", "error");
-        return;
-    }
+            if (!replyText && !file) {
+                showToast("⚠️ Vui lòng nhập câu trả lời hoặc chọn file đính kèm!", "error");
+                return;
+            }
 
-    try {
-        const nowStr = new Date().toLocaleString('vi-VN');
-        const updateData = {
-            answer: replyText,
-            reply: replyText,
-            answerText: replyText,
-            answeredAt: nowStr,
-            replyTime: nowStr,
-            isAnswered: true,
-            status: 'answered'
-        };
+            try {
+                const nowStr = new Date().toLocaleString('vi-VN');
+                const updateData = {
+                    answer: replyText,
+                    reply: replyText,
+                    answerText: replyText,
+                    answeredAt: nowStr,
+                    replyTime: nowStr,
+                    isAnswered: true,
+                    status: 'answered'
+                };
 
-        let fileUploadResult = null;
-        if (file) {
-            showToast("⏳ Đang tải file lên GitHub...", "success");
-            fileUploadResult = await uploadAnswerFileToGithub(file);
-            updateData.answerGhPath = fileUploadResult.ghPath;
-            updateData.replyGhPath = fileUploadResult.ghPath;
-            updateData.answerFileName = fileUploadResult.fileName;
-            updateData.replyFileName = fileUploadResult.fileName;
+                let fileUploadResult = null;
+                if (file) {
+                    showToast("⏳ Đang tải file lên GitHub...", "success");
+                    fileUploadResult = await uploadAnswerFileToGithub(file);
+                    updateData.answerGhPath = fileUploadResult.ghPath;
+                    updateData.replyGhPath = fileUploadResult.ghPath;
+                    updateData.answerFileName = fileUploadResult.fileName;
+                    updateData.replyFileName = fileUploadResult.fileName;
+                }
+
+                // 1. LƯU LÊN FIREBASE
+                showToast("⏳ Đang lưu dữ liệu...", "success");
+                await database.ref(`questions/public/items/${questionId}`).update(updateData);
+                
+                // 2. LƯU LÊN GOOGLE SHEETS & DRIVE
+                const question = allQuestions.find(q => q.id === questionId);
+                if (question) {
+                    const formData = {
+                        fullName: question.fullName || '',
+                        phone: question.phone || '',
+                        question: question.question || '',
+                        answer: replyText,
+                        answeredAt: nowStr
+                    };
+                    
+                    const fileData = file && fileUploadResult ? {
+                        file: file
+                    } : null;
+                    
+                    await updateGoogleSheetAnswer(questionId, formData, fileData);
+                }
+                
+                showToast("✅ Đã lưu câu trả lời thành công!", "success");
+                
+                if (selectedId === questionId) {
+                    selectQuestion(questionId);
+                }
+                
+            } catch (err) {
+                showToast("❌ " + err.message, "error");
+            }
         }
 
-        // 1. LƯU LÊN FIREBASE (Giữ nguyên)
-        showToast("⏳ Đang lưu dữ liệu...", "success");
-        await database.ref(`questions/public/items/${questionId}`).update(updateData);
-        
-        // 2. LƯU LÊN GOOGLE SHEETS & DRIVE (Thêm mới)
-        const question = allQuestions.find(q => q.id === questionId);
-    if (question) {
-        const formData = {
-            fullName: question.fullName || '',
-            phone: question.phone || '',
-            question: question.question || '',
-            answer: replyText,
-            answeredAt: nowStr
-        };
-        
-        const fileData = file && fileUploadResult ? {
-            file: file
-        } : null;
-        
-        // ✅ Gửi kèm questionId
-        await updateGoogleSheetAnswer(questionId, formData, fileData);
-    }
-        
-        showToast("✅ Đã lưu câu trả lời thành công!", "success");
-        
-        // Cập nhật lại modal
-        if (selectedId === questionId) {
-            selectQuestion(questionId);
-        }
-        
-    } catch (err) {
-        showToast("❌ " + err.message, "error");
-    }
-}
-
-// HÀM CẬP NHẬT CÂU TRẢ LỜI LÊN GOOGLE SHEETS & DRIVE
-// ============================================================
-async function updateGoogleSheetAnswer(questionId, formData, fileData) {
-    try {
-        const form = new FormData();
-        
-        // ✅ Thêm questionId để tìm chính xác hàng
-        form.append('action', 'update_answer');
-        form.append('questionId', questionId); // 🟢 QUAN TRỌNG
-        form.append('phone', formData.phone || '');
-        form.append('question', formData.question || '');
-        form.append('answer', formData.answer || '');
-        form.append('answeredAt', formData.answeredAt || '');
-        form.append('fullName', formData.fullName || '');
-        
-        // Xử lý file trả lời (nếu có)
-        if (fileData && fileData.file) {
-            const reader = new FileReader();
-            const base64 = await new Promise((resolve) => {
-                reader.onload = () => resolve(reader.result.split(',')[1]);
-                reader.readAsDataURL(fileData.file);
-            });
-            form.append('fileBase64', base64);
-            form.append('fileName', fileData.file.name);
-            form.append('fileMimeType', fileData.file.type);
-        }
-        
-        await fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: form
-        });
-        
-        return { result: 'success', message: 'Đã cập nhật Google Sheet!' };
-        
-    } catch (error) {
-        console.error('❌ Lỗi khi cập nhật Google Sheet:', error);
-        return { result: 'error', message: error.message };
-    }
-}
-
+        // ============================================================
+        // HÀM ĐỌC FILE
+        // ============================================================
         function readFileAsDataURL(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -1771,6 +1779,9 @@ async function updateGoogleSheetAnswer(questionId, formData, fileData) {
             });
         }
 
+        // ============================================================
+        // HÀM TẢI FILE TỪ GITHUB
+        // ============================================================
         async function downloadPrivateFile(ghPath, fileName) {
             try {
                 showToast("⏳ Đang tải tệp...", "success");
@@ -1815,6 +1826,9 @@ async function updateGoogleSheetAnswer(questionId, formData, fileData) {
             } catch (err) { alert("❌ " + err.message); }
         }
 
+        // ============================================================
+        // HÀM XÓA FILE TRÊN GITHUB
+        // ============================================================
         async function deletePrivateFile(ghPath) {
             if (!ghPath) return;
             try {
@@ -1848,6 +1862,9 @@ async function updateGoogleSheetAnswer(questionId, formData, fileData) {
             } catch (err) { console.error("Lỗi xóa file:", err); }
         }
 
+        // ============================================================
+        // HÀM XÓA CÂU HỎI
+        // ============================================================
         async function deleteQuestion(id) {
             if (!confirm('Xóa phản ánh này và toàn bộ file đính kèm?')) return;
             const q = allQuestions.find(item => item.id === id);
@@ -1876,6 +1893,9 @@ async function updateGoogleSheetAnswer(questionId, formData, fileData) {
                 .catch(error => { showToast('❌ ' + error.message, 'error'); });
         }
 
+        // ============================================================
+        // HÀM XUẤT EXCEL
+        // ============================================================
         function exportSummary() {
             if (filteredQuestions.length === 0) {
                 showToast('⚠️ Chưa có dữ liệu để xuất!', 'error');
@@ -1910,6 +1930,9 @@ async function updateGoogleSheetAnswer(questionId, formData, fileData) {
             showToast('📨 Đã xuất Excel thành công!', 'success');
         }
 
+        // ============================================================
+        // HÀM TIỆN ÍCH
+        // ============================================================
         function escapeHtml(text) {
             if (!text) return '';
             const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
@@ -1927,6 +1950,11 @@ async function updateGoogleSheetAnswer(questionId, formData, fileData) {
             clearTimeout(toastTimeout);
             toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 3000);
         }
+
+        // ============================================================
+        // KHỞI CHẠY
+        // ============================================================
+        loadGithubConfig();
     </script>
 </body>
 </html>
