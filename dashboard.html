@@ -1692,21 +1692,22 @@ const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxYt2xQl0mFu6
         
         // 2. LƯU LÊN GOOGLE SHEETS & DRIVE (Thêm mới)
         const question = allQuestions.find(q => q.id === questionId);
-        if (question) {
-            const formData = {
-                fullName: question.fullName || '',
-                phone: question.phone || '',
-                question: question.question || '',
-                answer: replyText,
-                answeredAt: nowStr
-            };
-            
-            const fileData = file && fileUploadResult ? {
-                file: file
-            } : null;
-            
-            await updateGoogleSheetAnswer(questionId, formData, fileData);
-        }
+    if (question) {
+        const formData = {
+            fullName: question.fullName || '',
+            phone: question.phone || '',
+            question: question.question || '',
+            answer: replyText,
+            answeredAt: nowStr
+        };
+        
+        const fileData = file && fileUploadResult ? {
+            file: file
+        } : null;
+        
+        // ✅ Gửi kèm questionId
+        await updateGoogleSheetAnswer(questionId, formData, fileData);
+    }
         
         showToast("✅ Đã lưu câu trả lời thành công!", "success");
         
@@ -1726,15 +1727,16 @@ async function updateGoogleSheetAnswer(questionId, formData, fileData) {
     try {
         const form = new FormData();
         
-        // Gửi dữ liệu để xác định hàng cần cập nhật
+        // ✅ Thêm questionId để tìm chính xác hàng
         form.append('action', 'update_answer');
+        form.append('questionId', questionId); // 🟢 QUAN TRỌNG
         form.append('phone', formData.phone || '');
         form.append('question', formData.question || '');
         form.append('answer', formData.answer || '');
         form.append('answeredAt', formData.answeredAt || '');
         form.append('fullName', formData.fullName || '');
         
-        // Xử lý file trả lời (nếu có) → cột K
+        // Xử lý file trả lời (nếu có)
         if (fileData && fileData.file) {
             const reader = new FileReader();
             const base64 = await new Promise((resolve) => {
