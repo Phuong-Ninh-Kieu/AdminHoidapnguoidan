@@ -803,7 +803,7 @@ document.getElementById('filter-stat-done').innerText = doneCount;
                     if(error) {
                         alert("Lỗi: " + error.message);
                     } else { 
-                        btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs"></i> Đồng bộ Sheets...';
+                        btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs"></i> Đang gởi và Đồng bộ dữ liệu...';
                         await syncToGoogle(updatedRecord || { ...data, ...updatePayload });
                         
                         alert("✅ Lưu và đồng bộ thành công!"); 
