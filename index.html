@@ -12,41 +12,52 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
-        .sidebar-active { background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%); color: white !important; box-shadow: 0 4px 12px rgba(29, 78, 216, 0.25); }
+        .sidebar-active { background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%); color: white !important; box-shadow: 0 2px 8px rgba(29, 78, 216, 0.25); }
         .modal-open { overflow: hidden; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        @keyframes zoom { from { transform: scale(0.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .pakn-row { transition: all 0.2s ease; }
+        @keyframes zoom { from { transform: scale(0.97); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .pakn-row { transition: all 0.15s ease; }
+
+        /* CỐ ĐỊNH TIÊU ĐỀ BẢNG GỌN ĐẸP */
+        .table-sticky-container {
+            max-height: 480px;
+            overflow-y: auto;
+            position: relative;
+        }
+        .table-sticky-container thead th {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            background-color: #1e293b !important;
+            box-shadow: inset 0 -1px 0 #334155;
+        }
     </style>
 </head>
-<body class="text-slate-700 antialiased selection:bg-blue-500 selection:text-white">
+<body class="text-slate-700 antialiased selection:bg-blue-500 selection:text-white text-xs">
 
     <!-- LOGIN SCREEN -->
     <div id="loginBox" class="fixed inset-0 bg-[#0f172a] flex items-center justify-center z-[500] p-4">
-        <div class="bg-white p-8 md:p-10 rounded-2xl shadow-2xl w-full max-w-md border border-slate-100 text-center relative overflow-hidden">
+        <div class="bg-white p-7 md:p-8 rounded-xl shadow-2xl w-full max-w-sm border border-slate-100 text-center relative overflow-hidden">
             <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-600 via-amber-500 to-red-600"></div>
-            <div class="w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                <img src="logo-mat-tran-to-quoc-viet-nam-01.png" alt="Logo" class="w-14 object-contain">
+            <div class="w-14 h-14 mx-auto mb-3 flex items-center justify-center">
+                <img src="logo-mat-tran-to-quoc-viet-nam-01.png" alt="Logo" class="w-12 object-contain">
             </div>
-            <h2 class="text-base font-extrabold text-[#991b1b] mb-1 tracking-tight">Hệ thống quản lý câu hỏi người dân</h2>
-            <h3 class="text-xl font-extrabold text-slate-800 mb-6 tracking-tight">ĐĂNG NHẬP</h3>
-            <div class="space-y-4 text-left">
+            <h2 class="text-xs font-extrabold text-[#991b1b] mb-1 tracking-tight">Hệ thống quản lý câu hỏi người dân</h2>
+            <h3 class="text-lg font-extrabold text-slate-800 mb-5 tracking-tight">ĐĂNG NHẬP</h3>
+            <div class="space-y-3 text-left">
                 <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1.5 flex items-center gap-1.5"><i class="fa-regular fa-envelope text-slate-400"></i> Email</label>
-                    <div class="relative">
-                        <input type="text" id="u" placeholder="admin@gmail.com" class="w-full bg-white border border-slate-200 px-4 py-2.5 rounded-xl outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/10 transition-all text-xs font-medium text-slate-800">
-                    </div>
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1 flex items-center gap-1.5"><i class="fa-regular fa-envelope text-slate-400"></i> Email</label>
+                    <input type="text" id="u" placeholder="admin@gmail.com" class="w-full bg-white border border-slate-200 px-3 py-2 rounded-lg outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-500 text-xs font-medium text-slate-800">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-600 mb-1.5 flex items-center gap-1.5"><i class="fa-solid fa-lock text-slate-400"></i> Mật khẩu</label>
-                    <div class="relative">
-                        <input type="password" id="p" placeholder="••••••••" class="w-full bg-white border border-slate-200 px-4 py-2.5 rounded-xl outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/10 transition-all text-xs font-medium text-slate-800">
-                    </div>
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1 flex items-center gap-1.5"><i class="fa-solid fa-lock text-slate-400"></i> Mật khẩu</label>
+                    <input type="password" id="p" placeholder="••••••••" class="w-full bg-white border border-slate-200 px-3 py-2 rounded-lg outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-500 text-xs font-medium text-slate-800">
                 </div>
-                <button onclick="login()" class="w-full bg-[#1e293b] hover:bg-slate-800 text-white py-3 rounded-xl font-bold text-xs shadow-md transition-all active:scale-[0.98] mt-2 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-lock text-amber-400"></i> Đăng nhập
+                <button onclick="login()" class="w-full bg-[#1e293b] hover:bg-slate-800 text-white py-2.5 rounded-lg font-bold text-xs shadow-md transition-all active:scale-[0.98] mt-2 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-lock text-amber-400 text-[11px]"></i> Đăng nhập
                 </button>
             </div>
         </div>
@@ -54,102 +65,102 @@
 
     <!-- MAIN APP -->
     <div id="app" class="hidden min-h-screen flex flex-col">
-        <header class="bg-[#1e293b] text-white px-4 md:px-6 py-3 flex justify-between items-center shadow-sm sticky top-0 z-[60] border-b border-slate-800">
-            <div class="flex items-center gap-3">
-                <div class="w-7 h-7 flex items-center justify-center">
-                    <img src="logo-mat-tran-to-quoc-viet-nam-01.png" alt="Logo" class="w-full object-contain">
-                </div>
-                <h1 class="font-bold text-xs md:text-sm tracking-tight text-amber-400">Mặt trận Tổ quốc Việt Nam Phường Ninh Kiều</h1>
-            </div>
+        <!-- HEADER COMPACT -->
+        <header class="bg-[#1e293b] text-white px-4 md:px-6 py-2 flex justify-between items-center shadow-xs sticky top-0 z-[60] border-b border-slate-800">
             <div class="flex items-center gap-2.5">
-                <div class="bg-slate-700/80 px-2.5 py-1 rounded-full border border-slate-600 text-[11px] font-medium text-slate-200 hidden sm:block">
+                <img src="logo-mat-tran-to-quoc-viet-nam-01.png" alt="Logo" class="w-6 h-6 object-contain">
+                <h1 class="font-bold text-xs tracking-tight text-amber-400">Mặt trận Tổ quốc Việt Nam Phường Ninh Kiều</h1>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="bg-slate-800 px-2 py-0.5 rounded border border-slate-700 text-[10px] font-medium text-slate-300 hidden sm:block">
                     mttqpnk@gmail.com
                 </div>
-                <button onclick="location.reload()" class="bg-[#d97706] hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg font-bold text-xs transition-all flex items-center gap-1.5 shadow-xs">
-                    <i class="fa-solid fa-power-off text-[10px]"></i><span>Đăng xuất</span>
+                <button onclick="location.reload()" class="bg-[#d97706] hover:bg-amber-600 text-white px-2.5 py-1 rounded font-bold text-[11px] transition-all flex items-center gap-1">
+                    <i class="fa-solid fa-power-off text-[9px]"></i><span>Đăng xuất</span>
                 </button>
             </div>
         </header>
 
-        <div class="bg-white border-b border-slate-200 px-4 md:px-6 py-2 flex gap-2 sticky top-[53px] md:top-[57px] z-50 overflow-x-auto shadow-2xs">
-            <button onclick="tab('dash')" id="btn-dash" class="px-3.5 py-1.5 rounded-lg font-bold text-xs sidebar-active whitespace-nowrap transition-all flex items-center gap-1.5"><i class="fa-solid fa-chart-pie text-xs"></i>Bảng điều khiển</button>
-            <button onclick="tab('pakn')" id="btn-pakn" class="px-3.5 py-1.5 rounded-lg font-bold text-xs text-slate-600 hover:bg-slate-100 transition-all whitespace-nowrap flex items-center gap-1.5"><i class="fa-solid fa-file-lines text-xs"></i>Danh sách câu hỏi</button>
-            <button onclick="tab('news')" id="btn-news" class="px-3.5 py-1.5 rounded-lg font-bold text-xs text-slate-600 hover:bg-slate-100 transition-all whitespace-nowrap flex items-center gap-1.5"><i class="fa-solid fa-bullhorn text-xs"></i>Tuyên truyền</button>
+        <!-- SUB NAV -->
+        <div class="bg-white border-b border-slate-200 px-4 md:px-6 py-1.5 flex gap-1.5 sticky top-[41px] z-50 overflow-x-auto shadow-2xs">
+            <button onclick="tab('dash')" id="btn-dash" class="px-3 py-1 rounded-md font-bold text-[11px] sidebar-active whitespace-nowrap transition-all flex items-center gap-1.5"><i class="fa-solid fa-chart-pie text-[10px]"></i>Bảng điều khiển</button>
+            <button onclick="tab('pakn')" id="btn-pakn" class="px-3 py-1 rounded-md font-bold text-[11px] text-slate-600 hover:bg-slate-100 transition-all whitespace-nowrap flex items-center gap-1.5"><i class="fa-solid fa-file-lines text-[10px]"></i>Danh sách câu hỏi</button>
+            <button onclick="tab('news')" id="btn-news" class="px-3 py-1 rounded-md font-bold text-[11px] text-slate-600 hover:bg-slate-100 transition-all whitespace-nowrap flex items-center gap-1.5"><i class="fa-solid fa-bullhorn text-[10px]"></i>Tuyên truyền</button>
         </div>
 
-        <main class="p-3 md:p-5 flex-1 max-w-[1600px] w-full mx-auto space-y-4">
+        <main class="p-2.5 md:p-4 flex-1 max-w-[1600px] w-full mx-auto space-y-3">
             <!-- TAB 1: DASHBOARD -->
-            <div id="t-dash" class="content-tab space-y-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                    <div class="bg-white p-4 rounded-xl shadow-2xs border border-slate-200/70 flex items-center gap-3.5 relative overflow-hidden">
+            <div id="t-dash" class="content-tab space-y-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+                    <div class="bg-white p-3 rounded-lg shadow-2xs border border-slate-200 flex items-center gap-3 relative overflow-hidden">
                         <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div>
-                        <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center text-base shrink-0"><i class="fa-solid fa-envelope"></i></div>
-                        <div><h3 id="stat-total" class="text-lg md:text-xl font-black text-slate-800">0</h3><p class="text-slate-500 text-[11px] font-semibold">Tổng số phản ánh</p></div>
+                        <div class="w-8 h-8 bg-blue-50 text-blue-600 rounded-md flex items-center justify-center text-sm shrink-0"><i class="fa-solid fa-envelope"></i></div>
+                        <div><h3 id="stat-total" class="text-base font-black text-slate-800 leading-none">0</h3><p class="text-slate-500 text-[10px] font-semibold mt-0.5">Tổng số phản ánh</p></div>
                     </div>
-                    <div class="bg-white p-4 rounded-xl shadow-2xs border border-slate-200/70 flex items-center gap-3.5 relative overflow-hidden">
+                    <div class="bg-white p-3 rounded-lg shadow-2xs border border-slate-200 flex items-center gap-3 relative overflow-hidden">
                         <div class="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500"></div>
-                        <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center text-base shrink-0"><i class="fa-solid fa-square-check"></i></div>
-                        <div><h3 id="stat-done" class="text-lg md:text-xl font-black text-slate-800">0</h3><p class="text-slate-500 text-[11px] font-semibold">Đã xử lý</p></div>
+                        <div class="w-8 h-8 bg-emerald-50 text-emerald-600 rounded-md flex items-center justify-center text-sm shrink-0"><i class="fa-solid fa-square-check"></i></div>
+                        <div><h3 id="stat-done" class="text-base font-black text-slate-800 leading-none">0</h3><p class="text-slate-500 text-[10px] font-semibold mt-0.5">Đã xử lý</p></div>
                     </div>
-                    <div class="bg-white p-4 rounded-xl shadow-2xs border border-slate-200/70 flex items-center gap-3.5 relative overflow-hidden">
+                    <div class="bg-white p-3 rounded-lg shadow-2xs border border-slate-200 flex items-center gap-3 relative overflow-hidden">
                         <div class="absolute left-0 top-0 bottom-0 w-1 bg-amber-500"></div>
-                        <div class="w-10 h-10 bg-amber-50 text-amber-600 rounded-lg flex items-center justify-center text-base shrink-0"><i class="fa-solid fa-fire"></i></div>
-                        <div><h3 id="stat-today" class="text-lg md:text-xl font-black text-slate-800">0</h3><p class="text-slate-500 text-[11px] font-semibold">Mới trong ngày</p></div>
+                        <div class="w-8 h-8 bg-amber-50 text-amber-600 rounded-md flex items-center justify-center text-sm shrink-0"><i class="fa-solid fa-fire"></i></div>
+                        <div><h3 id="stat-today" class="text-base font-black text-slate-800 leading-none">0</h3><p class="text-slate-500 text-[10px] font-semibold mt-0.5">Mới trong ngày</p></div>
                     </div>
-                    <div class="bg-white p-4 rounded-xl shadow-2xs border border-slate-200/70 flex items-center gap-3.5 relative overflow-hidden">
+                    <div class="bg-white p-3 rounded-lg shadow-2xs border border-slate-200 flex items-center gap-3 relative overflow-hidden">
                         <div class="absolute left-0 top-0 bottom-0 w-1 bg-purple-500"></div>
-                        <div class="w-10 h-10 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center text-base shrink-0"><i class="fa-solid fa-folder-open"></i></div>
-                        <div><h3 id="stat-hot" class="text-xs font-bold text-slate-800 truncate max-w-[170px]">Chưa có</h3><p class="text-slate-500 text-[11px] font-semibold">Lĩnh vực cao nhất</p></div>
+                        <div class="w-8 h-8 bg-purple-50 text-purple-600 rounded-md flex items-center justify-center text-sm shrink-0"><i class="fa-solid fa-folder-open"></i></div>
+                        <div><h3 id="stat-hot" class="text-xs font-bold text-slate-800 truncate max-w-[150px] leading-none">Chưa có</h3><p class="text-slate-500 text-[10px] font-semibold mt-0.5">Lĩnh vực cao nhất</p></div>
                     </div>
                 </div>
-                <div class="bg-white p-4 md:p-5 rounded-xl shadow-2xs border border-slate-200/70">
-                    <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2 text-[11px] uppercase tracking-wider"><i class="fa-solid fa-chart-line text-blue-600"></i> Xử lý phản ánh, kiến nghị theo thời gian</h3>
-                    <div class="h-[280px] w-full"><canvas id="myChart"></canvas></div>
+                <div class="bg-white p-3 md:p-4 rounded-lg shadow-2xs border border-slate-200">
+                    <h3 class="font-bold text-slate-800 mb-2 flex items-center gap-1.5 text-[10px] uppercase tracking-wider"><i class="fa-solid fa-chart-line text-blue-600"></i> Xử lý phản ánh, kiến nghị theo thời gian</h3>
+                    <div class="h-[250px] w-full"><canvas id="myChart"></canvas></div>
                 </div>
             </div>
 
-            <!-- TAB 2: DANH SÁCH + LỌC -->
-            <div id="t-pakn" class="content-tab hidden space-y-3">
-                <div class="bg-white p-3.5 md:p-4 rounded-xl shadow-2xs border border-slate-200/70 space-y-3">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5">
-                        <h3 class="font-bold text-slate-800 flex items-center gap-2 text-[11px] uppercase tracking-wider">
-                            <i class="fa-solid fa-file-lines text-amber-600 text-xs"></i> Danh sách toàn bộ phản ánh, kiến nghị
+            <!-- TAB 2: DANH SÁCH + LỌC GỌN GÀNG -->
+            <div id="t-pakn" class="content-tab hidden space-y-2.5">
+                <div class="bg-white p-3 rounded-lg shadow-2xs border border-slate-200 space-y-2.5">
+                    <!-- TOOLBAR TOP -->
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <h3 class="font-bold text-slate-800 flex items-center gap-1.5 text-[10px] uppercase tracking-wider">
+                            <i class="fa-solid fa-file-lines text-amber-600"></i> Danh sách phản ánh, kiến nghị
                         </h3>
                         <div class="flex items-center flex-wrap gap-1.5 w-full sm:w-auto justify-end">
-                            <!-- NÚT ĐỒNG BỘ GOOGLE SHEETS -->
-                            <button id="btn-sync-google" onclick="syncAllToGoogle()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs">
-                                <i class="fa-solid fa-arrows-rotate"></i> Đồng bộ dữ liệu
+                            <button id="btn-sync-google" onclick="syncAllToGoogle()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded text-[11px] font-bold transition-all flex items-center gap-1">
+                                <i class="fa-solid fa-arrows-rotate text-[10px]"></i> Đồng bộ
                             </button>
-                            <button onclick="exportExcel()" class="bg-teal-600 hover:bg-teal-700 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs">
-                                <i class="fa-solid fa-file-excel"></i> Xuất Excel
+                            <button onclick="exportExcel()" class="bg-teal-600 hover:bg-teal-700 text-white px-2.5 py-1 rounded text-[11px] font-bold transition-all flex items-center gap-1">
+                                <i class="fa-solid fa-file-excel text-[10px]"></i> Xuất Excel
                             </button>
-                            <button onclick="loadPAKN()" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 shadow-2xs" title="Tải lại">
-                                <i class="fa-solid fa-rotate"></i>
+                            <button onclick="loadPAKN()" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-[11px] font-bold transition-all" title="Tải lại">
+                                <i class="fa-solid fa-rotate text-[10px]"></i>
                             </button>
-                            <button onclick="deleteAllPakn()" class="bg-rose-600 hover:bg-rose-700 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs">
-                                <i class="fa-solid fa-trash"></i> Xóa tất cả
+                            <button onclick="deleteAllPakn()" class="bg-rose-600 hover:bg-rose-700 text-white px-2.5 py-1 rounded text-[11px] font-bold transition-all flex items-center gap-1">
+                                <i class="fa-solid fa-trash text-[10px]"></i> Xóa tất cả
                             </button>
                         </div>
                     </div>
 
-                    <!-- FILTER BAR -->
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:flex lg:flex-wrap gap-2 items-center">
-                        <div class="relative col-span-2 sm:col-span-3 lg:flex-1 lg:min-w-[200px]">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-xs"><i class="fa-solid fa-search"></i></span>
-                            <input type="text" id="searchPakn" onkeyup="filterPakn()" placeholder="Tìm kiếm tên, SĐT, nội dung..." class="w-full bg-slate-50 border border-slate-200 pl-8 pr-3 py-1.5 rounded-lg outline-none focus:border-blue-600 focus:bg-white text-xs font-medium transition-all">
+                    <!-- COMPACT FILTER BAR -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:flex lg:flex-wrap gap-1.5 items-center">
+                        <div class="relative col-span-2 sm:col-span-3 lg:flex-1 lg:min-w-[180px]">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-2.5 text-slate-400 text-[10px]"><i class="fa-solid fa-search"></i></span>
+                            <input type="text" id="searchPakn" onkeyup="filterPakn()" placeholder="Tìm kiếm tên, SĐT, nội dung..." class="w-full bg-slate-50 border border-slate-200 pl-7 pr-2.5 py-1 rounded text-xs font-medium outline-none focus:border-blue-600 focus:bg-white transition-all">
                         </div>
                         
-                        <select id="f-status" onchange="filterPakn()" class="bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 outline-none cursor-pointer hover:border-slate-300 transition-all">
+                        <select id="f-status" onchange="filterPakn()" class="bg-slate-50 border border-slate-200 px-2 py-1 rounded text-[11px] font-semibold text-slate-600 outline-none cursor-pointer hover:border-slate-300">
                             <option value="">💡 Trạng thái</option>
                             <option value="Đã trả lời">Đã trả lời</option>
                             <option value="Chưa trả lời">Chưa trả lời</option>
                         </select>
 
-                        <select id="f-year" onchange="filterPakn()" class="bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 outline-none cursor-pointer hover:border-slate-300 transition-all">
+                        <select id="f-year" onchange="filterPakn()" class="bg-slate-50 border border-slate-200 px-2 py-1 rounded text-[11px] font-semibold text-slate-600 outline-none cursor-pointer hover:border-slate-300">
                             <option value="">📅 Năm</option>
                         </select>
 
-                        <select id="f-month" onchange="filterPakn()" class="bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 outline-none cursor-pointer hover:border-slate-300 transition-all">
+                        <select id="f-month" onchange="filterPakn()" class="bg-slate-50 border border-slate-200 px-2 py-1 rounded text-[11px] font-semibold text-slate-600 outline-none cursor-pointer hover:border-slate-300">
                             <option value="">📅 Tháng</option>
                             <option value="1">Tháng 1</option><option value="2">Tháng 2</option><option value="3">Tháng 3</option>
                             <option value="4">Tháng 4</option><option value="5">Tháng 5</option><option value="6">Tháng 6</option>
@@ -157,63 +168,66 @@
                             <option value="10">Tháng 10</option><option value="11">Tháng 11</option><option value="12">Tháng 12</option>
                         </select>
 
-                        <select id="f-topic" onchange="filterPakn()" class="bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 outline-none cursor-pointer hover:border-slate-300 transition-all">
+                        <select id="f-topic" onchange="filterPakn()" class="bg-slate-50 border border-slate-200 px-2 py-1 rounded text-[11px] font-semibold text-slate-600 outline-none cursor-pointer hover:border-slate-300 max-w-[140px] truncate">
                             <option value="">📁 Lĩnh vực</option>
                         </select>
 
-                        <select id="f-area" onchange="filterPakn()" class="bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 outline-none cursor-pointer hover:border-slate-300 transition-all">
+                        <select id="f-area" onchange="filterPakn()" class="bg-slate-50 border border-slate-200 px-2 py-1 rounded text-[11px] font-semibold text-slate-600 outline-none cursor-pointer hover:border-slate-300">
                             <option value="">📍 Khu vực</option>
                         </select>
                     </div>
 
-                    <!-- TABLE -->
-                    <div class="overflow-x-auto border border-slate-200 rounded-lg">
-                        <table class="w-full text-left border-collapse">
+                    <!-- BẢNG CỐ ĐỊNH TIÊU ĐỀ COMPACT -->
+                    <div class="table-sticky-container border border-slate-200 rounded-md">
+                        <table class="w-full text-left border-separate border-spacing-0 min-w-[860px]">
                             <thead>
-                                <tr class="bg-[#1e293b] text-white text-[11px] font-bold">
-                                    <th class="p-2.5 pl-3 w-10">#</th>
-                                    <th class="p-2.5">Họ tên</th>
-                                    <th class="p-2.5">SĐT</th>
-                                    <th class="p-2.5">Lĩnh vực</th>
-                                    <th class="p-2.5">Khu vực</th>
-                                    <th class="p-2.5">Trạng thái</th>
-                                    <th class="p-2.5 text-center">File hỏi</th>
-                                    <th class="p-2.5 text-center">File trả lời</th>
-                                    <th class="p-2.5 pr-3 text-right">Thao tác</th>
+                                <tr class="text-white text-[10px] font-bold tracking-tight">
+                                    <th class="py-2 px-2.5 w-10 text-center">#</th>
+                                    <th class="py-2 px-2.5">Họ tên</th>
+                                    <th class="py-2 px-2.5 w-50">SĐT</th>
+                                    <th class="py-2 px-2.5">Lĩnh vực</th>
+                                    <th class="py-2 px-2.5 w-16 text-center">Khu vực</th>
+                                    <th class="py-2 px-2.5 w-50">Trạng thái</th>
+                                    <th class="py-2 px-2 text-center w-30">File hỏi</th>
+                                    <th class="py-2 px-2 text-center w-30">File trả lời</th>
+                                    <th class="py-2 px-2.5 text-right w-50">Thao tác</th>
                                 </tr>
                             </thead>
-                            <tbody id="list-pakn" class="text-xs divide-y divide-slate-100 font-medium text-slate-700"></tbody>
+                            <tbody id="list-pakn" class="text-xs divide-y divide-slate-100 font-medium text-slate-700 bg-white"></tbody>
                         </table>
                     </div>
-                    <div class="flex justify-between items-center pt-1 text-xs text-slate-500 font-medium">
-                        <span id="table-counter">Hiển thị 0 mục</span>
+
+                    <!-- THANH PHÂN TRANG (PAGINATION 10 HÀNG) -->
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-2 pt-1 text-[11px] text-slate-500 font-medium">
+                        <span id="table-counter">Đang tải...</span>
+                        <div id="pagination-controls" class="flex items-center gap-1 select-none"></div>
                     </div>
                 </div>
             </div>
 
             <!-- TAB 3: TUYÊN TRUYỀN -->
-            <div id="t-news" class="content-tab hidden space-y-3">
-                <div class="flex gap-1.5 border-b border-slate-200 pb-2.5">
-                    <button onclick="subTab('add')" id="btn-sub-add" class="bg-blue-600 text-white px-3.5 py-1.5 rounded-lg font-bold text-xs shadow-2xs transition-all flex items-center gap-1.5"><i class="fa-solid fa-plus"></i> Thêm bài tuyên truyền</button>
-                    <button onclick="subTab('manage')" id="btn-sub-manage" class="bg-slate-100 text-slate-600 px-3.5 py-1.5 rounded-lg font-bold text-xs hover:bg-slate-200 transition-all flex items-center gap-1.5"><i class="fa-solid fa-gear"></i> Quản lý các bài</button>
+            <div id="t-news" class="content-tab hidden space-y-2.5">
+                <div class="flex gap-1.5 border-b border-slate-200 pb-2">
+                    <button onclick="subTab('add')" id="btn-sub-add" class="bg-blue-600 text-white px-3 py-1 rounded font-bold text-[11px] shadow-2xs transition-all flex items-center gap-1"><i class="fa-solid fa-plus text-[10px]"></i> Thêm bài</button>
+                    <button onclick="subTab('manage')" id="btn-sub-manage" class="bg-slate-100 text-slate-600 px-3 py-1 rounded font-bold text-[11px] hover:bg-slate-200 transition-all flex items-center gap-1"><i class="fa-solid fa-gear text-[10px]"></i> Quản lý</button>
                 </div>
-                <div id="sub-add" class="bg-white p-4 md:p-5 rounded-xl shadow-2xs max-w-3xl border border-slate-200/70 space-y-3">
+                <div id="sub-add" class="bg-white p-3.5 md:p-4 rounded-lg shadow-2xs max-w-2xl border border-slate-200 space-y-2.5">
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Tiêu đề bài viết tuyên truyền:</label>
-                        <input id="nt" placeholder="Ví dụ: Kế hoạch tổ chức Đại hội..." class="w-full bg-white border border-slate-200 p-2 rounded-lg outline-none focus:border-blue-600 text-xs font-medium text-slate-800">
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Tiêu đề bài viết:</label>
+                        <input id="nt" placeholder="Ví dụ: Kế hoạch tổ chức..." class="w-full bg-white border border-slate-200 p-2 rounded text-xs outline-none focus:border-blue-600 font-medium text-slate-800">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Đường dẫn bài viết (Link Firebase / URL):</label>
-                        <input id="nl" placeholder="https://..." class="w-full bg-white border border-slate-200 p-2 rounded-lg outline-none focus:border-blue-600 text-xs font-medium text-slate-800">
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Đường dẫn bài viết (URL):</label>
+                        <input id="nl" placeholder="https://..." class="w-full bg-white border border-slate-200 p-2 rounded text-xs outline-none focus:border-blue-600 font-medium text-slate-800">
                     </div>
-                    <button onclick="addNews()" class="w-full bg-[#16a34a] hover:bg-green-700 text-white py-2 rounded-lg font-bold text-xs shadow-2xs transition-all flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-floppy-disk"></i> Lưu bài tuyên truyền
+                    <button onclick="addNews()" class="w-full bg-[#16a34a] hover:bg-green-700 text-white py-1.5 rounded font-bold text-xs shadow-2xs transition-all flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-floppy-disk text-[11px]"></i> Lưu bài tuyên truyền
                     </button>
                 </div>
-                <div id="sub-manage" class="hidden bg-white p-4 rounded-xl shadow-2xs border border-slate-200/70">
+                <div id="sub-manage" class="hidden bg-white p-3 rounded-lg shadow-2xs border border-slate-200">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
-                            <thead class="text-slate-400 text-[10px] uppercase font-bold border-b border-slate-100"><th class="pb-2 px-2">Tiêu đề</th><th class="pb-2 px-2">Đường dẫn</th><th class="pb-2 px-2 text-right">Thao tác</th></thead>
+                            <thead class="text-slate-400 text-[10px] uppercase font-bold border-b border-slate-100"><th class="pb-1.5 px-2">Tiêu đề</th><th class="pb-1.5 px-2">Đường dẫn</th><th class="pb-1.5 px-2 text-right">Thao tác</th></thead>
                             <tbody id="list-news" class="divide-y divide-slate-100 text-xs"></tbody>
                         </table>
                     </div>
@@ -222,50 +236,50 @@
         </main>
     </div>
 
-    <!-- MODAL DETAIL & REPLY -->
+    <!-- MODAL DETAIL & REPLY COMPACT -->
     <div id="modalDetail" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden z-[600] p-3 flex items-center justify-center">
-        <div class="bg-white w-full max-w-xl rounded-xl shadow-xl relative flex flex-col max-h-[90vh] overflow-hidden animate-[zoom_0.2s_ease-out] border border-slate-200">
-            <div class="p-3.5 md:p-4 border-b border-slate-100 flex justify-between items-center bg-white sticky top-0 z-10">
-                <h2 class="text-xs md:text-sm font-extrabold text-slate-800 flex items-center gap-2"><span class="w-6 h-6 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-[11px]"><i class="fa-solid fa-file-lines"></i></span> Chi tiết & Trả lời câu hỏi</h2>
-                <button onclick="closeModal()" class="w-6 h-6 rounded-full bg-slate-100 hover:bg-rose-100 hover:text-rose-500 text-slate-400 flex items-center justify-center transition-all text-xs"><i class="fa-solid fa-xmark"></i></button>
+        <div class="bg-white w-full max-w-lg rounded-xl shadow-xl relative flex flex-col max-h-[90vh] overflow-hidden animate-[zoom_0.15s_ease-out] border border-slate-200">
+            <div class="px-3.5 py-2.5 border-b border-slate-100 flex justify-between items-center bg-white sticky top-0 z-10">
+                <h2 class="text-xs font-bold text-slate-800 flex items-center gap-1.5"><span class="w-5 h-5 rounded bg-blue-50 text-blue-600 flex items-center justify-center text-[10px]"><i class="fa-solid fa-file-lines"></i></span> Chi tiết phản ánh & trả lời</h2>
+                <button onclick="closeModal()" class="w-5 h-5 rounded-full bg-slate-100 hover:bg-rose-100 hover:text-rose-500 text-slate-400 flex items-center justify-center transition-all text-[11px]"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="p-4 md:p-5 overflow-y-auto space-y-3.5">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50/70 p-3 rounded-lg border border-slate-200/60">
-                    <div class="space-y-2">
+            <div class="p-3.5 overflow-y-auto space-y-2.5 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-slate-50 p-2.5 rounded-lg border border-slate-200/80">
+                    <div class="space-y-1.5">
                         <div id="m-status"></div>
-                        <div><p class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest">Họ và tên</p><p id="m-name" class="font-bold text-slate-800 text-xs"></p></div>
-                        <div><p class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest">Địa chỉ</p><p id="m-address" class="font-medium text-slate-700 text-xs"></p></div>
-                        <div><p class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest">Lĩnh vực</p><span id="m-topic" class="inline-block bg-white border border-slate-200 px-2 py-0.5 rounded text-[11px] font-semibold text-slate-600 mt-0.5 shadow-2xs"></span></div>
+                        <div><p class="text-[9px] font-extrabold text-slate-400 uppercase">Họ và tên</p><p id="m-name" class="font-bold text-slate-800 text-xs"></p></div>
+                        <div><p class="text-[9px] font-extrabold text-slate-400 uppercase">Địa chỉ</p><p id="m-address" class="font-medium text-slate-700 text-xs"></p></div>
+                        <div><p class="text-[9px] font-extrabold text-slate-400 uppercase">Lĩnh vực</p><span id="m-topic" class="inline-block bg-white border border-slate-200 px-1.5 py-0.5 rounded text-[10px] font-semibold text-slate-600 mt-0.5"></span></div>
                     </div>
-                    <div class="space-y-2 sm:text-right">
-                        <div class="text-[11px] font-semibold text-slate-400" id="m-time"></div>
-                        <div><p class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest">Số điện thoại</p><p id="m-phone" class="font-bold text-slate-800 text-xs"></p></div>
-                        <div><p class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest">Khu vực</p><span id="m-area" class="inline-block bg-blue-50 text-blue-600 px-2 py-0.5 rounded text-[11px] font-bold mt-0.5 border border-blue-100"></span></div>
+                    <div class="space-y-1.5 sm:text-right">
+                        <div class="text-[10px] font-semibold text-slate-400" id="m-time"></div>
+                        <div><p class="text-[9px] font-extrabold text-slate-400 uppercase">Số điện thoại</p><p id="m-phone" class="font-bold text-slate-800 text-xs"></p></div>
+                        <div><p class="text-[9px] font-extrabold text-slate-400 uppercase">Khu vực</p><span id="m-area" class="inline-block bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded text-[10px] font-bold mt-0.5 border border-blue-100"></span></div>
                     </div>
                 </div>
                 <div>
-                    <h3 class="text-[11px] font-extrabold text-rose-500 uppercase tracking-wider mb-1 flex items-center gap-1.5"><i class="fa-solid fa-circle-question text-xs"></i> Nội dung phản ánh</h3>
-                    <div id="m-content" class="bg-slate-50 p-3 rounded-lg border border-slate-200/60 text-slate-700 leading-relaxed text-xs"></div>
+                    <h3 class="text-[10px] font-extrabold text-rose-500 uppercase tracking-wider mb-0.5 flex items-center gap-1"><i class="fa-solid fa-circle-question"></i> Nội dung phản ánh</h3>
+                    <div id="m-content" class="bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-slate-700 leading-relaxed text-xs"></div>
                 </div>
                 <div id="m-file-container">
-                    <h3 class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1.5"><i class="fa-solid fa-paperclip text-xs"></i> Tệp đính kèm người dân gửi</h3>
+                    <h3 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-0.5 flex items-center gap-1"><i class="fa-solid fa-paperclip"></i> Tệp đính kèm người dân gửi</h3>
                     <div id="m-file-link"></div>
                 </div>
-                <div class="bg-emerald-50/50 p-3.5 rounded-lg border border-emerald-200/70 space-y-3">
-                    <h3 class="text-[11px] font-extrabold text-emerald-700 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-comment-dots text-xs"></i> Soạn/Cập nhật câu trả lời</h3>
-                    <textarea id="m-reply-text" rows="2.5" placeholder="Nhập nội dung phản hồi tại đây..." class="w-full bg-white border border-emerald-200 p-2.5 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all text-xs font-medium"></textarea>
+                <div class="bg-emerald-50/50 p-2.5 rounded-lg border border-emerald-200 space-y-2">
+                    <h3 class="text-[10px] font-extrabold text-emerald-700 uppercase tracking-wider flex items-center gap-1"><i class="fa-solid fa-comment-dots"></i> Soạn câu trả lời</h3>
+                    <textarea id="m-reply-text" rows="2" placeholder="Nhập nội dung phản hồi..." class="w-full bg-white border border-emerald-200 p-2 rounded outline-none focus:ring-1 focus:ring-emerald-500 text-xs font-medium"></textarea>
                     <div>
-                        <p class="text-[11px] font-bold text-emerald-800 uppercase tracking-wide mb-1">Tệp đính kèm trả lời (nếu có):</p>
-                        <input type="file" id="m-reply-file" class="text-[11px] file:bg-emerald-600 file:text-white file:border-0 file:rounded-md file:px-2.5 file:py-1 file:font-bold file:cursor-pointer hover:file:bg-emerald-700 text-slate-500">
-                        <div id="m-reply-file-link" class="mt-1"></div>
+                        <p class="text-[10px] font-bold text-emerald-800 uppercase tracking-wide mb-0.5">Tệp trả lời đính kèm:</p>
+                        <input type="file" id="m-reply-file" class="text-[10px] file:bg-emerald-600 file:text-white file:border-0 file:rounded file:px-2 file:py-0.5 file:font-bold file:cursor-pointer hover:file:bg-emerald-700 text-slate-500">
+                        <div id="m-reply-file-link" class="mt-0.5"></div>
                     </div>
-                    <button id="m-btn-save" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-bold text-xs shadow-2xs transition-all flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-floppy-disk text-[11px]"></i> Lưu câu trả lời
+                    <button id="m-btn-save" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-1.5 rounded font-bold text-xs shadow-2xs transition-all flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-floppy-disk text-[10px]"></i> Lưu câu trả lời
                     </button>
                 </div>
             </div>
-            <div class="p-3 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
-                <button id="m-btn-del" class="bg-rose-50 hover:bg-rose-500 text-rose-500 hover:text-white px-3 py-1.5 rounded-lg font-bold text-xs transition-all border border-rose-200 flex items-center gap-1.5"><i class="fa-solid fa-trash text-[10px]"></i>Xóa phản ánh</button>
+            <div class="px-3 py-2 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
+                <button id="m-btn-del" class="bg-rose-50 hover:bg-rose-500 text-rose-500 hover:text-white px-2.5 py-1 rounded font-bold text-[11px] transition-all border border-rose-200 flex items-center gap-1"><i class="fa-solid fa-trash text-[9px]"></i>Xóa</button>
             </div>
         </div>
     </div>
@@ -276,15 +290,17 @@
         const _KEY = "sb_publishable_ri5aytFYiLMbC2q5qaPs9w_cA66g82l";
         const sb = supabase.createClient(_URL, _KEY);
         const GOOGLE_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzFg8K6BMy0PvdgAkreCMzYdSJRm1UvIcRvTeBe08vbtHA8b0JvilJivQcvAbYT6PQ2sQ/exec";
+        
         let myChart = null;
+        let allPaknList = [];
+        let filteredPaknList = [];
+        let currentPage = 1;
+        const PAGE_SIZE = 10;
 
         async function login() {
             const user = document.getElementById('u').value;
             const pass = document.getElementById('p').value;
-            if(!user || !pass) {
-                alert("Vui lòng nhập đầy đủ email và mật khẩu!");
-                return;
-            }
+            if(!user || !pass) return alert("Vui lòng nhập đầy đủ email và mật khẩu!");
             document.getElementById('loginBox').classList.add('hidden'); 
             document.getElementById('app').classList.remove('hidden'); 
             initDashboard(); 
@@ -313,11 +329,11 @@
             const btnManage = document.getElementById('btn-sub-manage');
             
             if (type === 'add') {
-                btnAdd.className = 'bg-blue-600 text-white px-3.5 py-1.5 rounded-lg font-bold text-xs shadow-2xs transition-all flex items-center gap-1.5';
-                btnManage.className = 'bg-slate-100 text-slate-600 px-3.5 py-1.5 rounded-lg font-bold text-xs hover:bg-slate-200 transition-all flex items-center gap-1.5';
+                btnAdd.className = 'bg-blue-600 text-white px-3 py-1 rounded font-bold text-[11px] shadow-2xs transition-all flex items-center gap-1';
+                btnManage.className = 'bg-slate-100 text-slate-600 px-3 py-1 rounded font-bold text-[11px] hover:bg-slate-200 transition-all flex items-center gap-1';
             } else {
-                btnManage.className = 'bg-blue-600 text-white px-3.5 py-1.5 rounded-lg font-bold text-xs shadow-2xs transition-all flex items-center gap-1.5';
-                btnAdd.className = 'bg-slate-100 text-slate-600 px-3.5 py-1.5 rounded-lg font-bold text-xs hover:bg-slate-200 transition-all flex items-center gap-1.5';
+                btnManage.className = 'bg-blue-600 text-white px-3 py-1 rounded font-bold text-[11px] shadow-2xs transition-all flex items-center gap-1';
+                btnAdd.className = 'bg-slate-100 text-slate-600 px-3 py-1 rounded font-bold text-[11px] hover:bg-slate-200 transition-all flex items-center gap-1';
             }
             if(type === 'manage') loadNews();
         }
@@ -337,18 +353,18 @@
                 data: {
                     labels: ['Tháng 9/2026'],
                     datasets: [
-                        { label: 'Tổng số PAKN gửi', data: [listData.length], backgroundColor: '#2563eb', borderRadius: 4, barThickness: 80 },
-                        { label: 'Đã xử lý', data: [listData.filter(i => i.trang_thai === 'Đã trả lời').length], backgroundColor: '#16a34a', borderRadius: 4, barThickness: 80 }
+                        { label: 'Tổng số PAKN gửi', data: [listData.length], backgroundColor: '#2563eb', borderRadius: 4, barThickness: 50 },
+                        { label: 'Đã xử lý', data: [listData.filter(i => i.trang_thai === 'Đã trả lời').length], backgroundColor: '#16a34a', borderRadius: 4, barThickness: 50 }
                     ]
                 },
                 options: { 
                     maintainAspectRatio: false, 
                     scales: { 
-                        y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { stepSize: 1 } },
-                        x: { grid: { display: false } }
+                        y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { stepSize: 1, font: { size: 10 } } },
+                        x: { grid: { display: false }, ticks: { font: { size: 10 } } }
                     },
                     plugins: {
-                        legend: { position: 'top', align: 'end', labels: { font: { family: 'Plus Jakarta Sans', weight: '600', size: 11 }, boxWidth: 10 } }
+                        legend: { position: 'top', align: 'end', labels: { font: { family: 'Plus Jakarta Sans', weight: '600', size: 10 }, boxWidth: 8 } }
                     }
                 }
             });
@@ -356,9 +372,11 @@
 
         async function loadPAKN() {
             const { data } = await sb.from('pakn').select('*').order('id', {ascending:false});
-            const dataList = data && data.length > 0 ? data : [];
-            renderTable(dataList);
-            populateFilters(dataList);
+            allPaknList = data && data.length > 0 ? data : [];
+            filteredPaknList = [...allPaknList];
+            currentPage = 1;
+            populateFilters(allPaknList);
+            renderTable();
         }
 
         function populateFilters(data) {
@@ -379,84 +397,164 @@
             fill('f-area', areas, '📍 Khu vực');
         }
 
-        function renderTable(dataList) {
-            const b = document.getElementById('list-pakn');
-            b.innerHTML = "";
-            dataList.forEach((item, index) => {
-                const status = item.trang_thai || 'Chưa trả lời';
-                let statusHtml = '';
-                if(status === 'Đã trả lời') {
-                    let xemThoiGian = item.xem_phan_hoi || item.xem_phản_hồi;
-                    let xemText = xemThoiGian 
-                        ? `<p class="text-[10px] text-slate-500 font-normal mt-0.5"><i class="fa-regular fa-eye mr-1"></i>${xemThoiGian}</p>` 
-                        : `<p class="text-[10px] text-slate-400 font-normal mt-0.5"><i class="fa-regular fa-clock mr-1"></i>Chưa xem</p>`;
-
-                    statusHtml = `
-                        <div>
-                            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[10px] font-bold inline-flex items-center gap-1"><i class="fa-solid fa-check"></i> Đã trả lời</span>
-                            ${xemText}
-                        </div>
-                    `;
-                } else {
-                    statusHtml = `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded text-[10px] font-bold inline-flex items-center gap-1"><i class="fa-solid fa-hourglass"></i> Chưa trả lời</span>`;
-                }
-
-                const fileHoiBadge = item.tep_dinh_kem ? 
-                    `<a href="${item.tep_dinh_kem}" target="_blank" class="bg-blue-50 text-blue-600 hover:bg-blue-100 px-2 py-1 rounded text-[11px] font-bold inline-flex items-center gap-1 transition-all"><i class="fa-solid fa-paperclip"></i> Xem</a>` : 
-                    `<span class="text-slate-300">—</span>`;
-
-                const fileTraLoiBadge = item.tep_tra_loi ? 
-                    `<a href="${item.tep_tra_loi}" target="_blank" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 px-2 py-1 rounded text-[11px] font-bold inline-flex items-center gap-1 transition-all"><i class="fa-solid fa-paperclip"></i> Xem</a>` : 
-                    `<span class="text-slate-300">—</span>`;
-
-                const actionBtn = status === 'Đã trả lời' ? 
-                    `<button onclick="viewDetail('${item.id}')" class="bg-[#2563eb] hover:bg-blue-700 text-white px-2.5 py-1.5 rounded-lg text-[11px] font-bold shadow-2xs transition-all inline-flex items-center gap-1"><i class="fa-solid fa-pen text-[10px]"></i> Sửa</button>` :
-                    `<button onclick="viewDetail('${item.id}')" class="bg-[#16a34a] hover:bg-green-700 text-white px-2.5 py-1.5 rounded-lg text-[11px] font-bold shadow-2xs transition-all inline-flex items-center gap-1"><i class="fa-solid fa-reply text-[10px]"></i> Trả lời</button>`;
-
-                b.innerHTML += `
-                <tr class="pakn-row hover:bg-slate-50 transition-all border-b border-slate-100" 
-                    data-status="${status}" 
-                    data-topic="${item.linh_vuc}"
-                    data-area="${item.khu_vuc}">
-                    <td class="p-2.5 pl-3 font-bold text-slate-600">${index + 1}</td>
-                    <td class="p-2.5 font-bold text-slate-800">${item.ho_ten}</td>
-                    <td class="p-2.5 text-slate-600 font-medium">${item.so_dien_thoai}</td>
-                    <td class="p-2.5 text-xs text-slate-600 font-medium"><span class="bg-slate-100 px-2 py-0.5 rounded">${item.linh_vuc}</span></td>
-                    <td class="p-2.5 text-xs font-bold"><span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded">${item.khu_vuc || '12'}</span></td>
-                    <td class="p-2.5">${statusHtml}</td>
-                    <td class="p-2.5 text-center">${fileHoiBadge}</td>
-                    <td class="p-2.5 text-center">${fileTraLoiBadge}</td>
-                    <td class="p-2.5 pr-3 text-right space-x-1.5">
-                        ${actionBtn}
-                        <button onclick="deleteRow(${item.id})" class="text-slate-300 hover:text-rose-500 transition-colors"><i class="fa-solid fa-xmark"></i></button>
-                    </td>
-                </tr>`;
-            });
-            document.getElementById('table-counter').innerText = `Hiển thị 1 - ${dataList.length} của ${dataList.length} mục`;
-        }
-
         function filterPakn() {
-            const search = document.getElementById('searchPakn').value.toLowerCase();
+            const search = document.getElementById('searchPakn').value.toLowerCase().trim();
             const status = document.getElementById('f-status').value;
+            const year = document.getElementById('f-year').value;
+            const month = document.getElementById('f-month').value;
             const topic = document.getElementById('f-topic').value;
             const area = document.getElementById('f-area').value;
 
-            document.querySelectorAll('.pakn-row').forEach(row => {
-                const text = row.innerText.toLowerCase();
-                const d = row.dataset;
-                const m = text.includes(search) &&
-                          (!status || d.status === status) &&
-                          (!topic || d.topic === topic) &&
-                          (!area || d.area === area);
-                row.style.display = m ? '' : 'none';
+            filteredPaknList = allPaknList.filter(item => {
+                const itemDate = item.created_at ? new Date(item.created_at) : null;
+                const itemYear = itemDate ? itemDate.getFullYear().toString() : '';
+                const itemMonth = itemDate ? (itemDate.getMonth() + 1).toString() : '';
+                const itemStatus = item.trang_thai || 'Chưa trả lời';
+
+                const matchSearch = !search || 
+                    (item.ho_ten && item.ho_ten.toLowerCase().includes(search)) ||
+                    (item.so_dien_thoai && item.so_dien_thoai.toLowerCase().includes(search)) ||
+                    (item.noi_dung && item.noi_dung.toLowerCase().includes(search));
+
+                const matchStatus = !status || itemStatus === status;
+                const matchYear = !year || itemYear === year;
+                const matchMonth = !month || itemMonth === month;
+                const matchTopic = !topic || item.linh_vuc === topic;
+                const matchArea = !area || item.khu_vuc === area;
+
+                return matchSearch && matchStatus && matchYear && matchMonth && matchTopic && matchArea;
             });
+
+            currentPage = 1;
+            renderTable();
+        }
+
+        function renderTable() {
+            const b = document.getElementById('list-pakn');
+            b.innerHTML = "";
+
+            const total = filteredPaknList.length;
+            const totalPages = Math.ceil(total / PAGE_SIZE) || 1;
+            
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const startIndex = (currentPage - 1) * PAGE_SIZE;
+            const endIndex = Math.min(startIndex + PAGE_SIZE, total);
+            const pageData = filteredPaknList.slice(startIndex, endIndex);
+
+            if (pageData.length === 0) {
+                b.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-400 font-medium italic">Không tìm thấy dữ liệu.</td></tr>`;
+            } else {
+                pageData.forEach((item, index) => {
+                    const realIndex = startIndex + index + 1;
+                    const status = item.trang_thai || 'Chưa trả lời';
+                    let statusHtml = '';
+
+                    if(status === 'Đã trả lời') {
+                        let xemThoiGian = item.xem_phan_hoi || item.xem_phản_hồi;
+                        let xemText = xemThoiGian 
+                            ? `<p class="text-[9px] text-slate-500 font-normal leading-none mt-0.5"><i class="fa-regular fa-eye mr-0.5"></i>${xemThoiGian}</p>` 
+                            : `<p class="text-[9px] text-slate-400 font-normal leading-none mt-0.5"><i class="fa-regular fa-clock mr-0.5"></i>Chưa xem</p>`;
+
+                        statusHtml = `
+                            <div>
+                                <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded text-[9px] font-bold inline-flex items-center gap-1"><i class="fa-solid fa-check"></i> Đã trả lời</span>
+                                ${xemText}
+                            </div>
+                        `;
+                    } else {
+                        statusHtml = `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-1.5 py-0.5 rounded text-[9px] font-bold inline-flex items-center gap-1"><i class="fa-solid fa-hourglass"></i> Chưa trả lời</span>`;
+                    }
+
+                    const fileHoiBadge = item.tep_dinh_kem ? 
+                        `<a href="${item.tep_dinh_kem}" target="_blank" class="bg-blue-50 text-blue-600 hover:bg-blue-100 px-1.5 py-0.5 rounded text-[10px] font-bold inline-flex items-center gap-1"><i class="fa-solid fa-paperclip"></i> Xem</a>` : 
+                        `<span class="text-slate-300">—</span>`;
+
+                    const fileTraLoiBadge = item.tep_tra_loi ? 
+                        `<a href="${item.tep_tra_loi}" target="_blank" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 px-1.5 py-0.5 rounded text-[10px] font-bold inline-flex items-center gap-1"><i class="fa-solid fa-paperclip"></i> Xem</a>` : 
+                        `<span class="text-slate-300">—</span>`;
+
+                    const actionBtn = status === 'Đã trả lời' ? 
+                        `<button onclick="viewDetail('${item.id}')" class="bg-[#2563eb] hover:bg-blue-700 text-white px-2 py-1 rounded text-[10px] font-bold inline-flex items-center gap-1"><i class="fa-solid fa-pen text-[9px]"></i> Sửa</button>` :
+                        `<button onclick="viewDetail('${item.id}')" class="bg-[#16a34a] hover:bg-green-700 text-white px-2 py-1 rounded text-[10px] font-bold inline-flex items-center gap-1"><i class="fa-solid fa-reply text-[9px]"></i> Trả lời</button>`;
+
+                    b.innerHTML += `
+                    <tr class="pakn-row hover:bg-slate-50 transition-all">
+                        <td class="py-1.5 px-2.5 text-center font-bold text-slate-500 border-b border-slate-100">${realIndex}</td>
+                        <td class="py-1.5 px-2.5 font-bold text-slate-800 border-b border-slate-100 truncate max-w-[150px]">${item.ho_ten || ''}</td>
+                        <td class="py-1.5 px-2.5 text-slate-600 font-medium border-b border-slate-100">${item.so_dien_thoai || ''}</td>
+                        <td class="py-1.5 px-2.5 text-[11px] text-slate-600 border-b border-slate-100"><span class="bg-slate-100 px-1.5 py-0.5 rounded">${item.linh_vuc || ''}</span></td>
+                        <td class="py-1.5 px-2.5 text-[11px] font-bold text-center border-b border-slate-100"><span class="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">${item.khu_vuc || '12'}</span></td>
+                        <td class="py-1.5 px-2.5 border-b border-slate-100">${statusHtml}</td>
+                        <td class="py-1.5 px-2 text-center border-b border-slate-100">${fileHoiBadge}</td>
+                        <td class="py-1.5 px-2 text-center border-b border-slate-100">${fileTraLoiBadge}</td>
+                        <td class="py-1.5 px-2.5 pr-3 text-right space-x-1 border-b border-slate-100">
+                            ${actionBtn}
+                            <button onclick="deleteRow(${item.id})" class="bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white border border-rose-200 px-2 py-1 rounded text-[10px] font-bold transition-all inline-flex items-center gap-1">
+                                <i class="fa-solid fa-trash text-[9px]"></i> Xóa
+                            </button>
+                        </td>
+                    </tr>`;
+                });
+            }
+
+            document.getElementById('table-counter').innerText = total > 0 
+                ? `Hiển thị ${startIndex + 1} - ${endIndex} của ${total} mục (Trang ${currentPage}/${totalPages})`
+                : `Hiển thị 0 mục`;
+
+            renderPaginationControls(totalPages);
+        }
+
+        function renderPaginationControls(totalPages) {
+            const paginationDiv = document.getElementById('pagination-controls');
+            if (totalPages <= 1) {
+                paginationDiv.innerHTML = '';
+                return;
+            }
+
+            let html = `
+                <button onclick="goToPage(1)" ${currentPage === 1 ? 'disabled class="opacity-30 cursor-not-allowed"' : ''} class="px-2 py-0.5 border border-slate-200 rounded bg-white hover:bg-slate-50 text-slate-600 font-bold text-[10px]" title="Đầu">
+                    <i class="fa-solid fa-angles-left"></i>
+                </button>
+                <button onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled class="opacity-30 cursor-not-allowed"' : ''} class="px-2 py-0.5 border border-slate-200 rounded bg-white hover:bg-slate-50 text-slate-600 font-bold text-[10px]" title="Trước">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+            `;
+
+            let startP = Math.max(1, currentPage - 2);
+            let endP = Math.min(totalPages, currentPage + 2);
+
+            for(let p = startP; p <= endP; p++) {
+                if(p === currentPage) {
+                    html += `<button class="px-2.5 py-0.5 bg-blue-600 text-white rounded font-bold text-[11px] shadow-2xs">${p}</button>`;
+                } else {
+                    html += `<button onclick="goToPage(${p})" class="px-2.5 py-0.5 border border-slate-200 rounded bg-white hover:bg-slate-50 text-slate-700 font-semibold text-[11px]">${p}</button>`;
+                }
+            }
+
+            html += `
+                <button onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled class="opacity-30 cursor-not-allowed"' : ''} class="px-2 py-0.5 border border-slate-200 rounded bg-white hover:bg-slate-50 text-slate-600 font-bold text-[10px]" title="Sau">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+                <button onclick="goToPage(${totalPages})" ${currentPage === totalPages ? 'disabled class="opacity-30 cursor-not-allowed"' : ''} class="px-2 py-0.5 border border-slate-200 rounded bg-white hover:bg-slate-50 text-slate-600 font-bold text-[10px]" title="Cuối">
+                    <i class="fa-solid fa-angles-right"></i>
+                </button>
+            `;
+
+            paginationDiv.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            renderTable();
         }
 
         async function exportExcel() {
-            const { data, error } = await sb.from('pakn').select('*').order('id', { ascending: false });
-            if (error || !data || data.length === 0) return alert("Không có dữ liệu để xuất Excel!");
+            const dataToExport = filteredPaknList.length > 0 ? filteredPaknList : allPaknList;
+            if (!dataToExport || dataToExport.length === 0) return alert("Không có dữ liệu để xuất Excel!");
 
-            const excelData = data.map((item, index) => ({
+            const excelData = dataToExport.map((item, index) => ({
                 "STT": index + 1,
                 "Họ và tên": item.ho_ten || "",
                 "Số điện thoại": item.so_dien_thoai || "",
@@ -476,82 +574,68 @@
         }
 
         async function deleteAllPakn() {
-    if (!confirm("⚠️ CẢNH BÁO QUAN TRỌNG:\nBạn có chắc chắn muốn XÓA TẤT CẢ phản ánh và TOÀN BỘ FILE đính kèm trên Supabase?\n\nThao tác này KHÔNG THỂ khôi phục!")) {
-        return;
-    }
+            if (!confirm("⚠️ CẢNH BÁO:\nBạn có chắc chắn muốn XÓA TẤT CẢ phản ánh và TOÀN BỘ FILE?\n\nThao tác này KHÔNG THỂ khôi phục!")) return;
 
-    try {
-        // 1. Lấy toàn bộ danh sách để trích xuất link file
-        const { data: allPakn, error: fetchErr } = await sb.from('pakn').select('id, tep_dinh_kem, tep_tra_loi');
-        if (fetchErr) throw fetchErr;
+            try {
+                const { data: allPakn, error: fetchErr } = await sb.from('pakn').select('id, tep_dinh_kem, tep_tra_loi');
+                if (fetchErr) throw fetchErr;
 
-        if (!allPakn || allPakn.length === 0) {
-            return alert("Không có dữ liệu nào để xóa!");
-        }
+                if (!allPakn || allPakn.length === 0) return alert("Không có dữ liệu nào để xóa!");
 
-        // 2. Thu thập danh sách tên file trong bucket 'attachments'
-        const filesToDelete = [];
-        allPakn.forEach(item => {
-            [item.tep_dinh_kem, item.tep_tra_loi].forEach(url => {
-                if (url && url.includes('/attachments/')) {
-                    const fileName = decodeURIComponent(url.split('/attachments/').pop().split('?')[0]);
-                    if (fileName) filesToDelete.push(fileName);
+                const filesToDelete = [];
+                allPakn.forEach(item => {
+                    [item.tep_dinh_kem, item.tep_tra_loi].forEach(url => {
+                        if (url && url.includes('/attachments/')) {
+                            const fileName = decodeURIComponent(url.split('/attachments/').pop().split('?')[0]);
+                            if (fileName) filesToDelete.push(fileName);
+                        }
+                    });
+                });
+
+                if (filesToDelete.length > 0) {
+                    await sb.storage.from('attachments').remove(filesToDelete);
                 }
-            });
-        });
 
-        // 3. Xóa các file trong Storage của Supabase
-        if (filesToDelete.length > 0) {
-            const { error: storageErr } = await sb.storage.from('attachments').remove(filesToDelete);
-            if (storageErr) console.warn("Lỗi xóa file storage:", storageErr);
-        }
+                const { error: delErr } = await sb.from('pakn').delete().gt('id', 0);
+                if (delErr) throw delErr;
 
-        // 4. Xóa toàn bộ dữ liệu trong bảng Database
-        const { error: delErr } = await sb.from('pakn').delete().gt('id', 0);
-        if (delErr) throw delErr;
-
-        alert(`✅ Đã xóa sạch toàn bộ dữ liệu và ${filesToDelete.length} tệp đính kèm trên hệ thống!`);
-        loadPAKN();
-        initDashboard();
-    } catch (err) {
-        console.error("Lỗi khi xóa tất cả:", err);
-        alert("Lỗi: " + err.message);
-    }
-}
-
-        async function deleteRow(id) {
-    if (!confirm(`Bạn có chắc chắn muốn xóa phản ánh #${id} và các file đính kèm liên quan?`)) return;
-
-    try {
-        // 1. Lấy thông tin file của bản ghi này trước khi xóa
-        const { data } = await sb.from('pakn').select('tep_dinh_kem, tep_tra_loi').eq('id', id).single();
-        
-        if (data) {
-            const filesToDelete = [];
-            [data.tep_dinh_kem, data.tep_tra_loi].forEach(url => {
-                if (url && url.includes('/attachments/')) {
-                    const fileName = decodeURIComponent(url.split('/attachments/').pop().split('?')[0]);
-                    if (fileName) filesToDelete.push(fileName);
-                }
-            });
-
-            // 2. Xóa file đính kèm trong Storage
-            if (filesToDelete.length > 0) {
-                await sb.storage.from('attachments').remove(filesToDelete);
+                alert(`✅ Đã xóa sạch toàn bộ dữ liệu!`);
+                loadPAKN();
+                initDashboard();
+            } catch (err) {
+                console.error("Lỗi:", err);
+                alert("Lỗi: " + err.message);
             }
         }
 
-        // 3. Xóa dòng trong Database
-        await sb.from('pakn').delete().eq('id', id);
-        
-        alert("✅ Đã xóa thành công!");
-        loadPAKN();
-        initDashboard();
-    } catch (err) {
-        console.error("Lỗi khi xóa:", err);
-        alert("Có lỗi xảy ra khi xóa: " + err.message);
-    }
-}
+        async function deleteRow(id) {
+            if (!confirm(`Bạn có chắc chắn muốn xóa phản ánh #${id}?`)) return;
+
+            try {
+                const { data } = await sb.from('pakn').select('tep_dinh_kem, tep_tra_loi').eq('id', id).single();
+                if (data) {
+                    const filesToDelete = [];
+                    [data.tep_dinh_kem, data.tep_tra_loi].forEach(url => {
+                        if (url && url.includes('/attachments/')) {
+                            const fileName = decodeURIComponent(url.split('/attachments/').pop().split('?')[0]);
+                            if (fileName) filesToDelete.push(fileName);
+                        }
+                    });
+
+                    if (filesToDelete.length > 0) {
+                        await sb.storage.from('attachments').remove(filesToDelete);
+                    }
+                }
+
+                await sb.from('pakn').delete().eq('id', id);
+                alert("✅ Đã xóa thành công!");
+                loadPAKN();
+                initDashboard();
+            } catch (err) {
+                console.error("Lỗi khi xóa:", err);
+                alert("Có lỗi xảy ra: " + err.message);
+            }
+        }
 
         async function viewDetail(id) {
             const { data } = await sb.from('pakn').select('*').eq('id', id).single();
@@ -567,22 +651,22 @@
             document.getElementById('m-reply-text').value = data.cau_tra_loi || "";
             
             document.getElementById('m-status').innerHTML = data.trang_thai === 'Đã trả lời' 
-                ? '<span class="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded text-[11px] font-bold border border-emerald-200">Đã trả lời</span>'
-                : '<span class="bg-amber-50 text-amber-700 px-2 py-0.5 rounded text-[11px] font-bold border border-amber-200">Chưa trả lời</span>';
+                ? '<span class="bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded text-[10px] font-bold border border-emerald-200">Đã trả lời</span>'
+                : '<span class="bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded text-[10px] font-bold border border-amber-200">Chưa trả lời</span>';
             
             const fb = document.getElementById('m-file-link');
             if(data.tep_dinh_kem) {
-                fb.innerHTML = `<a href="${data.tep_dinh_kem}" target="_blank" class="flex items-center justify-between bg-blue-50 hover:bg-blue-100 p-2.5 rounded-lg text-blue-700 font-bold text-xs border border-blue-100 transition-all"><span><i class="fa-solid fa-file-alt mr-2"></i>Xem tệp đính kèm</span><span class="bg-blue-600 text-white px-2 py-0.5 rounded text-[10px]">Tải xuống</span></a>`;
+                fb.innerHTML = `<a href="${data.tep_dinh_kem}" target="_blank" class="flex items-center justify-between bg-blue-50 hover:bg-blue-100 p-2 rounded text-blue-700 font-bold text-[11px] border border-blue-100"><span><i class="fa-solid fa-file-alt mr-1.5"></i>Xem tệp đính kèm</span><span class="bg-blue-600 text-white px-1.5 py-0.5 rounded text-[9px]">Mở</span></a>`;
             } else {
-                fb.innerHTML = `<span class="text-xs text-slate-400 italic">Không có tệp đính kèm</span>`;
+                fb.innerHTML = `<span class="text-[11px] text-slate-400 italic">Không có tệp đính kèm</span>`;
             }
 
             const replyFileBox = document.getElementById('m-reply-file-link');
             if (replyFileBox) {
                 if (data.tep_tra_loi) {
-                    replyFileBox.innerHTML = `<a href="${data.tep_tra_loi}" target="_blank" class="text-blue-600 underline text-xs font-medium inline-flex items-center gap-1 mt-1"><i class="fa-solid fa-paperclip"></i> Tệp trả lời hiện tại đang có</a>`;
+                    replyFileBox.innerHTML = `<a href="${data.tep_tra_loi}" target="_blank" class="text-blue-600 underline text-[11px] font-medium inline-flex items-center gap-1 mt-0.5"><i class="fa-solid fa-paperclip"></i> Tệp trả lời hiện tại</a>`;
                 } else {
-                    replyFileBox.innerHTML = `<span class="text-xs text-slate-400 italic">Chưa có tệp trả lời</span>`;
+                    replyFileBox.innerHTML = `<span class="text-[11px] text-slate-400 italic">Chưa có tệp trả lời</span>`;
                 }
             }
 
@@ -593,7 +677,6 @@
                 const btnSave = document.getElementById('m-btn-save');
                 const originalHtml = btnSave.innerHTML;
 
-                // 1. Khóa nút và hiển thị trạng thái đang xử lý
                 btnSave.disabled = true;
                 btnSave.classList.add('opacity-75', 'cursor-not-allowed');
                 btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs"></i> Đang xử lý...';
@@ -602,9 +685,8 @@
                     let replyFileUrl = data.tep_tra_loi || "";
                     const replyFileInput = document.getElementById('m-reply-file');
                     
-                    // Nếu có chọn tệp trả lời -> Tải lên Supabase Storage
                     if (replyFileInput.files && replyFileInput.files[0]) {
-                        btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs"></i> Đang tải tệp đính kèm...';
+                        btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs"></i> Đang tải tệp...';
                         const file = replyFileInput.files[0];
                         const cleanName = file.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9.]/g, '_');
                         const fName = "reply_" + Date.now() + "_" + cleanName;
@@ -615,8 +697,7 @@
                         }
                     }
 
-                    // 2. Cập nhật dữ liệu vào Database Supabase
-                    btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs"></i> Đang lưu câu trả lời...';
+                    btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs"></i> Đang lưu...';
                     const updatePayload = {
                         cau_tra_loi: replyText,
                         trang_thai: 'Đã trả lời',
@@ -625,21 +706,19 @@
 
                     const { data: updatedRecord, error } = await sb.from('pakn').update(updatePayload).eq('id', id).select().single();
                     if(error) {
-                        alert("Lỗi khi lưu: " + error.message);
+                        alert("Lỗi: " + error.message);
                     } else { 
-                        // 3. Đồng bộ sang Google Sheets & Drive
-                        btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs"></i> Đang đồng bộ Google Sheets...';
+                        btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs"></i> Đồng bộ Sheets...';
                         await syncToGoogle(updatedRecord || { ...data, ...updatePayload });
                         
-                        alert("✅ Lưu và đồng bộ câu trả lời thành công!"); 
+                        alert("✅ Lưu và đồng bộ thành công!"); 
                         closeModal(); 
                         loadPAKN(); 
                     }
                 } catch (err) {
                     console.error("Lỗi:", err);
-                    alert("Có lỗi xảy ra trong quá trình lưu dữ liệu!");
+                    alert("Có lỗi xảy ra!");
                 } finally {
-                    // Khôi phục lại trạng thái ban đầu của nút bấm
                     btnSave.disabled = false;
                     btnSave.classList.remove('opacity-75', 'cursor-not-allowed');
                     btnSave.innerHTML = originalHtml;
@@ -649,7 +728,7 @@
             document.getElementById('m-btn-del').onclick = async () => {
                 if(confirm("Bạn có chắc chắn muốn xóa phản ánh này?")) {
                     await sb.from('pakn').delete().eq('id', id);
-                    alert("Đã xóa thành công!");
+                    alert("Đã xóa!");
                     closeModal();
                     loadPAKN();
                 }
@@ -671,7 +750,7 @@
             
             const { error } = await sb.from('tuyen_truyen').insert([{ tieu_de: t, duong_dan: l }]);
             if(error) alert("Lỗi: " + error.message);
-            else { alert("Đã lưu bài tuyên truyền thành công!"); document.getElementById('nt').value = ""; document.getElementById('nl').value = ""; }
+            else { alert("Đã lưu thành công!"); document.getElementById('nt').value = ""; document.getElementById('nl').value = ""; }
         }
 
         async function loadNews() {
@@ -679,15 +758,15 @@
             const b = document.getElementById('list-news');
             b.innerHTML = "";
             if(!data || data.length === 0) {
-                b.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-slate-400">Chưa có bài viết tuyên truyền nào.</td></tr>`;
+                b.innerHTML = `<tr><td colspan="3" class="py-3 text-center text-slate-400">Chưa có bài viết.</td></tr>`;
                 return;
             }
             data.forEach(n => {
                 b.innerHTML += `
                 <tr class="hover:bg-slate-50 transition-all border-b border-slate-100">
-                    <td class="py-2.5 px-2 font-bold text-slate-800">${n.tieu_de}</td>
-                    <td class="py-2.5 px-2 text-xs text-blue-600 truncate max-w-xs font-medium"><a href="${n.duong_dan}" target="_blank" class="hover:underline">${n.duong_dan}</a></td>
-                    <td class="py-2.5 px-2 text-right"><button onclick="deleteNews(${n.id})" class="bg-rose-50 hover:bg-rose-500 text-rose-500 hover:text-white px-2 py-0.5 rounded font-bold text-[11px] transition-all border border-rose-200">Xóa</button></td>
+                    <td class="py-2 px-2 font-bold text-slate-800">${n.tieu_de}</td>
+                    <td class="py-2 px-2 text-xs text-blue-600 truncate max-w-xs font-medium"><a href="${n.duong_dan}" target="_blank" class="hover:underline">${n.duong_dan}</a></td>
+                    <td class="py-2 px-2 text-right"><button onclick="deleteNews(${n.id})" class="bg-rose-50 hover:bg-rose-500 text-rose-500 hover:text-white px-2 py-0.5 rounded font-bold text-[10px] transition-all border border-rose-200">Xóa</button></td>
                 </tr>`;
             });
         }
@@ -714,43 +793,34 @@
             }
         }
 
-        // HÀM ĐỒNG BỘ TOÀN BỘ (NÚT BẤM CHO ADMIN)
         async function syncAllToGoogle() {
-    const btn = document.getElementById('btn-sync-google');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang tải dữ liệu...';
+            const btn = document.getElementById('btn-sync-google');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang lấy dữ liệu...';
 
-    try {
-        // 1. Lấy toàn bộ dữ liệu mới nhất từ Supabase
-        const { data, error } = await sb.from('pakn').select('*').order('id', { ascending: true });
-        
-        if (error || !data || data.length === 0) {
-            alert("Không có phản ánh nào để đồng bộ!");
-            return;
+            try {
+                const { data, error } = await sb.from('pakn').select('*').order('id', { ascending: true });
+                if (error || !data || data.length === 0) return alert("Không có phản ánh nào để đồng bộ!");
+
+                btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Đang đồng bộ...`;
+
+                await fetch(GOOGLE_WEBHOOK_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({ records: data })
+                });
+
+                await new Promise(r => setTimeout(r, 3000));
+                alert(`✅ Đã đồng bộ thành công ${data.length} dữ liệu!`);
+            } catch (err) {
+                console.error("Lỗi đồng bộ:", err);
+                alert("Lỗi khi kết nối tới máy chủ Google!");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Đồng bộ';
+            }
         }
-
-        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Đang đồng bộ ${data.length} dữ liệu...`;
-
-        // 2. Gửi trực tiếp mảng dữ liệu sang Google Apps Script
-        await fetch(GOOGLE_WEBHOOK_URL, {
-            method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify({ records: data })
-        });
-
-        // 3. Đợi vài giây để Google Drive lưu file và ghi vào Google Sheets
-        await new Promise(r => setTimeout(r, 3000));
-        alert(`✅ Đã đồng bộ thành công ${data.length} dữ liệu!`);
-    } catch (err) {
-        console.error("Lỗi đồng bộ:", err);
-        alert("Lỗi khi kết nối tới máy chủ Google!");
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Đồng bộ dữ liệu';
-    }
-}
-
     </script>
 </body>
 </html>
