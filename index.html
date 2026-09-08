@@ -142,6 +142,14 @@
                         <h3 class="font-bold text-slate-800 flex items-center gap-1.5 text-[10px] uppercase tracking-wider">
                             <i class="fa-solid fa-file-lines text-amber-600"></i> Danh sách phản ánh, kiến nghị
                         </h3>
+<div class="flex items-center gap-1.5 text-[10px] font-semibold">
+    <span class="bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-md">
+        Tổng số: <strong id="filter-stat-total">0</strong>
+    </span>
+    <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-md">
+        Đã trả lời: <strong id="filter-stat-done">0</strong>
+    </span>
+</div>                        
                         <div class="flex items-center flex-wrap gap-1.5 w-full sm:w-auto justify-end">
                             <button id="btn-sync-google" onclick="syncAllToGoogle()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded text-[11px] font-bold transition-all flex items-center gap-1">
                                 <i class="fa-solid fa-arrows-rotate text-[10px]"></i> Đồng bộ
@@ -520,6 +528,11 @@ function updateChartByYear() {
             
             if (currentPage > totalPages) currentPage = totalPages;
             if (currentPage < 1) currentPage = 1;
+
+// Cập nhật 2 con số thống kê theo danh sách đang lọc
+const doneCount = filteredPaknList.filter(i => i.trang_thai === 'Đã trả lời').length;
+document.getElementById('filter-stat-total').innerText = total;
+document.getElementById('filter-stat-done').innerText = doneCount;            
 
             const startIndex = (currentPage - 1) * PAGE_SIZE;
             const endIndex = Math.min(startIndex + PAGE_SIZE, total);
