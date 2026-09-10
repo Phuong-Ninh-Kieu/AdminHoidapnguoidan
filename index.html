@@ -54,7 +54,7 @@
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-slate-600 mb-1 flex items-center gap-1.5"><i class="fa-solid fa-lock text-slate-400"></i> Mật khẩu</label>
-                    <input type="password" id="p" placeholder="••••••••" class="w-full bg-white border border-slate-200 px-3 py-2 rounded-lg outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-500 text-xs font-medium text-slate-800">
+                    <input type="password" id="p" placeholder="••••••••" onkeydown="if(event.key === 'Enter') login()" class="w-full bg-white border border-slate-200 px-3 py-2 rounded-lg outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-500 text-xs font-medium text-slate-800">
                 </div>
                 <button onclick="login()" class="w-full bg-[#1e293b] hover:bg-slate-800 text-white py-2.5 rounded-lg font-bold text-xs shadow-md transition-all active:scale-[0.98] mt-2 flex items-center justify-center gap-2">
                     <i class="fa-solid fa-lock text-amber-400 text-[11px]"></i> Đăng nhập
